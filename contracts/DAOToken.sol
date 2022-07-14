@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract EnglisterToken is ERC20, AccessControl {
+contract DAOToken is ERC20, AccessControl {
     string public TOKEN_NAME;
     string public TOKEN_SYMBOL;
     uint256 public TOKEN_INITIAL_SUPPLY;

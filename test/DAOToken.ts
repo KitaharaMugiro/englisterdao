@@ -3,7 +3,7 @@ import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("EnglisterToken", function () {
+describe("DAOToken", function () {
     // We define a fixture to reuse the same setup in every test.
     // We use loadFixture to run this setup once, snapshot that state,
     // and reset Hardhat Network to that snapshopt in every test.
@@ -11,7 +11,7 @@ describe("EnglisterToken", function () {
         // Contracts are deployed using the first signer/account by default
         const [owner, otherAccount, otherAccount2] = await ethers.getSigners();
 
-        const EnglisterToken = await ethers.getContractFactory("EnglisterToken");
+        const EnglisterToken = await ethers.getContractFactory("DAOToken");
         const NAME = "Englister"
         const SYMBOL = "ENG"
         const INITIAL_SUPPLY = 100;
