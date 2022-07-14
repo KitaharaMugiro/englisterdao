@@ -4,11 +4,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract DAOToken is ERC20, AccessControl {
-    string public TOKEN_NAME;
-    string public TOKEN_SYMBOL;
-    uint256 public TOKEN_INITIAL_SUPPLY;
-    uint256 public TOKEN_DECIMALS;
-
     // Roles
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
@@ -18,8 +13,7 @@ contract DAOToken is ERC20, AccessControl {
         string memory _tokenSymbol,
         uint256 _tokenInitialSupply
     ) ERC20(_tokenName, _tokenSymbol) {
-        TOKEN_INITIAL_SUPPLY = _tokenInitialSupply;
-        _mint(msg.sender, TOKEN_INITIAL_SUPPLY);
+        _mint(msg.sender, _tokenInitialSupply);
 
         //TEMPORARY: 作成者にロールを設定する(仕様検討後削除する可能性あり)
         _setupRole(MINTER_ROLE, msg.sender);
