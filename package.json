@@ -9,7 +9,8 @@
     "clean": "npx hardhat clean",
     "test": "npx hardhat test",
     "deploy": "npx hardhat run scripts/deploy.ts",
-    "deploy-dev": "npx hardhat run scripts/deploy.ts --network localhost"
+    "deploy-dev": "npx hardhat run scripts/deploy.ts --network localhost",
+    "deploy-goerli": "npx hardhat run scripts/deploy.ts --network goerli"
   },
   "keywords": [],
   "author": "",
