@@ -65,6 +65,50 @@ describe("DAOToken", function () {
         });
     });
 
+    describe("GetTopN", function () {
+        it("トークンの上位3件を取得できる", async function () {
+            const { token, owner, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
+
+            await token.connect(owner).batchTransfer(
+                [otherAccount.address, otherAccount2.address],
+                [20, 10]);
+
+            const expected = [owner.address, otherAccount.address, otherAccount2.address]
+            const result = await token.getTop(3);
+            expect(result[0]).to.equal(expected[0]);
+            expect(result[1]).to.equal(expected[1]);
+            expect(result[2]).to.equal(expected[2]);
+        });
+
+        it("トークンの上位2件を取得できる", async function () {
+            const { token, owner, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
+
+            await token.connect(owner).batchTransfer(
+                [otherAccount.address, otherAccount2.address],
+                [10, 20]);
+
+            const expected = [owner.address, otherAccount2.address]
+            const result = await token.getTop(2);
+            expect(result[0]).to.equal(expected[0]);
+            expect(result[1]).to.equal(expected[1]);
+        });
+
+        it("上位4件取ろうとすると最後はaddress(0)が入っている", async function () {
+            const { token, owner, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
+
+            await token.connect(owner).batchTransfer(
+                [otherAccount.address, otherAccount2.address],
+                [10, 20]);
+
+            const expected = [owner.address, otherAccount2.address, otherAccount.address, "0x0000000000000000000000000000000000000000"]
+            const result = await token.getTop(4);
+            expect(result[0]).to.equal(expected[0]);
+            expect(result[1]).to.equal(expected[1]);
+            expect(result[2]).to.equal(expected[2]);
+            expect(result[3]).to.equal(expected[3]);
+        });
+    })
+
     describe("Mint", function () {
         it("MINTER_ROLEは通貨を新規発行することができる", async function () {
             //NOT YET IMPLEMENTED
