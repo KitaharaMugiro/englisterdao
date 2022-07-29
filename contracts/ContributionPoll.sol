@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "hardhat/console.sol";
 
 contract ContributionPoll is AccessControl {
-    int256 pollId = 0;
+    int256 public pollId = 0;
 
     /**
      * @notice Settle the current poll, and start new poll
