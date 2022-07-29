@@ -6,7 +6,6 @@ require('dotenv').config();
 
 // hardhat-gas-reporter
 const COINMARKETCAP = process.env.COINMARKETCAP || ''
-console.log(process.env)
 const config: HardhatUserConfig = {
   solidity: "0.8.9",
   defaultNetwork: "hardhat",

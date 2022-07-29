@@ -119,7 +119,6 @@ contract DAOToken is ERC20, AccessControl {
         address[] memory exceptAddressMap = new address[](_limit);
         for (uint256 index = 0; index < _limit; index++) {
             address topAddress = _getTopAddress(exceptAddressMap);
-            console.log("topAddress: ", topAddress);
             topAddresses[index] = topAddress;
             topBalances[index] = balanceOf(topAddress);
             exceptAddressMap[index] = topAddress;

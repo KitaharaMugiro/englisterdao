@@ -20,7 +20,46 @@ describe("ContributionPoll", function () {
     describe("Deployment", function () {
         it("poll Idの初期値は0", async function () {
             const { poll } = await loadFixture(deploy);
-            expect(await poll.pollId).to.equal(0);
+            expect(await poll.pollId()).to.equal(0);
+        });
+    });
+
+    describe("SettleAndCreateNewPoll", function () {
+        it("Pollを終了すると、pollIdがインクリメントされる", async function () {
+            const { poll } = await loadFixture(deploy);
+            poll.settleAndCreateNewPoll();
+            expect(await poll.pollId()).to.equal(1);
+        });
+    });
+
+    describe("Candidate", function () {
+        it("最初は候補者は誰もいない", async function () {
+            const { poll } = await loadFixture(deploy);
+            const candidates = await poll.getCandidates();
+            expect(candidates).to.lengthOf(0);
+        });
+
+        it("立候補すると候補者が追加される(1人)", async function () {
+            const { poll } = await loadFixture(deploy);
+            await poll.candidateToContributionPoll()
+            const candidates = await poll.getCandidates();
+            expect(candidates).to.lengthOf(1);
+        });
+
+        it("立候補すると候補者が追加される(2人)", async function () {
+            const { poll, otherAccount } = await loadFixture(deploy);
+            await poll.candidateToContributionPoll()
+            await poll.connect(otherAccount).candidateToContributionPoll()
+            const candidates = await poll.getCandidates();
+            expect(candidates).to.lengthOf(2);
+        });
+
+        it("同じ人が立候補することはできない", async function () {
+            const { poll } = await loadFixture(deploy);
+            await poll.candidateToContributionPoll()
+            await expect(poll.candidateToContributionPoll()).to.be.revertedWith("You are already candidate to the current poll.");
+            const candidates = await poll.getCandidates();
+            expect(candidates).to.lengthOf(1);
         });
     });
 });
