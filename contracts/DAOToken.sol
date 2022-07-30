@@ -9,19 +9,22 @@ contract DAOToken is ERC20, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
 
-    // Holder Set
+    /**
+     * @notice 重複なしのホルダーリストを作成するためのstruct
+     */
     struct HolderSet {
         address[] values;
-        mapping(address => bool) is_in;
+        mapping(address => bool) exists;
     }
 
     HolderSet holders;
 
     function addHolder(address a) public {
-        if (!holders.is_in[a]) {
-            holders.values.push(a);
-            holders.is_in[a] = true;
+        if (holders.exists[a]) {
+            return;
         }
+        holders.values.push(a);
+        holders.exists[a] = true;
     }
 
     constructor(
@@ -37,7 +40,9 @@ contract DAOToken is ERC20, AccessControl {
         _setupRole(BURNER_ROLE, msg.sender);
     }
 
-    // MINTER_ROLE can mint new tokens
+    /**
+     * @notice MINTER_ROLE can mint new tokens
+     */
     function mint(address to, uint256 amount) external {
         // Check that the calling account has the minter role
         require(hasRole(MINTER_ROLE, msg.sender), "Caller is not a minter");
@@ -45,13 +50,18 @@ contract DAOToken is ERC20, AccessControl {
         addHolder(to);
     }
 
-    // BURNER_ROLE can burn tokens
+    /**
+     * @notice BURNER_ROLE can burn tokens
+     */
     function burn(address from, uint256 amount) external {
         // Check that the calling account has the minter role
         require(hasRole(BURNER_ROLE, msg.sender), "Caller is not a burner");
         _burn(from, amount);
     }
 
+    /**
+     * @notice 特定のアドレスに対してトークンを送る
+     */
     function transfer(address to, uint256 amount)
         public
         virtual
@@ -63,6 +73,9 @@ contract DAOToken is ERC20, AccessControl {
         return true;
     }
 
+    /**
+     * @notice 複数のアドレスに対してトークンを送る
+     */
     function batchTransfer(address[] memory _to, uint256[] memory _value)
         external
     {
@@ -73,23 +86,30 @@ contract DAOToken is ERC20, AccessControl {
         }
     }
 
+    /**
+     * @notice holderAddressがexceptAddressListに入っているかチェックする
+     * TODO: Array.containsを使うことでリファクタリングする
+     */
     function _checkSkip(
-        address[] memory exceptAddressMap,
+        address[] memory exceptAddressList,
         address holderAddress
     ) internal view returns (bool) {
         for (
             uint256 exceptIndex = 0;
-            exceptIndex < exceptAddressMap.length;
+            exceptIndex < exceptAddressList.length;
             exceptIndex++
         ) {
-            if (holderAddress == exceptAddressMap[exceptIndex]) {
+            if (holderAddress == exceptAddressList[exceptIndex]) {
                 return true;
             }
         }
         return false;
     }
 
-    function _getTopAddress(address[] memory exceptAddressMap)
+    /**
+     * @notice exceptAddressListを除いた上で最もトークンを保有したホルダーを返す
+     */
+    function _getTopAddress(address[] memory exceptAddressList)
         internal
         view
         returns (address)
@@ -99,7 +119,7 @@ contract DAOToken is ERC20, AccessControl {
 
         for (uint256 index = 0; index < holders.values.length; index++) {
             address holderAddress = holders.values[index];
-            if (_checkSkip(exceptAddressMap, holderAddress)) {
+            if (_checkSkip(exceptAddressList, holderAddress)) {
                 continue;
             }
 
@@ -112,17 +132,19 @@ contract DAOToken is ERC20, AccessControl {
         return topAddress;
     }
 
+    /**
+     * @notice get TOP holders order by the balance
+     */
     function getTop(uint256 _limit) public view returns (address[] memory) {
-        require(_limit < 5, "limit must be lesser than 5");
         address[] memory topAddresses = new address[](_limit);
         uint256[] memory topBalances = new uint256[](_limit);
-        address[] memory exceptAddressMap = new address[](_limit);
+        address[] memory exceptAddressList = new address[](_limit);
         for (uint256 index = 0; index < _limit; index++) {
-            address topAddress = _getTopAddress(exceptAddressMap);
+            address topAddress = _getTopAddress(exceptAddressList);
             console.log("topAddress: ", topAddress);
             topAddresses[index] = topAddress;
             topBalances[index] = balanceOf(topAddress);
-            exceptAddressMap[index] = topAddress;
+            exceptAddressList[index] = topAddress;
         }
         return topAddresses;
     }
