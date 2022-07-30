@@ -15,6 +15,8 @@ contract ContributionPoll is AccessControl {
     int256 public pollId = 0;
     address public daoTokenAddress;
     uint256 private RANK_FOR_VOTE = 10; //DAOトークンの保有順位がRANK_FOR_VOTE以上なら投票可能
+    uint256 private CONTRIBUTOR_ASSIGNMENT_TOKEN = 5000; //貢献者に割り当てられるDAOトークンの数
+    uint256 private SUPPORTER_ASSIGNMENT_TOKEN = 3000; //投票者に割り当てられるDAOトークンの数
     mapping(int256 => address[]) candidates; // pollId => [candidate1, candidate2, ...]
 
     //TODO: votesからvotersは取得できるため、リファクタリングして削除する
@@ -46,10 +48,66 @@ contract ContributionPoll is AccessControl {
     }
 
     /**
-     * @notice Settle the current poll
+     * @notice Settle the current poll and totalize the result
      */
     function _settleContributionPoll() internal {
-        // TODO : 貢献度投票の集計を行う
+        // 貢献度投票の集計を行う
+
+        // 票を標準化する (TODO: 投票時に計算してもいいかも)
+        // 例: [(a, 4), (b, 5), (c,0)]という投票結果を[(a, 0.444), (b, 0.555), (c, 0)]に変換する
+        for (uint256 index = 0; index < votes[pollId].length; index++) {
+            Vote memory vote = votes[pollId][index];
+            uint256 totalPoints = 0;
+            for (
+                uint256 candidateIndex = 0;
+                candidateIndex < vote.candidates.length;
+                candidateIndex++
+            ) {
+                totalPoints += vote.points[candidateIndex];
+            }
+            for (
+                uint256 candidateIndex = 0;
+                candidateIndex < vote.candidates.length;
+                candidateIndex++
+            ) {
+                vote.points[candidateIndex] =
+                    vote.points[candidateIndex] /
+                    totalPoints;
+            }
+            votes[pollId][index] = vote;
+        }
+
+        // 投票結果を合算する
+        // ex:  [(a, 44.4), (b, 55.5), (c, 0)] + [(a,20), (c:100)] = [(a, 64.4), (b:55.5), (c:100)]
+        address[] memory summedCandidates;
+        uint256[] memory summedPoints;
+        for (uint256 index = 0; index < votes[pollId].length; index++) {
+            Vote memory vote = votes[pollId][index];
+            for (
+                uint256 candidateIndex = 0;
+                candidateIndex < vote.candidates.length;
+                candidateIndex++
+            ) {
+                address _candidate = vote.candidates[candidateIndex];
+                uint256 _points = vote.points[candidateIndex];
+                bool isExist = false;
+                for (
+                    uint256 summedCandidateIndex = 0;
+                    summedCandidateIndex < summedCandidates.length;
+                    summedCandidateIndex++
+                ) {
+                    if (summedCandidates[summedCandidateIndex] == _candidate) {
+                        summedPoints[summedCandidateIndex] += _points;
+                        isExist = true;
+                        break;
+                    }
+                }
+                if (!isExist) {
+                    summedCandidates.push(_candidate);
+                    summedPoints.push(_points);
+                }
+            }
+        }
     }
 
     /**
