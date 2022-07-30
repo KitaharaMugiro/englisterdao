@@ -15,13 +15,13 @@ struct Vote {
 contract ContributionPoll is AccessControl {
     int256 public pollId = 0;
     address public daoTokenAddress;
-    uint256 private RANK_FOR_VOTE = 10; //DAOトークンの保有順位がRANK_FOR_VOTE以上なら投票可能
-    uint256 private CONTRIBUTOR_ASSIGNMENT_TOKEN = 5000; //貢献者に割り当てられるDAOトークンの数
-    uint256 private SUPPORTER_ASSIGNMENT_TOKEN = 3000; //投票者に割り当てられるDAOトークンの数
-    mapping(int256 => address[]) candidates; // pollId => [candidate1, candidate2, ...]
+    uint256 public RANK_FOR_VOTE = 10; //DAOトークンの保有順位がRANK_FOR_VOTE以上なら投票可能
+    uint256 public CONTRIBUTOR_ASSIGNMENT_TOKEN = 5000; //貢献者に割り当てられるDAOトークンの数
+    uint256 public SUPPORTER_ASSIGNMENT_TOKEN = 3000; //投票者に割り当てられるDAOトークンの数
+    mapping(int256 => address[]) public candidates; // pollId => [candidate1, candidate2, ...]
 
     //TODO: votesからvotersは取得できるため、リファクタリングして削除する
-    mapping(int256 => address[]) voters; // pollId => [candidate1, candidate2, ...]
+    mapping(int256 => address[]) public voters; // pollId => [candidate1, candidate2, ...]
     mapping(int256 => Vote[]) public votes; // pollId => [vote1, vote2, ...]
 
     /**
