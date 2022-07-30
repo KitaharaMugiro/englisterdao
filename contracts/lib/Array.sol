@@ -15,4 +15,17 @@ library Array {
         }
         return false;
     }
+
+    function contains(int256[] memory a, int256 b)
+        internal
+        pure
+        returns (bool)
+    {
+        for (uint256 index = 0; index < a.length; index++) {
+            if (a[index] == b) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

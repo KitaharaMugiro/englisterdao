@@ -17,6 +17,19 @@ describe("ContributionPoll", function () {
         return { poll, owner, otherAccount };
     }
 
+    async function deployToken() {
+        // Contracts are deployed using the first signer/account by default
+        const [owner, otherAccount, otherAccount2] = await ethers.getSigners();
+
+        const EnglisterToken = await ethers.getContractFactory("DAOToken");
+        const NAME = "Englister"
+        const SYMBOL = "ENG"
+        const INITIAL_SUPPLY = 100;
+        const token = await EnglisterToken.deploy(NAME, SYMBOL, INITIAL_SUPPLY);
+
+        return { token, owner, otherAccount, otherAccount2 };
+    }
+
     describe("Deployment", function () {
         it("poll Idの初期値は0", async function () {
             const { poll } = await loadFixture(deploy);
@@ -66,14 +79,36 @@ describe("ContributionPoll", function () {
     describe("Vote", function () {
         it("候補者がいない状況で投票することはできない", async function () {
             const { poll, owner } = await loadFixture(deploy);
+            const { token } = await deployToken();
+            await poll.setDaoTokenAddress(token.address);
             await expect(poll.vote(owner.address)).to.be.revertedWith("The candidate is not in the current poll.");
         });
 
         it("候補者がいれば投票をすることができる", async function () {
             const { poll, otherAccount } = await loadFixture(deploy);
+            const { token } = await deployToken();
+            await poll.setDaoTokenAddress(token.address);
             await poll.connect(otherAccount).candidateToContributionPoll()
-            const result = await poll.vote(otherAccount.address)
-            expect(result.value).to.equal(1);
+            await expect(await poll.vote(otherAccount.address)).to.be.not.revertedWith("The candidate is not in the current poll.");
+        });
+
+        it("2回投票することはできない", async function () {
+            const { poll, otherAccount } = await loadFixture(deploy);
+            const { token } = await deployToken();
+            await poll.setDaoTokenAddress(token.address);
+            await poll.connect(otherAccount).candidateToContributionPoll()
+
+            await poll.vote(otherAccount.address)
+            await expect(poll.vote(otherAccount.address)).to.be.revertedWith("You are already voted.");
+        });
+
+        it("DAOトークンのTOP10の保有者でなければ投票できない", async function () {
+            const { poll, otherAccount, owner } = await loadFixture(deploy);
+            const { token } = await deployToken();
+            await poll.setDaoTokenAddress(token.address);
+            await poll.connect(owner).candidateToContributionPoll()
+
+            await expect(poll.connect(otherAccount).vote(owner.address)).to.be.revertedWith("You are not in the top 10 holder.");
         });
     });
 });
