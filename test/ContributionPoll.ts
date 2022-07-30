@@ -62,4 +62,18 @@ describe("ContributionPoll", function () {
             expect(candidates).to.lengthOf(1);
         });
     });
+
+    describe("Vote", function () {
+        it("候補者がいない状況で投票することはできない", async function () {
+            const { poll, owner } = await loadFixture(deploy);
+            await expect(poll.vote(owner.address)).to.be.revertedWith("The candidate is not in the current poll.");
+        });
+
+        it("候補者がいれば投票をすることができる", async function () {
+            const { poll, otherAccount } = await loadFixture(deploy);
+            await poll.connect(otherAccount).candidateToContributionPoll()
+            const result = await poll.vote(otherAccount.address)
+            expect(result.value).to.equal(1);
+        });
+    });
 });
