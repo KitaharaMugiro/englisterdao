@@ -116,6 +116,7 @@ contract DAOToken is ERC20, AccessControl {
      * @notice get TOP holders order by the balance
      */
     function getTop(uint256 _limit) public view returns (address[] memory) {
+        //TODO: Quick sortして上位_limit件を返す方がいいかも
         address[] memory topAddresses = new address[](_limit);
         uint256[] memory topBalances = new uint256[](_limit);
         address[] memory exceptAddressMap = new address[](_limit);
