@@ -6,11 +6,21 @@ import "hardhat/console.sol";
 import "./lib/Array.sol";
 import "./DAOToken.sol";
 
+struct Vote {
+    address voter;
+    address[] candidates;
+    uint256[] points;
+}
+
 contract ContributionPoll is AccessControl {
     int256 public pollId = 0;
     address public daoTokenAddress;
+    uint256 private RANK_FOR_VOTE = 10; //DAOトークンの保有順位がRANK_FOR_VOTE以上なら投票可能
     mapping(int256 => address[]) candidates; // pollId => [candidate1, candidate2, ...]
+
+    //TODO: votesからvotersは取得できるため、リファクタリングして削除する
     mapping(int256 => address[]) voters; // pollId => [candidate1, candidate2, ...]
+    mapping(int256 => Vote[]) public votes; // pollId => [vote1, vote2, ...]
 
     /**
      * @notice DAO Token Addressを指定する
@@ -18,6 +28,14 @@ contract ContributionPoll is AccessControl {
      */
     function setDaoTokenAddress(address _daoTokenAddress) external {
         daoTokenAddress = _daoTokenAddress;
+    }
+
+    /**
+     * @notice RANK_FOR_VOTEを指定する
+     * TODO: 権限設定
+     */
+    function setRankForVote(uint256 _rankForVote) external {
+        RANK_FOR_VOTE = _rankForVote;
     }
 
     /**
@@ -59,9 +77,9 @@ contract ContributionPoll is AccessControl {
     /**
      * @notice SenderがDAO TokenのTop10のホルダーであるかをチェックする
      */
-    function _isTop10() internal view returns (bool) {
+    function _isTopHolder() internal view returns (bool) {
         DAOToken daoToken = DAOToken(daoTokenAddress);
-        if (Array.contains(daoToken.getTop(10), msg.sender)) {
+        if (Array.contains(daoToken.getTop(RANK_FOR_VOTE), msg.sender)) {
             return true;
         }
         return false;
@@ -70,20 +88,56 @@ contract ContributionPoll is AccessControl {
     /**
      * @notice vote to the current poll
      */
-    function vote(address candidate) external returns (bool) {
-        // Check if the candidate is in the current poll
-        require(
-            Array.contains(candidates[pollId], candidate),
-            "The candidate is not in the current poll."
-        );
+    function vote(address[] memory _candidates, uint256[] memory _points)
+        external
+        returns (bool)
+    {
+        // DAOトークンのTOP10に入っていない場合は投票することはできない
+        require(_isTopHolder(), "You are not in the top 10 holder.");
+
         // Check if the voter is already voted
+        // TODO:投票を上書きする処理を書いた後にこの制限をなくす
         require(
             !Array.contains(voters[pollId], msg.sender),
             "You are already voted."
         );
 
-        // DAOトークンのTOP10に入っていない場合は投票することはできない
-        require(_isTop10(), "You are not in the top 10 holder.");
+        // Check if the points and candidates are the same length
+        require(
+            _points.length == _candidates.length,
+            "The number of points is not valid."
+        );
+
+        for (uint256 index = 0; index < _candidates.length; index++) {
+            // Check if the candidate is in the current poll
+            require(
+                Array.contains(candidates[pollId], _candidates[index]),
+                "The candidate is not in the current poll."
+            );
+
+            // Check if the points are valid
+            require(
+                _points[index] >= 0,
+                "The points are not valid. (0 <= points)"
+            );
+            require(
+                _points[index] <= 20,
+                "The points are not valid. (points < 20)"
+            );
+
+            // 自分のポイントは必ずゼロにする
+            if (_candidates[index] == msg.sender) {
+                _points[index] = 0;
+            }
+        }
+
+        //投票を記録
+        Vote memory _vote = Vote({
+            voter: msg.sender,
+            candidates: _candidates,
+            points: _points
+        });
+        votes[pollId].push(_vote);
 
         // 投票した人を記録
         voters[pollId].push(msg.sender);
@@ -96,5 +150,12 @@ contract ContributionPoll is AccessControl {
      */
     function getCandidates() external view returns (address[] memory) {
         return candidates[pollId];
+    }
+
+    /**
+     * @notice get the current poll's votes
+     */
+    function getVotes() external view returns (Vote[] memory) {
+        return votes[pollId];
     }
 }

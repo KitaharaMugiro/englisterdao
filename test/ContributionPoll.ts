@@ -81,7 +81,7 @@ describe("ContributionPoll", function () {
             const { poll, owner } = await loadFixture(deploy);
             const { token } = await deployToken();
             await poll.setDaoTokenAddress(token.address);
-            await expect(poll.vote(owner.address)).to.be.revertedWith("The candidate is not in the current poll.");
+            await expect(poll.vote([owner.address], [1])).to.be.revertedWith("The candidate is not in the current poll.");
         });
 
         it("候補者がいれば投票をすることができる", async function () {
@@ -89,7 +89,7 @@ describe("ContributionPoll", function () {
             const { token } = await deployToken();
             await poll.setDaoTokenAddress(token.address);
             await poll.connect(otherAccount).candidateToContributionPoll()
-            await expect(await poll.vote(otherAccount.address)).to.be.not.revertedWith("The candidate is not in the current poll.");
+            await expect(await poll.vote([otherAccount.address], [1])).to.be.not.revertedWith("The candidate is not in the current poll.");
         });
 
         it("2回投票することはできない", async function () {
@@ -98,8 +98,8 @@ describe("ContributionPoll", function () {
             await poll.setDaoTokenAddress(token.address);
             await poll.connect(otherAccount).candidateToContributionPoll()
 
-            await poll.vote(otherAccount.address)
-            await expect(poll.vote(otherAccount.address)).to.be.revertedWith("You are already voted.");
+            await poll.vote([otherAccount.address], [1])
+            await expect(poll.vote([otherAccount.address], [1])).to.be.revertedWith("You are already voted.");
         });
 
         it("DAOトークンのTOP10の保有者でなければ投票できない", async function () {
@@ -108,7 +108,60 @@ describe("ContributionPoll", function () {
             await poll.setDaoTokenAddress(token.address);
             await poll.connect(owner).candidateToContributionPoll()
 
-            await expect(poll.connect(otherAccount).vote(owner.address)).to.be.revertedWith("You are not in the top 10 holder.");
+            await expect(poll.connect(otherAccount).vote([owner.address], [1])).to.be.revertedWith("You are not in the top 10 holder.");
+        });
+
+        it("投票で21ポイント以上をつけることはできない", async function () {
+            const { poll, otherAccount } = await loadFixture(deploy);
+            const { token } = await deployToken();
+            await poll.setDaoTokenAddress(token.address);
+            await poll.connect(otherAccount).candidateToContributionPoll()
+
+            await expect(poll.vote([otherAccount.address], [21])).to.be.revertedWith("The points are not valid. (points < 20)");
+        });
+
+        it("投票者の数とポイントの数が一致している必要がある", async function () {
+            const { poll, otherAccount } = await loadFixture(deploy);
+            const { token } = await deployToken();
+            await poll.setDaoTokenAddress(token.address);
+            await poll.connect(otherAccount).candidateToContributionPoll()
+
+            await expect(poll.vote([otherAccount.address], [1, 2])).to.be.revertedWith("The number of points is not valid.");
+        });
+
+        it("投票がされれば投票結果が保存される(1件)", async function () {
+            const { poll, otherAccount } = await loadFixture(deploy);
+            const { token } = await deployToken();
+
+            await poll.setDaoTokenAddress(token.address);
+            await poll.connect(otherAccount).candidateToContributionPoll()
+
+            await poll.vote([otherAccount.address], [1])
+
+            const votes = await poll.getVotes();
+            expect(votes).to.lengthOf(1);
+
+            //TODO: 投票の中身も念の為チェックする
+        });
+
+        it("投票がされれば投票結果が保存される(2件)", async function () {
+            const { poll, otherAccount } = await loadFixture(deploy);
+            const { token } = await deployToken();
+
+            // ownerとotherAccountがトークンを持つようにする
+            await token.transfer(otherAccount.address, 10);
+
+            await poll.setDaoTokenAddress(token.address);
+            await poll.connect(otherAccount).candidateToContributionPoll()
+
+            await poll.vote([otherAccount.address], [1])
+            await poll.connect(otherAccount).vote([otherAccount.address], [1])
+
+            const votes = await poll.getVotes();
+            expect(votes).to.lengthOf(2);
+
+
+            //TODO: 投票の中身も念の為チェックする
         });
     });
 });
