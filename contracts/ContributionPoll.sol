@@ -18,6 +18,7 @@ contract ContributionPoll is AccessControl {
     uint256 public RANK_FOR_VOTE = 10; //DAOトークンの保有順位がRANK_FOR_VOTE以上なら投票可能
     uint256 public CONTRIBUTOR_ASSIGNMENT_TOKEN = 5000; //貢献者に割り当てられるDAOトークンの数
     uint256 public SUPPORTER_ASSIGNMENT_TOKEN = 3000; //投票者に割り当てられるDAOトークンの数
+    uint256 public VOTE_MAX_POINT = 20; //投票できる最大点数
     mapping(int256 => address[]) public candidates; // pollId => [candidate1, candidate2, ...]
 
     //TODO: votesからvotersは取得できるため、リファクタリングして削除する
@@ -41,6 +42,16 @@ contract ContributionPoll is AccessControl {
     }
 
     /**
+     * @notice CONTRIBUTOR_ASSIGNMENT_TOKENを指定する
+     * TODO: 権限設定
+     */
+    function setContributorAssignmentToken(uint256 _contributorAssignmentToken)
+        external
+    {
+        CONTRIBUTOR_ASSIGNMENT_TOKEN = _contributorAssignmentToken;
+    }
+
+    /**
      * @notice SUPPORTER_ASSIGNMENT_TOKENを指定する
      * TODO: 権限設定
      */
@@ -51,15 +62,23 @@ contract ContributionPoll is AccessControl {
     }
 
     /**
+     * @notice VOTE_MAX_POINTを指定する
+     * TODO: 権限設定
+     */
+    function setVoteMaxPoint(uint256 _voteMaxPoint) external {
+        VOTE_MAX_POINT = _voteMaxPoint;
+    }
+
+    /**
      * @notice Settle the current poll, and start new poll
      */
-    function settleAndCreateNewPoll() external {
+    function settleCurrentPollAndCreateNewPoll() external {
         _settleContributionPoll();
         _createContributionPoll();
     }
 
     /**
-     * @notice Settle the current poll and totalize the result
+     * @notice Settle the current poll and aggregate the result
      */
     function _settleContributionPoll() internal {
         // 貢献度投票の集計を行う
@@ -181,7 +200,7 @@ contract ContributionPoll is AccessControl {
     }
 
     /**
-     * @notice SenderがDAO TokenのTop10のホルダーであるかをチェックする
+     * @notice SenderがDAO TokenのTop N(RANK_FOR_VOTE)のホルダーであるかをチェックする
      */
     function _isTopHolder() internal view returns (bool) {
         DAOToken daoToken = DAOToken(daoTokenAddress);
@@ -227,8 +246,8 @@ contract ContributionPoll is AccessControl {
         external
         returns (bool)
     {
-        // DAOトークンのTOP10に入っていない場合は投票することはできない
-        require(_isTopHolder(), "You are not in the top 10 holder.");
+        // DAOトークンのTOP N(RANK_FOR_VOTE)に入っていない場合は投票することはできない
+        require(_isTopHolder(), "You are not in the top RANK_FOR_VOTE holder.");
 
         // Check if the voter is already voted
         // TODO:投票を上書きする処理を書いた後にこの制限をなくす
@@ -259,8 +278,8 @@ contract ContributionPoll is AccessControl {
                 "The points are not valid. (0 <= points)"
             );
             require(
-                _points[index] <= 20,
-                "The points are not valid. (points < 20)"
+                _points[index] <= VOTE_MAX_POINT,
+                "The points are not valid. (points < VOTE_MAX_POINT)"
             );
 
             // 自分のポイントは必ずゼロにする

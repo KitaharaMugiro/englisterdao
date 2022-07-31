@@ -36,10 +36,10 @@ describe("ContributionPoll", function () {
         });
     });
 
-    describe("SettleAndCreateNewPoll", function () {
+    describe("settleCurrentPollAndCreateNewPoll", function () {
         it("Pollを終了すると、pollIdがインクリメントされる", async function () {
             const { poll } = await loadFixture(deploy);
-            await poll.settleAndCreateNewPoll();
+            await poll.settleCurrentPollAndCreateNewPoll();
             expect(await poll.pollId()).to.equal(1);
         });
     });
@@ -114,7 +114,7 @@ describe("ContributionPoll", function () {
             await poll.setDaoTokenAddress(token.address);
             await poll.connect(owner).candidateToContributionPoll()
 
-            await expect(poll.connect(otherAccount).vote([owner.address], [1])).to.be.revertedWith("You are not in the top 10 holder.");
+            await expect(poll.connect(otherAccount).vote([owner.address], [1])).to.be.revertedWith("You are not in the top RANK_FOR_VOTE holder.");
         });
 
         it("投票で21ポイント以上をつけることはできない", async function () {
@@ -123,7 +123,7 @@ describe("ContributionPoll", function () {
             await poll.setDaoTokenAddress(token.address);
             await poll.connect(otherAccount).candidateToContributionPoll()
 
-            await expect(poll.vote([otherAccount.address], [21])).to.be.revertedWith("The points are not valid. (points < 20)");
+            await expect(poll.vote([otherAccount.address], [21])).to.be.revertedWith("The points are not valid. (points < VOTE_MAX_POINT)");
         });
 
         it("投票者の数とポイントの数が一致している必要がある", async function () {
@@ -174,7 +174,7 @@ describe("ContributionPoll", function () {
         it("投票が実施されなかった場合は、誰にもトークンは送られない", async function () {
             const { poll, token, owner } = await loadFixture(deploy);
             await poll.setDaoTokenAddress(token.address);
-            await poll.settleAndCreateNewPoll();
+            await poll.settleCurrentPollAndCreateNewPoll();
             const balance = await token.balanceOf(owner.address);
             expect(balance).to.eq(100);
         });
@@ -188,7 +188,7 @@ describe("ContributionPoll", function () {
             await poll.connect(otherAccount).candidateToContributionPoll()
             await poll.vote([otherAccount.address], [5])
 
-            await poll.settleAndCreateNewPoll();
+            await poll.settleCurrentPollAndCreateNewPoll();
 
             const balance = await token.balanceOf(owner.address);
             expect(balance).to.eq(100 + 3000);
@@ -208,7 +208,7 @@ describe("ContributionPoll", function () {
             await poll.connect(otherAccount2).vote([otherAccount.address], [10])
 
 
-            await poll.settleAndCreateNewPoll();
+            await poll.settleCurrentPollAndCreateNewPoll();
 
             const balance = await token.balanceOf(owner.address);
             expect(balance).to.eq(70 + 1500);
@@ -233,7 +233,7 @@ describe("ContributionPoll", function () {
             await poll.connect(otherAccount2).vote([otherAccount.address], [10])
 
 
-            await poll.settleAndCreateNewPoll();
+            await poll.settleCurrentPollAndCreateNewPoll();
 
             const balance = await token.balanceOf(owner.address);
             expect(balance).to.eq(70 + 2);
@@ -253,7 +253,7 @@ describe("ContributionPoll", function () {
             await poll.connect(otherAccount2).candidateToContributionPoll()
             await poll.vote([otherAccount.address, otherAccount2.address], [2, 3])
 
-            await poll.settleAndCreateNewPoll();
+            await poll.settleCurrentPollAndCreateNewPoll();
 
             const balance = await token.balanceOf(owner.address);
             expect(balance).to.eq(100 + 3000);
@@ -275,7 +275,7 @@ describe("ContributionPoll", function () {
             await poll.vote([otherAccount.address, otherAccount2.address], [1, 1])
             await poll.connect(otherAccount).vote([otherAccount.address, otherAccount2.address], [0, 1])
 
-            await poll.settleAndCreateNewPoll();
+            await poll.settleCurrentPollAndCreateNewPoll();
 
             const balance = await token.balanceOf(owner.address);
             expect(balance).to.eq(70 + 1500);
