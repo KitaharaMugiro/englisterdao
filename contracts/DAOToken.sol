@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "hardhat/console.sol";
+import "./lib/Array.sol";
 
 contract DAOToken is ERC20, AccessControl {
     // Roles
@@ -87,26 +88,6 @@ contract DAOToken is ERC20, AccessControl {
     }
 
     /**
-     * @notice holderAddressがexceptAddressListに入っているかチェックする
-     * TODO: Array.containsを使うことでリファクタリングする
-     */
-    function _checkSkip(
-        address[] memory exceptAddressList,
-        address holderAddress
-    ) internal view returns (bool) {
-        for (
-            uint256 exceptIndex = 0;
-            exceptIndex < exceptAddressList.length;
-            exceptIndex++
-        ) {
-            if (holderAddress == exceptAddressList[exceptIndex]) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * @notice exceptAddressListを除いた上で最もトークンを保有したホルダーを返す
      */
     function _getTopAddress(address[] memory exceptAddressList)
@@ -119,7 +100,7 @@ contract DAOToken is ERC20, AccessControl {
 
         for (uint256 index = 0; index < holders.values.length; index++) {
             address holderAddress = holders.values[index];
-            if (_checkSkip(exceptAddressList, holderAddress)) {
+            if (Array.contains(exceptAddressList, holderAddress)) {
                 continue;
             }
 
@@ -136,12 +117,12 @@ contract DAOToken is ERC20, AccessControl {
      * @notice get TOP holders order by the balance
      */
     function getTop(uint256 _limit) public view returns (address[] memory) {
+        //TODO: Quick sortして上位_limit件を返す方がいいかも
         address[] memory topAddresses = new address[](_limit);
         uint256[] memory topBalances = new uint256[](_limit);
         address[] memory exceptAddressList = new address[](_limit);
         for (uint256 index = 0; index < _limit; index++) {
             address topAddress = _getTopAddress(exceptAddressList);
-            console.log("topAddress: ", topAddress);
             topAddresses[index] = topAddress;
             topBalances[index] = balanceOf(topAddress);
             exceptAddressList[index] = topAddress;
