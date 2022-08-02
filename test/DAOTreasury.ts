@@ -32,21 +32,74 @@ describe("DAOTreasury", function () {
     }
 
     describe("getBalance", function () {
-        it("初期のETH保有量は「0 ether」である", async function () {
+        it("初期のトレジャリーのETH保有量は「0 ether」である", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
             const expectedValue = 0;
             expect(await treasury.getBalance()).to.equal(expectedValue);
         });
-        /*
-        it("ETHを送金して送金後のETH保有量を確認する", async function () {
+        
+        it("ETHを「1 ether」送金して送金後のトレジャリーのETH保有量を確認する", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
 
-            console.log("otherAccount.getBalance = %s", await otherAccount.getBalance());
-            await otherAccount.sendTransaction({ to: treasury.address, value: 1 });
+            // トレジャリーへ送金
+            //console.log("otherAccount.getBalance = %s", await otherAccount.getBalance());
+            await treasury.connect(otherAccount).Deposit({ value: ethers.utils.parseEther("1.0") });
+            //console.log("otherAccount.getBalance = %s", await otherAccount.getBalance());
 
-            const expectedValue = 1;
+            // 単体テスト
+            const expectedValue = ethers.utils.parseEther("1.0");
             expect(await treasury.getBalance()).to.equal(expectedValue);
+            //console.log("treasury.getBalance = %s", await treasury.getBalance());
         });
-        */
+        
+    });
+
+    describe("requestForTokenToEth", function () {
+        it("指定が0トークンの場合はエラーとなること", async function () {
+            const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
+            await expect(treasury.connect(otherAccount).requestForTokenToEth(0)).revertedWith("Token(amount) must be at least 1");
+        });
+        it("DAOトークンが0のアカウントはエラーとなること", async function () {
+            const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
+            await expect(treasury.connect(otherAccount).requestForTokenToEth(1)).revertedWith("Not enough tokens");
+        });
+        it("DAOトークンが足りないアカウントはエラーとなること", async function () {
+            const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
+            
+            // DAOトークンをownerからテストアカウントへ送付
+            await token.connect(owner).batchTransfer(
+                [otherAccount.address, otherAccount2.address],
+                [10, 20]);
+            
+            // 単体テスト
+            await expect(treasury.connect(otherAccount).requestForTokenToEth(11)).revertedWith("Not enough tokens");
+            await expect(treasury.connect(otherAccount2).requestForTokenToEth(21)).revertedWith("Not enough tokens");
+        });
+        it("DAOトークンの換金（残トークン数を確認）", async function () {
+            const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
+
+            // トレジャリーへ送金
+            await treasury.connect(otherAccount).Deposit({ value: ethers.utils.parseEther("0.0000005") });
+            await treasury.connect(otherAccount).Deposit({ value: ethers.utils.parseEther("0.0000005") });
+
+            // DAOトークンをownerからテストアカウントへ送付
+            await token.connect(owner).batchTransfer(
+                [otherAccount.address, otherAccount2.address],
+                [30, 40]);
+            
+            // 30トークンを換金(otherAccount)
+            console.log("treasury.getBalance = %s", await treasury.getBalance());
+            let rtn1 = await treasury.connect(otherAccount).requestForTokenToEth(30);
+            console.log("treasury.getBalance = %s", await treasury.getBalance());
+            // 20トークンを換金(otherAccount2)
+            let rtn2 = await treasury.connect(otherAccount2).requestForTokenToEth(20);
+            console.log("treasury.getBalance = %s", await treasury.getBalance());
+
+            // 単体テスト（残トークン数を確認）
+            const expectedValue1 = 0;
+            const expectedValue2 = 20;
+            expect(await token.balanceOf(otherAccount.address)).to.equal(expectedValue1);
+            expect(await token.balanceOf(otherAccount2.address)).to.equal(expectedValue2);
+        });
     });
 });

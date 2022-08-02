@@ -44,14 +44,15 @@ contract DAOTreasury is Ownable {
     /**
      * @notice Exchange DAOTokens to Ethereum(ETH).
      */
-    function requestForTokenToEth( uint256 _amount ) external returns(bool) {
+    function requestForTokenToEth( uint256 _amount ) external returns(uint256) {
+
+        require((_amount > 0), "Token(amount) must be at least 1");
 
         DAOToken daoToken = DAOToken(_daoTokenContractAddress);
 
         // Verify that hold(balance) the DAOTokens.
         uint256 balance = daoToken.balanceOf(address(msg.sender));
-
-        if ( balance < _amount ) return false;
+        require((balance >= _amount), "Not enough tokens");
 
         // Transfer Ethereum(ETH).
         uint256 total_supply = daoToken.totalSupply();                          // Get the totalSupply of DAOTokens.
@@ -70,7 +71,14 @@ contract DAOTreasury is Ownable {
         */
         // Burn the exchanged DAOTokens.
         daoToken.burn(address(msg.sender), _amount);
-        
+
+        return pay_val;
+    }
+
+    /**
+     * @notice Send ETH to the Treasury.
+     */
+    function Deposit() public payable returns (bool) {
         return true;
     }
 }
