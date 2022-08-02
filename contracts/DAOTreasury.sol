@@ -11,23 +11,23 @@ import "./DAOToken.sol";
 
 contract DAOTreasury is Ownable {
 
-    address private _daoTokenContractAddress;
+    address private _daoTokenAddress;
 
     constructor () {
 
     }
 
     /**
-     * @notice Set DAOTokenContract Address.
+     * @notice Set DAOToken Address.
      */
-    function setDAOTokenContractAddress(address _address) external onlyOwner {
-        _daoTokenContractAddress = _address;
+    function setDAOTokenAddress(address _address) external onlyOwner {
+        _daoTokenAddress = _address;
     }
 
     /**
      * @notice Charges for ETH held by Treasury.
      */
-    function getBalance() public view returns (uint) {
+    function getBalance() public view returns (uint256) {
         return address(this).balance;
     }
 
@@ -48,27 +48,19 @@ contract DAOTreasury is Ownable {
 
         require((_amount > 0), "Token(amount) must be at least 1");
 
-        DAOToken daoToken = DAOToken(_daoTokenContractAddress);
+        DAOToken daoToken = DAOToken(_daoTokenAddress);
 
         // Verify that hold(balance) the DAOTokens.
         uint256 balance = daoToken.balanceOf(address(msg.sender));
         require((balance >= _amount), "Not enough tokens");
 
         // Transfer Ethereum(ETH).
-        uint256 total_supply = daoToken.totalSupply();                          // Get the totalSupply of DAOTokens.
-        uint256 pay_val = (address(this).balance * _amount) / total_supply;     // Calculate the payment value.
+        uint256 total_supply = daoToken.totalSupply();                 // Get the totalSupply of DAOTokens.
+        uint256 pay_val = (getBalance() * _amount) / total_supply;     // Calculate the payment value.
 
         // https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3008
         Address.sendValue(payable(msg.sender), pay_val);
 
-        /*
-            TODO:
-                送金で、Errorが発生した場合を想定して、Try Catchするべき。しかし、以下のコンパイルエラーが発生する。
-                Try can only be used with external function calls and contract creation calls.
-                確かに、sendValue(...) は、Internal である。
-                何がしかのトリックが必要と思われる。
-                送付するeternalな関数を別に作って、this.sendValueとして自身のメソッドを呼び出すと上手くいくか？
-        */
         // Burn the exchanged DAOTokens.
         daoToken.burn(address(msg.sender), _amount);
 

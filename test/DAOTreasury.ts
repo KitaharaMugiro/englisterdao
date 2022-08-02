@@ -24,7 +24,7 @@ describe("DAOTreasury", function () {
         const token = await EnglisterToken.deploy(NAME, SYMBOL, INITIAL_SUPPLY);
 
         // 権限設定
-        await treasury.setDAOTokenContractAddress(token.address);
+        await treasury.setDAOTokenAddress(token.address);
         await token.setupMinterRole(treasury.address);
         await token.setupBurnerRole(treasury.address);
 
