@@ -49,6 +49,13 @@ contract DAOToken is ERC20, AccessControl {
     }
 
     /**
+     * @notice BURNER_ROLEを付与する (TODO: 本当にこのメソッドを生やして良いのか検討する & 権限設定)
+     */
+    function setupBurnerRole(address contractAddress) external {
+        _setupRole(BURNER_ROLE, contractAddress);
+    }
+
+    /**
      * @notice MINTER_ROLE can mint new tokens
      */
     function mint(address to, uint256 amount) external {
