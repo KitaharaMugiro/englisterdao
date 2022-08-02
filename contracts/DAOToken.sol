@@ -2,10 +2,11 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 import "./lib/Array.sol";
 
-contract DAOToken is ERC20, AccessControl {
+contract DAOToken is ERC20, AccessControl, Ownable {
     // Roles
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
@@ -40,14 +41,14 @@ contract DAOToken is ERC20, AccessControl {
     /**
      * @notice MINTER_ROLEを付与する (TODO: 本当にこのメソッドを生やして良いのか検討する & 権限設定)
      */
-    function setupMinterRole(address contractAddress) external {
+    function setupMinterRole(address contractAddress) external onlyOwner {
         _setupRole(MINTER_ROLE, contractAddress);
     }
 
     /**
      * @notice BURNER_ROLEを付与する (TODO: 本当にこのメソッドを生やして良いのか検討する & 権限設定)
      */
-    function setupBurnerRole(address contractAddress) external {
+    function setupBurnerRole(address contractAddress) external onlyOwner {
         _setupRole(BURNER_ROLE, contractAddress);
     }
 
@@ -75,7 +76,6 @@ contract DAOToken is ERC20, AccessControl {
      */
     function transfer(address to, uint256 amount)
         public
-        virtual
         override
         returns (bool)
     {
@@ -86,9 +86,11 @@ contract DAOToken is ERC20, AccessControl {
 
     /**
      * @notice 複数のアドレスに対してトークンを送る
+     * transferの一部が失敗する可能性があるため利用しないことを推奨する (TODO: 削除検討)
      */
     function batchTransfer(address[] memory _to, uint256[] memory _value)
         external
+        onlyOwner
     {
         require(_to.length == _value.length, "invalid input");
         require(_to.length <= 255, "exceed max allowed");
