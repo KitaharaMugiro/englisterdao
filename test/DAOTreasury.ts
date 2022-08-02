@@ -25,7 +25,6 @@ describe("DAOTreasury", function () {
 
         // 権限設定
         await treasury.setDAOTokenAddress(token.address);
-        await token.setupMinterRole(treasury.address);
         await token.setupBurnerRole(treasury.address);
 
         return { token, treasury, owner, otherAccount, otherAccount2 };
