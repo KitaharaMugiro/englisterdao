@@ -35,10 +35,6 @@ contract DAOToken is ERC20, AccessControl {
     ) ERC20(_tokenName, _tokenSymbol) {
         _mint(msg.sender, _tokenInitialSupply);
         addHolder(msg.sender);
-
-        //TEMPORARY: 作成者にロールを設定する(仕様検討後削除する可能性あり)
-        _setupRole(MINTER_ROLE, msg.sender);
-        _setupRole(BURNER_ROLE, msg.sender);
     }
 
     /**
