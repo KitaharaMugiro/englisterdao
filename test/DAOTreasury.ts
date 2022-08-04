@@ -90,7 +90,7 @@ describe("DAOTreasury", function () {
 
             // 30トークンを換金(otherAccount)
             let rtn1 = await treasury.connect(otherAccount).requestForTokenToEth(30);
-            // トレジャリー残：970000000000 wei ( = 1000000000000 wei * 30 / 1000 )
+            // トレジャリー残：970000000000 wei ( = 1000000000000 wei - (1000000000000 wei * 30 / 1000) )
             expect(await treasury.getBalance()).to.equal(970000000000);
             console.log("treasury.getBalance = %s", await treasury.getBalance());
             // DAOトークン総数：970 ( = 1000 - 30 )
@@ -99,7 +99,7 @@ describe("DAOTreasury", function () {
 
             // 20トークンを換金(otherAccount2)
             let rtn2 = await treasury.connect(otherAccount2).requestForTokenToEth(20);
-            // トレジャリー残：950000000000 wei ( = 970000000000 wei * 20 / 970 )
+            // トレジャリー残：950000000000 wei ( = 970000000000 wei - (970000000000 wei * 20 / 970) )
             expect(await treasury.getBalance()).to.equal(950000000000);
             console.log("treasury.getBalance = %s", await treasury.getBalance());
             // DAOトークン総数：950 ( = 970 - 20 )

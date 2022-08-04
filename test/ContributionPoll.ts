@@ -345,7 +345,7 @@ describe("ContributionPoll", function () {
             // 貢献者への報酬
             const assignmentTokenAccount = (10 * 100 / 10) * 5000 / 200;
             const assignmentTokenAccount2 = (8 * 100 / 8) * 5000 / 200;
-            // TODO：得点は異なるが報酬は同じになるのは良い？
+            // 投票得点は、投票者がどの割合で候補者へ報酬を割り振りたいかなので、得点は異なるが報酬は同じになる
             console.log("assignmentToken:Account = %s", assignmentTokenAccount);
             console.log("assignmentToken:Account2 = %s", assignmentTokenAccount2);
             // 投票者への報酬
