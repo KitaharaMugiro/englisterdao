@@ -1,6 +1,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 import "./lib/Array.sol";
 import "./DAOToken.sol";
@@ -12,7 +13,7 @@ struct Vote {
     uint256[] points;
 }
 
-contract ContributionPoll is AccessControl {
+contract ContributionPoll is AccessControl, Ownable {
     int256 public pollId = 0;
     address public daoTokenAddress;
     uint256 public RANK_FOR_VOTE = 10; //DAOトークンの保有順位がRANK_FOR_VOTE以上なら投票可能
@@ -27,52 +28,49 @@ contract ContributionPoll is AccessControl {
 
     /**
      * @notice DAO Token Addressを指定する
-     * TODO: constructorで指定するようにする, もしくは権限設定
      */
-    function setDaoTokenAddress(address _daoTokenAddress) external {
+    function setDaoTokenAddress(address _daoTokenAddress) external onlyOwner {
         daoTokenAddress = _daoTokenAddress;
     }
 
     /**
      * @notice RANK_FOR_VOTEを指定する
-     * TODO: 権限設定
      */
-    function setRankForVote(uint256 _rankForVote) external {
+    function setRankForVote(uint256 _rankForVote) external onlyOwner {
         RANK_FOR_VOTE = _rankForVote;
     }
 
     /**
      * @notice CONTRIBUTOR_ASSIGNMENT_TOKENを指定する
-     * TODO: 権限設定
      */
     function setContributorAssignmentToken(uint256 _contributorAssignmentToken)
         external
+        onlyOwner
     {
         CONTRIBUTOR_ASSIGNMENT_TOKEN = _contributorAssignmentToken;
     }
 
     /**
      * @notice SUPPORTER_ASSIGNMENT_TOKENを指定する
-     * TODO: 権限設定
      */
     function setSupporterAssignmentToken(uint256 _supporterAssignmentToken)
         external
+        onlyOwner
     {
         SUPPORTER_ASSIGNMENT_TOKEN = _supporterAssignmentToken;
     }
 
     /**
      * @notice VOTE_MAX_POINTを指定する
-     * TODO: 権限設定
      */
-    function setVoteMaxPoint(uint256 _voteMaxPoint) external {
+    function setVoteMaxPoint(uint256 _voteMaxPoint) external onlyOwner {
         VOTE_MAX_POINT = _voteMaxPoint;
     }
 
     /**
      * @notice Settle the current poll, and start new poll
      */
-    function settleCurrentPollAndCreateNewPoll() external {
+    function settleCurrentPollAndCreateNewPoll() external onlyOwner {
         _settleContributionPoll();
         _createContributionPoll();
     }

@@ -10,12 +10,9 @@ import "hardhat/console.sol";
 import "./DAOToken.sol";
 
 contract DAOTreasury is Ownable {
-
     address private _daoTokenAddress;
 
-    constructor () {
-
-    }
+    constructor() {}
 
     /**
      * @notice Set DAOToken Address.
@@ -37,15 +34,15 @@ contract DAOTreasury is Ownable {
      * This code is withdraw the full amount to the owner's wallet.
      * It's comment out.
      */
-    //function withdraw() external onlyOwner {
-    //    Address.sendValue(payable(this.owner()), address(this).balance);
-    //}
+    function withdraw() external onlyOwner returns (bool) {
+        //Address.sendValue(payable(this.owner()), address(this).balance);
+        return true;
+    }
 
     /**
      * @notice Exchange DAOTokens to Ethereum(ETH).
      */
-    function requestForTokenToEth( uint256 _amount ) external returns(uint256) {
-
+    function requestForTokenToEth(uint256 _amount) external returns (uint256) {
         require((_amount > 0), "Token(amount) must be at least 1");
 
         DAOToken daoToken = DAOToken(_daoTokenAddress);
@@ -55,8 +52,8 @@ contract DAOTreasury is Ownable {
         require((balance >= _amount), "Not enough tokens");
 
         // Transfer Ethereum(ETH).
-        uint256 total_supply = daoToken.totalSupply();                 // Get the totalSupply of DAOTokens.
-        uint256 pay_val = (getBalance() * _amount) / total_supply;     // Calculate the payment value.
+        uint256 total_supply = daoToken.totalSupply(); // Get the totalSupply of DAOTokens.
+        uint256 pay_val = (getBalance() * _amount) / total_supply; // Calculate the payment value.
 
         // https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3008
         Address.sendValue(payable(msg.sender), pay_val);
@@ -70,7 +67,7 @@ contract DAOTreasury is Ownable {
     /**
      * @notice Send ETH to the Treasury.
      */
-    function Deposit() public payable returns (bool) {
+    function deposit() public payable returns (bool) {
         return true;
     }
 }
