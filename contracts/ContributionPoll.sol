@@ -2,6 +2,7 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "hardhat/console.sol";
 import "./lib/Array.sol";
 import "./DAOToken.sol";
@@ -13,7 +14,7 @@ struct Vote {
     uint256[] points;
 }
 
-contract ContributionPoll is AccessControl, Ownable {
+contract ContributionPoll is AccessControl, Ownable, Pausable {
     int256 public pollId = 0;
     address public daoTokenAddress;
     uint256 public RANK_FOR_VOTE = 10; //DAOトークンの保有順位がRANK_FOR_VOTE以上なら投票可能
@@ -70,7 +71,11 @@ contract ContributionPoll is AccessControl, Ownable {
     /**
      * @notice Settle the current poll, and start new poll
      */
-    function settleCurrentPollAndCreateNewPoll() external onlyOwner {
+    function settleCurrentPollAndCreateNewPoll()
+        external
+        onlyOwner
+        whenNotPaused
+    {
         _settleContributionPoll();
         _createContributionPoll();
     }
@@ -186,7 +191,7 @@ contract ContributionPoll is AccessControl, Ownable {
     /**
      * @notice candidate to the current poll
      */
-    function candidateToContributionPoll() external {
+    function candidateToContributionPoll() external whenNotPaused {
         //すでにmsg.senderが立候補済みか確認
         for (uint256 index = 0; index < candidates[pollId].length; index++) {
             require(
@@ -242,6 +247,7 @@ contract ContributionPoll is AccessControl, Ownable {
      */
     function vote(address[] memory _candidates, uint256[] memory _points)
         external
+        whenNotPaused
         returns (bool)
     {
         // DAOトークンのTOP N(RANK_FOR_VOTE)に入っていない場合は投票することはできない
