@@ -2,13 +2,14 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "hardhat/console.sol";
 
 import "./DAOToken.sol";
 
-contract DAOTreasury is Ownable, Pausable {
+contract DAOTreasury is Ownable, Pausable, ReentrancyGuard {
     address private _daoTokenAddress;
 
     constructor() {}
@@ -44,6 +45,7 @@ contract DAOTreasury is Ownable, Pausable {
     function requestForTokenToEth(uint256 _amount)
         external
         whenNotPaused
+        nonReentrant
         returns (uint256)
     {
         require((_amount > 0), "Token(amount) must be at least 1");

@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "hardhat/console.sol";
 import "./lib/Array.sol";
 import "./DAOToken.sol";
@@ -14,7 +15,7 @@ struct Vote {
     uint256[] points;
 }
 
-contract ContributionPoll is AccessControl, Ownable, Pausable {
+contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
     int256 public pollId = 0;
     address public daoTokenAddress;
     uint256 public RANK_FOR_VOTE = 10; //DAOトークンの保有順位がRANK_FOR_VOTE以上なら投票可能
@@ -75,6 +76,7 @@ contract ContributionPoll is AccessControl, Ownable, Pausable {
         external
         onlyOwner
         whenNotPaused
+        nonReentrant
     {
         _settleContributionPoll();
         _createContributionPoll();
