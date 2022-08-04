@@ -52,9 +52,8 @@ describe("DAOToken", function () {
         it("複数のアカウントに対して1度に送金することができる", async function () {
             const { token, owner, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
 
-            await token.connect(owner).batchTransfer(
-                [otherAccount.address, otherAccount2.address],
-                [10, 20]);
+            await token.connect(owner).transfer(otherAccount.address, 10);
+            await token.connect(owner).transfer(otherAccount2.address, 20);
 
             expect(await token.balanceOf(otherAccount.address)).to.equal(10);
             expect(await token.balanceOf(otherAccount2.address)).to.equal(20);
@@ -69,9 +68,10 @@ describe("DAOToken", function () {
         it("トークンの上位3件を取得できる", async function () {
             const { token, owner, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
 
-            await token.connect(owner).batchTransfer(
-                [otherAccount.address, otherAccount2.address],
-                [20, 10]);
+
+            await token.connect(owner).transfer(otherAccount.address, 20);
+            await token.connect(owner).transfer(otherAccount2.address, 10);
+
 
             const expected = [owner.address, otherAccount.address, otherAccount2.address]
             const result = await token.getTop(3);
@@ -83,9 +83,8 @@ describe("DAOToken", function () {
         it("トークンの上位2件を取得できる", async function () {
             const { token, owner, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
 
-            await token.connect(owner).batchTransfer(
-                [otherAccount.address, otherAccount2.address],
-                [10, 20]);
+            await token.connect(owner).transfer(otherAccount.address, 10);
+            await token.connect(owner).transfer(otherAccount2.address, 20);
 
             const expected = [owner.address, otherAccount2.address]
             const result = await token.getTop(2);
@@ -96,9 +95,10 @@ describe("DAOToken", function () {
         it("上位4件取ろうとすると最後はaddress(0)が入っている", async function () {
             const { token, owner, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
 
-            await token.connect(owner).batchTransfer(
-                [otherAccount.address, otherAccount2.address],
-                [10, 20]);
+
+            await token.connect(owner).transfer(otherAccount.address, 10);
+            await token.connect(owner).transfer(otherAccount2.address, 20);
+
 
             const expected = [owner.address, otherAccount2.address, otherAccount.address, "0x0000000000000000000000000000000000000000"]
             const result = await token.getTop(4);

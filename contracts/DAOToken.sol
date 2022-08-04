@@ -85,21 +85,6 @@ contract DAOToken is ERC20, AccessControl, Ownable {
     }
 
     /**
-     * @notice 複数のアドレスに対してトークンを送る
-     * transferの一部が失敗する可能性があるため利用しないことを推奨する (TODO: 削除検討)
-     */
-    function batchTransfer(address[] memory _to, uint256[] memory _value)
-        external
-        onlyOwner
-    {
-        require(_to.length == _value.length, "invalid input");
-        require(_to.length <= 255, "exceed max allowed");
-        for (uint8 i = 0; i < _to.length; i++) {
-            transfer(_to[i], _value[i]);
-        }
-    }
-
-    /**
      * @notice exceptAddressListを除いた上で最もトークンを保有したホルダーを返す
      */
     function _getTopAddress(address[] memory exceptAddressList)
