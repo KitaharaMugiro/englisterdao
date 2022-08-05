@@ -176,7 +176,7 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
             );
         }
 
-        // add the vote to the list of votes
+        // save the vote to the list of votes
         votes[pollId].push(_vote);
         return true;
     }
@@ -199,13 +199,12 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
      * @notice Settle the current poll and aggregate the result
      */
     function _settleContributionPoll() internal {
-        address[] memory voters = getCurrentVoters();
-        // 投票結果を合算する
-        // ex:  [(a, 44.4), (b, 55.5), (c, 0)] + [(a,20), (c:100)] = [(a, 64.4), (b:55.5), (c:100)]
+        // Add up votes for each candidate
         address[] memory summedCandidates = candidates[pollId];
         uint256[] memory summedPoints = new uint256[](
             candidates[pollId].length
         );
+        address[] memory voters = getCurrentVoters();
         for (uint256 index = 0; index < votes[pollId].length; index++) {
             Vote memory _vote = votes[pollId][index];
             for (
@@ -231,8 +230,7 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
             }
         }
 
-        // Contributorへの配布量を決定する
-        // [(a, 64.4), (b:55.5), (c:100)] => [(a, 0.29), (b:0.25), (c:0.45)] =>  [(a, 1450), (b: 1250), (c:2250)]
+        // Decide how much to distribute to Contributors
         uint256 totalPoints = 0;
         for (uint256 index = 0; index < summedPoints.length; index++) {
             uint256 _points = summedPoints[index];
@@ -250,18 +248,16 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
                     totalPoints
                 );
             }
-            // Contributorへの配布を実行
             _mintTokenForContributor(summedCandidates, assignmentToken);
         }
 
-        // 投票者への配布量を決定する (等分する)
+        // Decide how much to distribute to Supporters
         uint256 totalVoterCount = voters.length;
         if (totalVoterCount > 0) {
             uint256 voterAssignmentToken = SafeMath.div(
                 SUPPORTER_ASSIGNMENT_TOKEN,
                 totalVoterCount
             );
-            // 投票者への配布を実行
             _mintTokenForSupporter(voters, voterAssignmentToken);
         }
     }
@@ -274,18 +270,18 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
     }
 
     /**
-     * @notice SenderがDAO TokenのTop N(RANK_FOR_VOTE)のホルダーであるかをチェックする
+     * @notice Check if the Sender is a DAO Token Top N (RANK_FOR_VOTE) holder
      */
     function _isTopHolder() internal view returns (bool) {
         DAOToken daoToken = DAOToken(daoTokenAddress);
-        if (Array.contains(daoToken.getTop(RANK_FOR_VOTE), msg.sender)) {
+        if (Array.contains(daoToken.getTopHolders(RANK_FOR_VOTE), msg.sender)) {
             return true;
         }
         return false;
     }
 
     /**
-     * @notice DAOトークンを発行し送付する
+     * @notice Mint dao token for contributors
      */
     function _mintTokenForContributor(
         address[] memory to,
@@ -302,7 +298,7 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
     }
 
     /**
-     * @notice DAOトークンを発行し送付する
+     * @notice Mint dao token for supporters
      */
     function _mintTokenForSupporter(address[] memory to, uint256 amount)
         internal
@@ -314,10 +310,11 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
     }
 
     /**
-     * @notice 投票のポイントを合計する
+     * @notice Sum up the points of the vote
      */
     function _calculateTotalPoint(Vote memory _vote)
         internal
+        pure
         returns (uint256)
     {
         uint256 totalPoints = 0;
