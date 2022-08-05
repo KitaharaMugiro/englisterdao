@@ -77,4 +77,13 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard {
     function deposit() public payable whenNotPaused returns (bool) {
         return true;
     }
+
+    /**
+     * @notice get token rate(ETH/DAOToken)
+     */
+    function getCurrentTokenRate() public view returns (uint256) {
+        DAOToken daoToken = DAOToken(_daoTokenAddress);
+        uint256 total_supply = daoToken.totalSupply(); // Get the totalSupply of DAOTokens.
+        return SafeMath.div(SafeMath.mul(getBalance(), 1), total_supply);
+    }
 }

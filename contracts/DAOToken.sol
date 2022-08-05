@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 import "./lib/Array.sol";
+import "./interface/DAOEvents.sol";
 
-contract DAOToken is ERC20, AccessControl, Ownable {
+contract DAOToken is ERC20, AccessControl, Ownable, DAOEvents {
     // Roles
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
@@ -76,6 +77,7 @@ contract DAOToken is ERC20, AccessControl, Ownable {
     {
         _transfer(msg.sender, to, amount);
         _addHolder(to);
+        emit Transfer(msg.sender, to, amount);
         return true;
     }
 
