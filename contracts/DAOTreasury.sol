@@ -8,8 +8,9 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "hardhat/console.sol";
 import "./lib/SafeMath.sol";
 import "./DAOToken.sol";
+import "./interface/DAOEvents.sol";
 
-contract DAOTreasury is Ownable, Pausable, ReentrancyGuard {
+contract DAOTreasury is Ownable, Pausable, ReentrancyGuard, DAOEvents {
     address private _daoTokenAddress;
 
     constructor() {}
@@ -68,6 +69,7 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard {
         // Burn the exchanged DAOTokens.
         daoToken.burn(address(msg.sender), _amount);
 
+        emit RequestForTokenToEth(_amount, pay_val);
         return pay_val;
     }
 
@@ -75,6 +77,7 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard {
      * @notice Send ETH to the Treasury.
      */
     function deposit() public payable whenNotPaused returns (bool) {
+        emit Deposited(msg.sender, msg.value);
         return true;
     }
 

@@ -1,10 +1,11 @@
 pragma solidity ^0.8.6;
 
 interface DAOEvents {
-    event SettlePoll(uint256 pollId);
-    event StartPoll(uint256 pollId);
-    event PollEnabeld(bool enabled);
-    event Vote(uint256 pollId, address indexed voter);
-    event Candidate(uint256 pollId, address indexed candidate);
-    event Deposit(uint256 pollId, address indexed voter, uint256 amount);
+    event SettlePoll(int256 pollId);
+    event CreatePoll(int256 pollId);
+    event VotingEnabled(int256 pollId, bool enabled);
+    event Voted(int256 pollId, address indexed voter);
+    event Candidated(int256 pollId, address indexed candidate);
+    event Deposited(address indexed sender, uint256 amount);
+    event RequestForTokenToEth(uint256 amount, uint256 payedAmount);
 }
