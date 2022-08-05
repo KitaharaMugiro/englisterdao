@@ -284,5 +284,81 @@ describe("ContributionPoll", function () {
             const balance3 = await token.balanceOf(otherAccount2.address);
             expect(balance3).to.eq(3750);
         });
+        
+        it("誰も投票しなかった場合(貢献者は存在する)", async function () {
+            // - 投票者が0人
+            // - 貢献者が2人 (otherAccount, otherAccount2)
+            const { token, owner, poll, otherAccount, otherAccount2 } = await loadFixture(deploy);
+
+            await token.transfer(otherAccount.address, 40);
+            
+            // 初期状態を確認
+            const balanceOwner = await token.balanceOf(owner.address);
+            expect(balanceOwner).to.eq(60);
+            const balanceAccount1 = await token.balanceOf(otherAccount.address);
+            expect(balanceAccount1).to.eq(40);
+            const balanceAccount2 = await token.balanceOf(otherAccount2.address);
+            expect(balanceAccount2).to.eq(0);
+
+            // 貢献者が2人 (otherAccount, otherAccount2)
+            await poll.connect(otherAccount).candidateToContributionPoll();
+            await poll.connect(otherAccount2).candidateToContributionPoll();
+
+            // 集計(誰も投票しなかった状態)
+            await poll.settleCurrentPollAndCreateNewPoll();
+
+            // 変わっていないことを確認
+            const balance = await token.balanceOf(owner.address);
+            expect(balance).to.eq(60);
+            const balance2 = await token.balanceOf(otherAccount.address);
+            expect(balance2).to.eq(40);
+            const balance3 = await token.balanceOf(otherAccount2.address);
+            expect(balance3).to.eq(0);
+        });
+        
+        it("投票者が全員を投票しなかった場合", async function () {
+            // - 投票者が2人 (owner, otherAccount)
+            // - 貢献者が2人 (otherAccount, otherAccount2)
+            const { token, owner, poll, otherAccount, otherAccount2 } = await loadFixture(deploy);
+
+            await token.transfer(otherAccount.address, 30);
+
+            // 初期状態を確認
+            const balanceOwner = await token.balanceOf(owner.address);
+            expect(balanceOwner).to.eq(70);
+            const balanceAccount1 = await token.balanceOf(otherAccount.address);
+            expect(balanceAccount1).to.eq(30);
+            const balanceAccount2 = await token.balanceOf(otherAccount2.address);
+            expect(balanceAccount2).to.eq(0);
+
+            // 貢献者が2人
+            await poll.connect(otherAccount).candidateToContributionPoll();
+            await poll.connect(otherAccount2).candidateToContributionPoll();
+
+            // 投票者が2人(別々に1人ずつ)
+            await poll.vote([otherAccount.address], [10])
+            await poll.connect(otherAccount).vote([otherAccount2.address], [8])
+
+            // 集計
+            await poll.settleCurrentPollAndCreateNewPoll();
+
+            // 貢献者への報酬
+            const assignmentTokenAccount = (10 * 100 / 10) * 5000 / 200;
+            const assignmentTokenAccount2 = (8 * 100 / 8) * 5000 / 200;
+            // 投票得点は、投票者がどの割合で候補者へ報酬を割り振りたいかなので、得点は異なるが報酬は同じになる
+            console.log("assignmentToken:Account = %s", assignmentTokenAccount);
+            console.log("assignmentToken:Account2 = %s", assignmentTokenAccount2);
+            // 投票者への報酬
+            const voterAssignmentToken = 1500; // (3000 / 投票者2人)
+
+            // 結果
+            const balance = await token.balanceOf(owner.address);
+            expect(balance).to.eq(70 + voterAssignmentToken);
+            const balance2 = await token.balanceOf(otherAccount.address);
+            expect(balance2).to.eq(30 + voterAssignmentToken + assignmentTokenAccount);
+            const balance3 = await token.balanceOf(otherAccount2.address);
+            expect(balance3).to.eq(assignmentTokenAccount2);
+        });
+
     });
 });
