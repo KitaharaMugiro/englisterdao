@@ -16,6 +16,11 @@ struct Vote {
 }
 
 contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
+    // ContributionPollを開始したり終了する権限
+    // Role to start and end a ContributionPoll
+    bytes32 public constant POLL_ADMIN_ROLE = keccak256("POLL_ADMIN_ROLE");
+
+    // ContributionPoll Id
     int256 public pollId = 0;
 
     // 配布するDAOトークンのアドレス
@@ -59,48 +64,74 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
     }
 
     /**
-     * @notice Set RANK_FOR_VOTE
-     * @dev only owner can set RANK_FOR_VOTE
+     * @notice Set POLL_ADMIN_ROLE
+     * @dev only owner can set POLL_ADMIN_ROLE
      */
-    function setRankForVote(uint256 _rankForVote) external onlyOwner {
+    function setPollAdminRole(address _address) external onlyOwner {
+        _setupRole(POLL_ADMIN_ROLE, _address);
+    }
+
+    /**
+     * @notice Set RANK_FOR_VOTE
+     * @dev only poll admin can set RANK_FOR_VOTE
+     */
+    function setRankForVote(uint256 _rankForVote) external {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
+        );
         RANK_FOR_VOTE = _rankForVote;
     }
 
     /**
      * @notice Set CONTRIBUTOR_ASSIGNMENT_TOKEN
-     * @dev only owner can set CONTRIBUTOR_ASSIGNMENT_TOKEN
+     * @dev only poll admin can set CONTRIBUTOR_ASSIGNMENT_TOKEN
      */
     function setContributorAssignmentToken(uint256 _contributorAssignmentToken)
         external
-        onlyOwner
     {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
+        );
         CONTRIBUTOR_ASSIGNMENT_TOKEN = _contributorAssignmentToken;
     }
 
     /**
      * @notice Set SUPPORTER_ASSIGNMENT_TOKEN
-     * @dev only owner can set SUPPORTER_ASSIGNMENT_TOKEN
+     * @dev only poll admin can set SUPPORTER_ASSIGNMENT_TOKEN
      */
     function setSupporterAssignmentToken(uint256 _supporterAssignmentToken)
         external
-        onlyOwner
     {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
+        );
         SUPPORTER_ASSIGNMENT_TOKEN = _supporterAssignmentToken;
     }
 
     /**
      * @notice Set VOTE_MAX_POINT
-     * @dev only owner can set VOTE_MAX_POINT
+     * @dev only poll admin can set VOTE_MAX_POINT
      */
-    function setVoteMaxPoint(uint256 _voteMaxPoint) external onlyOwner {
+    function setVoteMaxPoint(uint256 _voteMaxPoint) external {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
+        );
         VOTE_MAX_POINT = _voteMaxPoint;
     }
 
     /**
      * @notice Set VOTE_MAX_POINT
-     * @dev only owner can set VOTE_MAX_POINT
+     * @dev only poll admin can set VOTE_MAX_POINT
      */
-    function setVotingEnabled(bool _votingEnabled) external onlyOwner {
+    function setVotingEnabled(bool _votingEnabled) external {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
+        );
         votingEnabled = _votingEnabled;
     }
 
@@ -201,14 +232,17 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
 
     /**
      * @notice Settle the current poll, and start new poll
-     * @dev only owner can execute this function and it is expected that external cron system calls this function weekly or bi-weekly.
+     * @dev only poll admin can execute this function and it is expected that external cron system calls this function weekly or bi-weekly.
      */
     function settleCurrentPollAndCreateNewPoll()
         external
-        onlyOwner
         whenNotPaused
         nonReentrant
     {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
+        );
         _settleContributionPoll();
         _createContributionPoll();
     }

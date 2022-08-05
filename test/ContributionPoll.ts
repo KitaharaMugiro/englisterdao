@@ -23,6 +23,7 @@ describe("ContributionPoll", function () {
 
         // 権限設定
         await poll.setDaoTokenAddress(token.address);
+        await poll.setPollAdminRole(owner.address);
         await token.setupMinterRole(poll.address);
 
 
