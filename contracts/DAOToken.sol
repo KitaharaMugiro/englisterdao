@@ -12,22 +12,15 @@ contract DAOToken is ERC20, AccessControl, Ownable {
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
 
     /**
-     * @notice 重複なしのホルダーリストを作成するためのstruct
+     * @notice struct to create a duplicate-free holder list
      */
     struct HolderSet {
         address[] values;
         mapping(address => bool) exists;
     }
 
+    // holders of DAO token
     HolderSet holders;
-
-    function addHolder(address a) public {
-        if (holders.exists[a]) {
-            return;
-        }
-        holders.values.push(a);
-        holders.exists[a] = true;
-    }
 
     constructor(
         string memory _tokenName,
@@ -35,35 +28,37 @@ contract DAOToken is ERC20, AccessControl, Ownable {
         uint256 _tokenInitialSupply
     ) ERC20(_tokenName, _tokenSymbol) {
         _mint(msg.sender, _tokenInitialSupply);
-        addHolder(msg.sender);
+        _addHolder(msg.sender);
     }
 
     /**
-     * @notice MINTER_ROLEを付与する (TODO: 本当にこのメソッドを生やして良いのか検討する & 権限設定)
+     * @notice Set MINTER_ROLE
+     * @dev only owner can set MINTER_ROLE
      */
     function setupMinterRole(address contractAddress) external onlyOwner {
         _setupRole(MINTER_ROLE, contractAddress);
     }
 
     /**
-     * @notice BURNER_ROLEを付与する (TODO: 本当にこのメソッドを生やして良いのか検討する & 権限設定)
+     * @notice Set BURNER_ROLE
+     * @dev only owner can set BURNER_ROLE
      */
     function setupBurnerRole(address contractAddress) external onlyOwner {
         _setupRole(BURNER_ROLE, contractAddress);
     }
 
     /**
-     * @notice MINTER_ROLE can mint new tokens
+     * @dev MINTER_ROLE can mint new tokens
      */
     function mint(address to, uint256 amount) external {
         // Check that the calling account has the minter role
         require(hasRole(MINTER_ROLE, msg.sender), "Caller is not a minter");
         _mint(to, amount);
-        addHolder(to);
+        _addHolder(to);
     }
 
     /**
-     * @notice BURNER_ROLE can burn tokens
+     * @dev BURNER_ROLE can burn tokens
      */
     function burn(address from, uint256 amount) external {
         // Check that the calling account has the minter role
@@ -72,7 +67,7 @@ contract DAOToken is ERC20, AccessControl, Ownable {
     }
 
     /**
-     * @notice 特定のアドレスに対してトークンを送る
+     * @notice send tokens to address
      */
     function transfer(address to, uint256 amount)
         public
@@ -80,12 +75,12 @@ contract DAOToken is ERC20, AccessControl, Ownable {
         returns (bool)
     {
         _transfer(msg.sender, to, amount);
-        addHolder(to);
+        _addHolder(to);
         return true;
     }
 
     /**
-     * @notice exceptAddressListを除いた上で最もトークンを保有したホルダーを返す
+     * @dev Return holders with the most tokens, excluding exceptAddressList
      */
     function _getTopAddress(address[] memory exceptAddressList)
         internal
@@ -111,6 +106,17 @@ contract DAOToken is ERC20, AccessControl, Ownable {
     }
 
     /**
+     * @dev Store the address of token holders
+     */
+    function _addHolder(address a) internal {
+        if (holders.exists[a]) {
+            return;
+        }
+        holders.values.push(a);
+        holders.exists[a] = true;
+    }
+
+    /**
      * @notice get TOP holders order by the balance
      */
     function getTopHolders(uint256 _limit)
@@ -118,7 +124,6 @@ contract DAOToken is ERC20, AccessControl, Ownable {
         view
         returns (address[] memory)
     {
-        //TODO: Quick sortして上位_limit件を返す方がいいかも
         address[] memory topAddresses = new address[](_limit);
         uint256[] memory topBalances = new uint256[](_limit);
         address[] memory exceptAddressList = new address[](_limit);

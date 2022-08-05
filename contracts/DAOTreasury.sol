@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "hardhat/console.sol";
-
+import "./lib/SafeMath.sol";
 import "./DAOToken.sol";
 
 contract DAOTreasury is Ownable, Pausable, ReentrancyGuard {
@@ -22,20 +22,18 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard {
     }
 
     /**
-     * @notice Charges for ETH held by Treasury.
+     * @notice ETH held by Treasury.
      */
     function getBalance() public view returns (uint256) {
         return address(this).balance;
     }
 
     /**
-     * @notice Can't pull out ETH(balance) anyone.
-     * Below is a sample code.
-     * This code is withdraw the full amount to the owner's wallet.
-     * It's comment out.
+     * @notice withdraw the full amount to the owner's wallet.
+     * @dev The owner has previledge to withdraw the full amount.
      */
     function withdraw() external onlyOwner returns (bool) {
-        //Address.sendValue(payable(this.owner()), address(this).balance);
+        Address.sendValue(payable(this.owner()), address(this).balance);
         return true;
     }
 
@@ -48,17 +46,21 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard {
         nonReentrant
         returns (uint256)
     {
-        require((_amount > 0), "Token(amount) must be at least 1");
+        require((_amount > 0), "amount must be greater than 0");
 
         DAOToken daoToken = DAOToken(_daoTokenAddress);
 
-        // Verify that hold(balance) the DAOTokens.
         uint256 balance = daoToken.balanceOf(address(msg.sender));
-        require((balance >= _amount), "Not enough tokens");
+        require((balance >= _amount), "token balance is not enough");
 
         // Transfer Ethereum(ETH).
         uint256 total_supply = daoToken.totalSupply(); // Get the totalSupply of DAOTokens.
-        uint256 pay_val = (getBalance() * _amount) / total_supply; // Calculate the payment value.
+
+        // Calculate the payment value.
+        uint256 pay_val = SafeMath.div(
+            SafeMath.mul(getBalance(), _amount),
+            total_supply
+        );
 
         // https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3008
         Address.sendValue(payable(msg.sender), pay_val);

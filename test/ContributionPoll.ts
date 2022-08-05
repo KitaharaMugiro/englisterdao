@@ -221,7 +221,7 @@ describe("ContributionPoll", function () {
             expect(votes[0].points[1]).to.equal(0);
         });
 
-        it("投票がenableされていない場合は投票することができない", async function () {
+        it("投票の受付可否をownerが制御することができ、受付拒否している場合は投票できない", async function () {
             const { poll, otherAccount, token } = await loadFixture(deploy);
 
             await poll.setDaoTokenAddress(token.address);
