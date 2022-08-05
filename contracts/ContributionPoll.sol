@@ -2,6 +2,8 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "hardhat/console.sol";
 import "./lib/Array.sol";
 import "./DAOToken.sol";
@@ -13,46 +15,56 @@ struct Vote {
     uint256[] points;
 }
 
-contract ContributionPoll is AccessControl, Ownable {
-    // pollを識別するためのID。投票の開始時にインクリメントされる。
+contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
     int256 public pollId = 0;
 
     // 配布するDAOトークンのアドレス
+    // DAO token address to distribute
     address public daoTokenAddress;
 
-    //投票はDAOトークンを保有ランキングがRANK_FOR_VOTEよりも上位の場合に可能
+    // 投票はDAOトークンを保有ランキングがRANK_FOR_VOTEよりも上位の場合に可能
+    // votes are possible only if the holder has a ranking higher than RANK_FOR_VOTE
     uint256 public RANK_FOR_VOTE = 10;
 
-    //立候補者に割り当てられるDAOトークンの総数
+    // 立候補者(貢献者)に割り当てられるDAOトークンの総数
+    // total amount of DAO tokens to be distributed to candidates(contributors)
     uint256 public CONTRIBUTOR_ASSIGNMENT_TOKEN = 5000;
 
-    //投票者に割り当てられるDAOトークンの総数
+    // 投票者に割り当てられるDAOトークンの総数
+    // total amount of DAO tokens to be distributed to voters
     uint256 public SUPPORTER_ASSIGNMENT_TOKEN = 3000;
 
-    //投票時に指定できる最大点数
+    // 投票時に指定できる最大点数
+    // maximum number of points that can be voted
     uint256 public VOTE_MAX_POINT = 20;
 
     // 立候補者のリスト
+    // list of candidates
     mapping(int256 => address[]) public candidates; // pollId => [candidate1, candidate2, ...]
 
+    // 投票のリスト
+    // list of vote
     mapping(int256 => Vote[]) public votes; // pollId => [vote1, vote2, ...]
 
     /**
-     * @notice DAO Token Addressを指定する
+     * @notice Set DAO Token Address
+     * @dev only owner can set DAO Token Address
      */
     function setDaoTokenAddress(address _daoTokenAddress) external onlyOwner {
         daoTokenAddress = _daoTokenAddress;
     }
 
     /**
-     * @notice RANK_FOR_VOTEを指定する
+     * @notice Set RANK_FOR_VOTE
+     * @dev only owner can set RANK_FOR_VOTE
      */
     function setRankForVote(uint256 _rankForVote) external onlyOwner {
         RANK_FOR_VOTE = _rankForVote;
     }
 
     /**
-     * @notice CONTRIBUTOR_ASSIGNMENT_TOKENを指定する
+     * @notice Set CONTRIBUTOR_ASSIGNMENT_TOKEN
+     * @dev only owner can set CONTRIBUTOR_ASSIGNMENT_TOKEN
      */
     function setContributorAssignmentToken(uint256 _contributorAssignmentToken)
         external
@@ -62,7 +74,8 @@ contract ContributionPoll is AccessControl, Ownable {
     }
 
     /**
-     * @notice SUPPORTER_ASSIGNMENT_TOKENを指定する
+     * @notice Set SUPPORTER_ASSIGNMENT_TOKEN
+     * @dev only owner can set SUPPORTER_ASSIGNMENT_TOKEN
      */
     function setSupporterAssignmentToken(uint256 _supporterAssignmentToken)
         external
@@ -72,16 +85,125 @@ contract ContributionPoll is AccessControl, Ownable {
     }
 
     /**
-     * @notice VOTE_MAX_POINTを指定する
+     * @notice Set VOTE_MAX_POINT
+     * @dev only owner can set VOTE_MAX_POINT
      */
     function setVoteMaxPoint(uint256 _voteMaxPoint) external onlyOwner {
         VOTE_MAX_POINT = _voteMaxPoint;
     }
 
     /**
-     * @notice Settle the current poll, and start new poll
+     * @notice candidate to the current poll
      */
-    function settleCurrentPollAndCreateNewPoll() external onlyOwner {
+    function candidateToContributionPoll() external whenNotPaused {
+        //すでにmsg.senderが立候補済みか確認
+        for (uint256 index = 0; index < candidates[pollId].length; index++) {
+            require(
+                candidates[pollId][index] != msg.sender,
+                "You are already candidate to the current poll."
+            );
+        }
+        candidates[pollId].push(msg.sender);
+    }
+
+    /**
+     * @notice vote to the current poll
+     */
+    function vote(address[] memory _candidates, uint256[] memory _points)
+        external
+        whenNotPaused
+        returns (bool)
+    {
+        // DAOトークンのTOP N(RANK_FOR_VOTE)に入っていない場合は投票することはできない
+        require(_isTopHolder(), "You are not in the top RANK_FOR_VOTE holder.");
+
+        address[] memory voters = getCurrentVoters();
+
+        // Check if the voter is already voted
+        // TODO:投票を上書きする処理を書いた後にこの制限をなくす
+        require(!Array.contains(voters, msg.sender), "You are already voted.");
+
+        // Check if the candidate is valid
+        require(_candidates.length != 0, "Candidates must not be empty.");
+
+        // Check if the points and candidates are the same length
+        require(
+            _points.length == _candidates.length,
+            "The number of points is not valid."
+        );
+
+        for (uint256 index = 0; index < _candidates.length; index++) {
+            // Check if the candidate is in the current poll
+            require(
+                Array.contains(candidates[pollId], _candidates[index]),
+                "The candidate is not in the current poll."
+            );
+
+            // Check if the points are valid
+            require(
+                _points[index] >= 0,
+                "The points are not valid. (0 <= points)"
+            );
+            require(
+                _points[index] <= VOTE_MAX_POINT,
+                "The points are not valid. (points < VOTE_MAX_POINT)"
+            );
+
+            // 自分のポイントは必ずゼロにする
+            if (_candidates[index] == msg.sender) {
+                _points[index] = 0;
+            }
+        }
+
+        //投票を記録
+        Vote memory _vote = Vote({
+            voter: msg.sender,
+            candidates: _candidates,
+            points: _points
+        });
+
+        uint256 totalPoints = 0;
+        for (
+            uint256 candidateIndex = 0;
+            candidateIndex < _vote.candidates.length;
+            candidateIndex++
+        ) {
+            totalPoints = SafeMath.add(
+                totalPoints,
+                _vote.points[candidateIndex]
+            );
+        }
+        require(
+            totalPoints > 0,
+            "The total points are not valid. (totalPoints <= 0)"
+        );
+        for (
+            uint256 candidateIndex = 0;
+            candidateIndex < _vote.candidates.length;
+            candidateIndex++
+        ) {
+            //WARN : 小数部分を切り捨てている
+            _vote.points[candidateIndex] = SafeMath.div(
+                SafeMath.mul(_vote.points[candidateIndex], 100),
+                totalPoints
+            );
+        }
+
+        votes[pollId].push(_vote);
+
+        return true;
+    }
+
+    /**
+     * @notice Settle the current poll, and start new poll
+     * @dev only owner can execute this function and it is expected that external cron system calls this function weekly or bi-weekly.
+     */
+    function settleCurrentPollAndCreateNewPoll()
+        external
+        onlyOwner
+        whenNotPaused
+        nonReentrant
+    {
         _settleContributionPoll();
         _createContributionPoll();
     }
@@ -90,38 +212,7 @@ contract ContributionPoll is AccessControl, Ownable {
      * @notice Settle the current poll and aggregate the result
      */
     function _settleContributionPoll() internal {
-        // 貢献度投票の集計を行う
-
-        // 票を標準化する (TODO: 投票時に計算してもいいかも)
-        // 例: [(a, 4), (b, 5), (c,0)]という投票結果を[(a, 44), (b, 55), (c, 0)]に変換する
         address[] memory voters = getCurrentVoters();
-        for (uint256 index = 0; index < votes[pollId].length; index++) {
-            Vote memory vote = votes[pollId][index];
-            uint256 totalPoints = 0;
-            for (
-                uint256 candidateIndex = 0;
-                candidateIndex < vote.candidates.length;
-                candidateIndex++
-            ) {
-                totalPoints = SafeMath.add(
-                    totalPoints,
-                    vote.points[candidateIndex]
-                );
-            }
-            for (
-                uint256 candidateIndex = 0;
-                candidateIndex < vote.candidates.length;
-                candidateIndex++
-            ) {
-                //WARN : 小数部分を切り捨てる
-                vote.points[candidateIndex] = SafeMath.div(
-                    SafeMath.mul(vote.points[candidateIndex], 100),
-                    totalPoints
-                );
-            }
-            votes[pollId][index] = vote;
-        }
-
         // 投票結果を合算する
         // ex:  [(a, 44.4), (b, 55.5), (c, 0)] + [(a,20), (c:100)] = [(a, 64.4), (b:55.5), (c:100)]
         address[] memory summedCandidates = candidates[pollId];
@@ -196,20 +287,6 @@ contract ContributionPoll is AccessControl, Ownable {
     }
 
     /**
-     * @notice candidate to the current poll
-     */
-    function candidateToContributionPoll() external {
-        //すでにmsg.senderが立候補済みか確認
-        for (uint256 index = 0; index < candidates[pollId].length; index++) {
-            require(
-                candidates[pollId][index] != msg.sender,
-                "You are already candidate to the current poll."
-            );
-        }
-        candidates[pollId].push(msg.sender);
-    }
-
-    /**
      * @notice SenderがDAO TokenのTop N(RANK_FOR_VOTE)のホルダーであるかをチェックする
      */
     function _isTopHolder() internal view returns (bool) {
@@ -247,65 +324,6 @@ contract ContributionPoll is AccessControl, Ownable {
         for (uint256 index = 0; index < to.length; index++) {
             daoToken.mint(to[index], amount);
         }
-    }
-
-    /**
-     * @notice vote to the current poll
-     */
-    function vote(address[] memory _candidates, uint256[] memory _points)
-        external
-        returns (bool)
-    {
-        // DAOトークンのTOP N(RANK_FOR_VOTE)に入っていない場合は投票することはできない
-        require(_isTopHolder(), "You are not in the top RANK_FOR_VOTE holder.");
-
-        address[] memory voters = getCurrentVoters();
-
-        // Check if the voter is already voted
-        // TODO:投票を上書きする処理を書いた後にこの制限をなくす
-        require(!Array.contains(voters, msg.sender), "You are already voted.");
-
-        // Check if the candidate is valid
-        require(_candidates.length != 0, "Candidates must not be empty.");
-
-        // Check if the points and candidates are the same length
-        require(
-            _points.length == _candidates.length,
-            "The number of points is not valid."
-        );
-
-        for (uint256 index = 0; index < _candidates.length; index++) {
-            // Check if the candidate is in the current poll
-            require(
-                Array.contains(candidates[pollId], _candidates[index]),
-                "The candidate is not in the current poll."
-            );
-
-            // Check if the points are valid
-            require(
-                _points[index] >= 0,
-                "The points are not valid. (0 <= points)"
-            );
-            require(
-                _points[index] <= VOTE_MAX_POINT,
-                "The points are not valid. (points < VOTE_MAX_POINT)"
-            );
-
-            // 自分のポイントは必ずゼロにする
-            if (_candidates[index] == msg.sender) {
-                _points[index] = 0;
-            }
-        }
-
-        //投票を記録
-        Vote memory _vote = Vote({
-            voter: msg.sender,
-            candidates: _candidates,
-            points: _points
-        });
-        votes[pollId].push(_vote);
-
-        return true;
     }
 
     /**

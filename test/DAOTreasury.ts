@@ -66,9 +66,9 @@ describe("DAOTreasury", function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
 
             // DAOトークンをownerからテストアカウントへ送付
-            await token.connect(owner).batchTransfer(
-                [otherAccount.address, otherAccount2.address],
-                [10, 20]);
+            await token.connect(owner).transfer(otherAccount.address, 10);
+            await token.connect(owner).transfer(otherAccount2.address, 20);
+
 
             // 単体テスト
             await expect(treasury.connect(otherAccount).requestForTokenToEth(11)).revertedWith("Not enough tokens");
@@ -84,9 +84,8 @@ describe("DAOTreasury", function () {
             console.log("treasury.getBalance = %s", await treasury.getBalance());
 
             // DAOトークンをownerからテストアカウントへ送付
-            await token.connect(owner).batchTransfer(
-                [otherAccount.address, otherAccount2.address],
-                [30, 40]);
+            await token.connect(owner).transfer(otherAccount.address, 30);
+            await token.connect(owner).transfer(otherAccount2.address, 40);
 
             // 30トークンを換金(otherAccount)
             let rtn1 = await treasury.connect(otherAccount).requestForTokenToEth(30);
