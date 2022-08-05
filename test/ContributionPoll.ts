@@ -146,12 +146,12 @@ describe("ContributionPoll", function () {
             const votes = await poll.getCurrentVotes();
             expect(votes).to.lengthOf(1);
 
-            //TODO: 投票の中身も念の為チェックする
+            const vote = votes[0];
+            expect(vote.points[0]).to.equal(100);
         });
 
         it("投票がされれば投票結果が保存される(2件)", async function () {
             const { poll, otherAccount, otherAccount2, token } = await loadFixture(deploy);
-
 
             // ownerとotherAccount2がトークンを持つようにする
             await token.transfer(otherAccount2.address, 10);
@@ -165,7 +165,60 @@ describe("ContributionPoll", function () {
             const votes = await poll.getCurrentVotes();
             expect(votes).to.lengthOf(2);
 
-            //TODO: 投票の中身も念の為チェックする
+
+            expect(votes[0].points[0]).to.equal(100);
+            expect(votes[1].points[0]).to.equal(100);
+        });
+
+        it("ポイントの合計は100になるように正規化される", async function () {
+            const { poll, otherAccount, otherAccount2, token } = await loadFixture(deploy);
+
+            await poll.setDaoTokenAddress(token.address);
+            await poll.connect(otherAccount).candidateToContributionPoll()
+            await poll.connect(otherAccount2).candidateToContributionPoll()
+
+
+            await poll.vote([otherAccount.address, otherAccount2.address], [2, 3])
+
+            const votes = await poll.getCurrentVotes();
+            expect(votes).to.lengthOf(1);
+
+            expect(votes[0].points[0]).to.equal(40);
+            expect(votes[0].points[1]).to.equal(60);
+        });
+
+        it("ポイントの合計は100になるように正規化される(割り切れない場合)", async function () {
+            const { poll, otherAccount, otherAccount2, token } = await loadFixture(deploy);
+
+            await poll.setDaoTokenAddress(token.address);
+            await poll.connect(otherAccount).candidateToContributionPoll()
+            await poll.connect(otherAccount2).candidateToContributionPoll()
+
+
+            await poll.vote([otherAccount.address, otherAccount2.address], [1, 2])
+
+            const votes = await poll.getCurrentVotes();
+            expect(votes).to.lengthOf(1);
+
+            expect(votes[0].points[0]).to.equal(33);
+            expect(votes[0].points[1]).to.equal(66);
+        });
+
+        it("自分自身への投票は0点となる", async function () {
+            const { owner, poll, otherAccount, token } = await loadFixture(deploy);
+
+            await poll.setDaoTokenAddress(token.address);
+            await poll.connect(otherAccount).candidateToContributionPoll()
+            await poll.connect(owner).candidateToContributionPoll()
+
+
+            await poll.vote([otherAccount.address, owner.address], [1, 2])
+
+            const votes = await poll.getCurrentVotes();
+            expect(votes).to.lengthOf(1);
+
+            expect(votes[0].points[0]).to.equal(100);
+            expect(votes[0].points[1]).to.equal(0);
         });
     });
 

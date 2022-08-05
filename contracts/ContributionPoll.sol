@@ -96,7 +96,6 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
      * @notice candidate to the current poll
      */
     function candidateToContributionPoll() external whenNotPaused {
-        //すでにmsg.senderが立候補済みか確認
         for (uint256 index = 0; index < candidates[pollId].length; index++) {
             require(
                 candidates[pollId][index] != msg.sender,
@@ -107,23 +106,25 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
     }
 
     /**
-     * @notice vote to the current poll
+     * @notice vote to the current poll.
+     * @dev Voters assign points to candidates and register their votes.
+     * Points are normalized to a total of 100 points.
+     * A voted point for oneself will always be 0.
      */
     function vote(address[] memory _candidates, uint256[] memory _points)
         external
         whenNotPaused
         returns (bool)
     {
-        // DAOトークンのTOP N(RANK_FOR_VOTE)に入っていない場合は投票することはできない
+        // if the voter is not in the top N(RANK_FOR_VOTE) of DAO token holders,
         require(_isTopHolder(), "You are not in the top RANK_FOR_VOTE holder.");
 
         address[] memory voters = getCurrentVoters();
 
         // Check if the voter is already voted
-        // TODO:投票を上書きする処理を書いた後にこの制限をなくす
         require(!Array.contains(voters, msg.sender), "You are already voted.");
 
-        // Check if the candidate is valid
+        // Check if the candidate is not empty
         require(_candidates.length != 0, "Candidates must not be empty.");
 
         // Check if the points and candidates are the same length
@@ -149,48 +150,34 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
                 "The points are not valid. (points < VOTE_MAX_POINT)"
             );
 
-            // 自分のポイントは必ずゼロにする
+            // A voted point for oneself will always be 0.
             if (_candidates[index] == msg.sender) {
                 _points[index] = 0;
             }
         }
 
-        //投票を記録
         Vote memory _vote = Vote({
             voter: msg.sender,
             candidates: _candidates,
             points: _points
         });
 
-        uint256 totalPoints = 0;
+        uint256 totalPoints = _calculateTotalPoint(_vote);
+
+        // normalize the points to a total of 100 points
         for (
             uint256 candidateIndex = 0;
             candidateIndex < _vote.candidates.length;
             candidateIndex++
         ) {
-            totalPoints = SafeMath.add(
-                totalPoints,
-                _vote.points[candidateIndex]
-            );
-        }
-        require(
-            totalPoints > 0,
-            "The total points are not valid. (totalPoints <= 0)"
-        );
-        for (
-            uint256 candidateIndex = 0;
-            candidateIndex < _vote.candidates.length;
-            candidateIndex++
-        ) {
-            //WARN : 小数部分を切り捨てている
             _vote.points[candidateIndex] = SafeMath.div(
                 SafeMath.mul(_vote.points[candidateIndex], 100),
                 totalPoints
             );
         }
 
+        // add the vote to the list of votes
         votes[pollId].push(_vote);
-
         return true;
     }
 
@@ -324,6 +311,33 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
         for (uint256 index = 0; index < to.length; index++) {
             daoToken.mint(to[index], amount);
         }
+    }
+
+    /**
+     * @notice 投票のポイントを合計する
+     */
+    function _calculateTotalPoint(Vote memory _vote)
+        internal
+        returns (uint256)
+    {
+        uint256 totalPoints = 0;
+        for (
+            uint256 candidateIndex = 0;
+            candidateIndex < _vote.candidates.length;
+            candidateIndex++
+        ) {
+            totalPoints = SafeMath.add(
+                totalPoints,
+                _vote.points[candidateIndex]
+            );
+        }
+
+        require(
+            totalPoints > 0,
+            "The total points are not valid. (totalPoints <= 0)"
+        );
+
+        return totalPoints;
     }
 
     /**
