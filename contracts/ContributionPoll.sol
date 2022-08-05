@@ -14,16 +14,27 @@ struct Vote {
 }
 
 contract ContributionPoll is AccessControl, Ownable {
+    // pollを識別するためのID。投票の開始時にインクリメントされる。
     int256 public pollId = 0;
+
+    // 配布するDAOトークンのアドレス
     address public daoTokenAddress;
-    uint256 public RANK_FOR_VOTE = 10; //DAOトークンの保有順位がRANK_FOR_VOTE以上なら投票可能
-    uint256 public CONTRIBUTOR_ASSIGNMENT_TOKEN = 5000; //貢献者に割り当てられるDAOトークンの数
-    uint256 public SUPPORTER_ASSIGNMENT_TOKEN = 3000; //投票者に割り当てられるDAOトークンの数
-    uint256 public VOTE_MAX_POINT = 20; //投票できる最大点数
+
+    //投票はDAOトークンを保有ランキングがRANK_FOR_VOTEよりも上位の場合に可能
+    uint256 public RANK_FOR_VOTE = 10;
+
+    //立候補者に割り当てられるDAOトークンの総数
+    uint256 public CONTRIBUTOR_ASSIGNMENT_TOKEN = 5000;
+
+    //投票者に割り当てられるDAOトークンの総数
+    uint256 public SUPPORTER_ASSIGNMENT_TOKEN = 3000;
+
+    //投票時に指定できる最大点数
+    uint256 public VOTE_MAX_POINT = 20;
+
+    // 立候補者のリスト
     mapping(int256 => address[]) public candidates; // pollId => [candidate1, candidate2, ...]
 
-    //TODO: votesからvotersは取得できるため、リファクタリングして削除する
-    mapping(int256 => address[]) public voters; // pollId => [candidate1, candidate2, ...]
     mapping(int256 => Vote[]) public votes; // pollId => [vote1, vote2, ...]
 
     /**
@@ -83,6 +94,7 @@ contract ContributionPoll is AccessControl, Ownable {
 
         // 票を標準化する (TODO: 投票時に計算してもいいかも)
         // 例: [(a, 4), (b, 5), (c,0)]という投票結果を[(a, 44), (b, 55), (c, 0)]に変換する
+        address[] memory voters = getCurrentVoters();
         for (uint256 index = 0; index < votes[pollId].length; index++) {
             Vote memory vote = votes[pollId][index];
             uint256 totalPoints = 0;
@@ -165,14 +177,14 @@ contract ContributionPoll is AccessControl, Ownable {
         }
 
         // 投票者への配布量を決定する (等分する)
-        uint256 totalVoterCount = voters[pollId].length;
+        uint256 totalVoterCount = voters.length;
         if (totalVoterCount > 0) {
             uint256 voterAssignmentToken = SafeMath.div(
                 SUPPORTER_ASSIGNMENT_TOKEN,
                 totalVoterCount
             );
             // 投票者への配布を実行
-            _mintTokenForSupporter(voters[pollId], voterAssignmentToken);
+            _mintTokenForSupporter(voters, voterAssignmentToken);
         }
     }
 
@@ -247,12 +259,11 @@ contract ContributionPoll is AccessControl, Ownable {
         // DAOトークンのTOP N(RANK_FOR_VOTE)に入っていない場合は投票することはできない
         require(_isTopHolder(), "You are not in the top RANK_FOR_VOTE holder.");
 
+        address[] memory voters = getCurrentVoters();
+
         // Check if the voter is already voted
         // TODO:投票を上書きする処理を書いた後にこの制限をなくす
-        require(
-            !Array.contains(voters[pollId], msg.sender),
-            "You are already voted."
-        );
+        require(!Array.contains(voters, msg.sender), "You are already voted.");
 
         // Check if the candidate is valid
         require(_candidates.length != 0, "Candidates must not be empty.");
@@ -294,23 +305,32 @@ contract ContributionPoll is AccessControl, Ownable {
         });
         votes[pollId].push(_vote);
 
-        // 投票した人を記録
-        voters[pollId].push(msg.sender);
-
         return true;
     }
 
     /**
      * @notice get the current poll's candidates
      */
-    function getCandidates() external view returns (address[] memory) {
+    function getCurrentCandidates() public view returns (address[] memory) {
         return candidates[pollId];
     }
 
     /**
      * @notice get the current poll's votes
      */
-    function getVotes() external view returns (Vote[] memory) {
+    function getCurrentVotes() public view returns (Vote[] memory) {
         return votes[pollId];
+    }
+
+    /**
+     * @notice get the current poll's voters
+     */
+    function getCurrentVoters() public view returns (address[] memory) {
+        Vote[] memory _votes = votes[pollId];
+        address[] memory _voters = new address[](_votes.length);
+        for (uint256 index = 0; index < _votes.length; index++) {
+            _voters[index] = _votes[index].voter;
+        }
+        return _voters;
     }
 }
