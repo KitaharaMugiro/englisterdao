@@ -220,6 +220,16 @@ describe("ContributionPoll", function () {
             expect(votes[0].points[0]).to.equal(100);
             expect(votes[0].points[1]).to.equal(0);
         });
+
+        it("投票がenableされていない場合は投票することができない", async function () {
+            const { poll, otherAccount, token } = await loadFixture(deploy);
+
+            await poll.setDaoTokenAddress(token.address);
+            await poll.connect(otherAccount).candidateToContributionPoll()
+            await poll.setVotingEnabled(false);
+
+            await expect(poll.vote([otherAccount.address], [1])).to.be.revertedWith("Voting is not enabled right now. Contact the admin to start voting.");
+        });
     });
 
     describe("Settlement and Totalize", function () {

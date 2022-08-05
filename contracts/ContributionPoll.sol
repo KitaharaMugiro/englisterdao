@@ -38,6 +38,10 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
     // maximum number of points that can be voted
     uint256 public VOTE_MAX_POINT = 20;
 
+    // 投票可能かどうかの制御を行うフラグ
+    // flag to control voting
+    bool public votingEnabled = true;
+
     // 立候補者のリスト
     // list of candidates
     mapping(int256 => address[]) public candidates; // pollId => [candidate1, candidate2, ...]
@@ -93,6 +97,14 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
     }
 
     /**
+     * @notice Set VOTE_MAX_POINT
+     * @dev only owner can set VOTE_MAX_POINT
+     */
+    function setVotingEnabled(bool _votingEnabled) external onlyOwner {
+        votingEnabled = _votingEnabled;
+    }
+
+    /**
      * @notice candidate to the current poll
      */
     function candidateToContributionPoll() external whenNotPaused {
@@ -116,6 +128,12 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
         whenNotPaused
         returns (bool)
     {
+        // Check if votig is enabled
+        require(
+            votingEnabled,
+            "Voting is not enabled right now. Contact the admin to start voting."
+        );
+
         // if the voter is not in the top N(RANK_FOR_VOTE) of DAO token holders,
         require(_isTopHolder(), "You are not in the top RANK_FOR_VOTE holder.");
 
