@@ -50,7 +50,25 @@ describe("DAOTreasury", function () {
             expect(await treasury.getBalance()).to.equal(expectedValue);
             //console.log("treasury.getBalance = %s", await treasury.getBalance());
         });
+    });
 
+    describe("getCurrentTokenRate", function () {
+        it("初期のトークンレートは0", async function () {
+            const { treasury, } = await loadFixture(deploy);
+            const expectedValue = 0;
+            expect(await treasury.getCurrentTokenRate()).to.equal(expectedValue);
+        });
+
+        it("1000トークンに対して1ETHがあるため、0.001がトークンレートになる", async function () {
+            const { treasury, otherAccount } = await loadFixture(deploy);
+
+            // トレジャリーへ送金
+            await treasury.connect(otherAccount).deposit({ value: ethers.utils.parseEther("1.0") });
+
+            // 1000トークンに対して1 etherがあるため、0.001がトークンレートになる
+            const expectedValue = ethers.utils.parseEther("0.001");
+            expect(await treasury.getCurrentTokenRate()).to.equal(expectedValue);
+        });
     });
 
     describe("requestForTokenToEth", function () {

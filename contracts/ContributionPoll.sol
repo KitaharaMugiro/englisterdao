@@ -8,6 +8,7 @@ import "hardhat/console.sol";
 import "./lib/Array.sol";
 import "./DAOToken.sol";
 import "./lib/SafeMath.sol";
+import "./interface/DAOEvents.sol";
 
 struct Vote {
     address voter;
@@ -15,7 +16,13 @@ struct Vote {
     uint256[] points;
 }
 
-contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
+contract ContributionPoll is
+    AccessControl,
+    Ownable,
+    Pausable,
+    ReentrancyGuard,
+    DAOEvents
+{
     // ContributionPollを開始したり終了する権限
     // Role to start and end a ContributionPoll
     bytes32 public constant POLL_ADMIN_ROLE = keccak256("POLL_ADMIN_ROLE");
@@ -133,6 +140,7 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
             "Caller is not a poll admin"
         );
         votingEnabled = _votingEnabled;
+        emit VotingEnabled(pollId, votingEnabled);
     }
 
     /**
@@ -146,6 +154,7 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
             );
         }
         candidates[pollId].push(msg.sender);
+        emit Candidated(pollId, msg.sender);
     }
 
     /**
@@ -227,6 +236,7 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
 
         // save the vote to the list of votes
         votes[pollId].push(_vote);
+        emit Voted(pollId, msg.sender);
         return true;
     }
 
@@ -312,6 +322,8 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
             );
             _mintTokenForSupporter(voters, voterAssignmentToken);
         }
+
+        emit SettlePoll(pollId);
     }
 
     /**
@@ -319,6 +331,7 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
      */
     function _createContributionPoll() internal {
         pollId++;
+        emit CreatePoll(pollId);
     }
 
     /**
