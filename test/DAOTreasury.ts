@@ -56,11 +56,11 @@ describe("DAOTreasury", function () {
     describe("requestForTokenToEth", function () {
         it("指定が0トークンの場合はエラーとなること", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
-            await expect(treasury.connect(otherAccount).requestForTokenToEth(0)).revertedWith("Token(amount) must be at least 1");
+            await expect(treasury.connect(otherAccount).requestForTokenToEth(0)).revertedWith("amount must be greater than 0");
         });
         it("DAOトークンが0のアカウントはエラーとなること", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
-            await expect(treasury.connect(otherAccount).requestForTokenToEth(1)).revertedWith("Not enough tokens");
+            await expect(treasury.connect(otherAccount).requestForTokenToEth(1)).revertedWith("token balance is not enough");
         });
         it("DAOトークンが足りないアカウントはエラーとなること", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
@@ -71,8 +71,8 @@ describe("DAOTreasury", function () {
 
 
             // 単体テスト
-            await expect(treasury.connect(otherAccount).requestForTokenToEth(11)).revertedWith("Not enough tokens");
-            await expect(treasury.connect(otherAccount2).requestForTokenToEth(21)).revertedWith("Not enough tokens");
+            await expect(treasury.connect(otherAccount).requestForTokenToEth(11)).revertedWith("token balance is not enough");
+            await expect(treasury.connect(otherAccount2).requestForTokenToEth(21)).revertedWith("token balance is not enough");
         });
         it("DAOトークンの換金（残トークン数を確認）", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);

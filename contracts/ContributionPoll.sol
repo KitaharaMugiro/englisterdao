@@ -16,185 +16,129 @@ struct Vote {
 }
 
 contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
+    // ContributionPollを開始したり終了する権限
+    // Role to start and end a ContributionPoll
+    bytes32 public constant POLL_ADMIN_ROLE = keccak256("POLL_ADMIN_ROLE");
+
+    // ContributionPoll Id
     int256 public pollId = 0;
+
+    // 配布するDAOトークンのアドレス
+    // DAO token address to distribute
     address public daoTokenAddress;
-    uint256 public RANK_FOR_VOTE = 10; //DAOトークンの保有順位がRANK_FOR_VOTE以上なら投票可能
-    uint256 public CONTRIBUTOR_ASSIGNMENT_TOKEN = 5000; //貢献者に割り当てられるDAOトークンの数
-    uint256 public SUPPORTER_ASSIGNMENT_TOKEN = 3000; //投票者に割り当てられるDAOトークンの数
-    uint256 public VOTE_MAX_POINT = 20; //投票できる最大点数
+
+    // 投票はDAOトークンを保有ランキングがRANK_FOR_VOTEよりも上位の場合に可能
+    // votes are possible only if the holder has a ranking higher than RANK_FOR_VOTE
+    uint256 public RANK_FOR_VOTE = 10;
+
+    // 立候補者(貢献者)に割り当てられるDAOトークンの総数
+    // total amount of DAO tokens to be distributed to candidates(contributors)
+    uint256 public CONTRIBUTOR_ASSIGNMENT_TOKEN = 5000;
+
+    // 投票者に割り当てられるDAOトークンの総数
+    // total amount of DAO tokens to be distributed to voters
+    uint256 public SUPPORTER_ASSIGNMENT_TOKEN = 3000;
+
+    // 投票時に指定できる最大点数
+    // maximum number of points that can be voted
+    uint256 public VOTE_MAX_POINT = 20;
+
+    // 投票可能かどうかの制御を行うフラグ
+    // flag to control voting
+    bool public votingEnabled = true;
+
+    // 立候補者のリスト
+    // list of candidates
     mapping(int256 => address[]) public candidates; // pollId => [candidate1, candidate2, ...]
 
-    //TODO: votesからvotersは取得できるため、リファクタリングして削除する
-    mapping(int256 => address[]) public voters; // pollId => [candidate1, candidate2, ...]
+    // 投票のリスト
+    // list of vote
     mapping(int256 => Vote[]) public votes; // pollId => [vote1, vote2, ...]
 
     /**
-     * @notice DAO Token Addressを指定する
+     * @notice Set DAO Token Address
+     * @dev only owner can set DAO Token Address
      */
     function setDaoTokenAddress(address _daoTokenAddress) external onlyOwner {
         daoTokenAddress = _daoTokenAddress;
     }
 
     /**
-     * @notice RANK_FOR_VOTEを指定する
+     * @notice Set POLL_ADMIN_ROLE
+     * @dev only owner can set POLL_ADMIN_ROLE
      */
-    function setRankForVote(uint256 _rankForVote) external onlyOwner {
+    function setPollAdminRole(address _address) external onlyOwner {
+        _setupRole(POLL_ADMIN_ROLE, _address);
+    }
+
+    /**
+     * @notice Set RANK_FOR_VOTE
+     * @dev only poll admin can set RANK_FOR_VOTE
+     */
+    function setRankForVote(uint256 _rankForVote) external {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
+        );
         RANK_FOR_VOTE = _rankForVote;
     }
 
     /**
-     * @notice CONTRIBUTOR_ASSIGNMENT_TOKENを指定する
+     * @notice Set CONTRIBUTOR_ASSIGNMENT_TOKEN
+     * @dev only poll admin can set CONTRIBUTOR_ASSIGNMENT_TOKEN
      */
     function setContributorAssignmentToken(uint256 _contributorAssignmentToken)
         external
-        onlyOwner
     {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
+        );
         CONTRIBUTOR_ASSIGNMENT_TOKEN = _contributorAssignmentToken;
     }
 
     /**
-     * @notice SUPPORTER_ASSIGNMENT_TOKENを指定する
+     * @notice Set SUPPORTER_ASSIGNMENT_TOKEN
+     * @dev only poll admin can set SUPPORTER_ASSIGNMENT_TOKEN
      */
     function setSupporterAssignmentToken(uint256 _supporterAssignmentToken)
         external
-        onlyOwner
     {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
+        );
         SUPPORTER_ASSIGNMENT_TOKEN = _supporterAssignmentToken;
     }
 
     /**
-     * @notice VOTE_MAX_POINTを指定する
+     * @notice Set VOTE_MAX_POINT
+     * @dev only poll admin can set VOTE_MAX_POINT
      */
-    function setVoteMaxPoint(uint256 _voteMaxPoint) external onlyOwner {
+    function setVoteMaxPoint(uint256 _voteMaxPoint) external {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
+        );
         VOTE_MAX_POINT = _voteMaxPoint;
     }
 
     /**
-     * @notice Settle the current poll, and start new poll
+     * @notice Set VOTE_MAX_POINT
+     * @dev only poll admin can set VOTE_MAX_POINT
      */
-    function settleCurrentPollAndCreateNewPoll()
-        external
-        onlyOwner
-        whenNotPaused
-        nonReentrant
-    {
-        _settleContributionPoll();
-        _createContributionPoll();
-    }
-
-    /**
-     * @notice Settle the current poll and aggregate the result
-     */
-    function _settleContributionPoll() internal {
-        // 貢献度投票の集計を行う
-
-        // 票を標準化する (TODO: 投票時に計算してもいいかも)
-        // 例: [(a, 4), (b, 5), (c,0)]という投票結果を[(a, 44), (b, 55), (c, 0)]に変換する
-        for (uint256 index = 0; index < votes[pollId].length; index++) {
-            Vote memory vote = votes[pollId][index];
-            uint256 totalPoints = 0;
-            for (
-                uint256 candidateIndex = 0;
-                candidateIndex < vote.candidates.length;
-                candidateIndex++
-            ) {
-                totalPoints = SafeMath.add(
-                    totalPoints,
-                    vote.points[candidateIndex]
-                );
-            }
-            for (
-                uint256 candidateIndex = 0;
-                candidateIndex < vote.candidates.length;
-                candidateIndex++
-            ) {
-                //WARN : 小数部分を切り捨てる
-                vote.points[candidateIndex] = SafeMath.div(
-                    SafeMath.mul(vote.points[candidateIndex], 100),
-                    totalPoints
-                );
-            }
-            votes[pollId][index] = vote;
-        }
-
-        // 投票結果を合算する
-        // ex:  [(a, 44.4), (b, 55.5), (c, 0)] + [(a,20), (c:100)] = [(a, 64.4), (b:55.5), (c:100)]
-        address[] memory summedCandidates = candidates[pollId];
-        uint256[] memory summedPoints = new uint256[](
-            candidates[pollId].length
+    function setVotingEnabled(bool _votingEnabled) external {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
         );
-        for (uint256 index = 0; index < votes[pollId].length; index++) {
-            Vote memory _vote = votes[pollId][index];
-            for (
-                uint256 candidateIndex = 0;
-                candidateIndex < _vote.candidates.length;
-                candidateIndex++
-            ) {
-                address _candidate = _vote.candidates[candidateIndex];
-                uint256 _point = _vote.points[candidateIndex];
-                for (
-                    uint256 summedCandidateIndex = 0;
-                    summedCandidateIndex < summedCandidates.length;
-                    summedCandidateIndex++
-                ) {
-                    if (summedCandidates[summedCandidateIndex] == _candidate) {
-                        summedPoints[summedCandidateIndex] = SafeMath.add(
-                            summedPoints[summedCandidateIndex],
-                            _point
-                        );
-                        break;
-                    }
-                }
-            }
-        }
-
-        // Contributorへの配布量を決定する
-        // [(a, 64.4), (b:55.5), (c:100)] => [(a, 0.29), (b:0.25), (c:0.45)] =>  [(a, 1450), (b: 1250), (c:2250)]
-        uint256 totalPoints = 0;
-        for (uint256 index = 0; index < summedPoints.length; index++) {
-            uint256 _points = summedPoints[index];
-            totalPoints = SafeMath.add(totalPoints, _points);
-        }
-
-        uint256[] memory assignmentToken = new uint256[](
-            candidates[pollId].length
-        );
-        if (totalPoints > 0) {
-            for (uint256 index = 0; index < summedCandidates.length; index++) {
-                uint256 _points = summedPoints[index];
-                assignmentToken[index] = SafeMath.div(
-                    SafeMath.mul(_points, CONTRIBUTOR_ASSIGNMENT_TOKEN),
-                    totalPoints
-                );
-            }
-            // Contributorへの配布を実行
-            _mintTokenForContributor(summedCandidates, assignmentToken);
-        }
-
-        // 投票者への配布量を決定する (等分する)
-        uint256 totalVoterCount = voters[pollId].length;
-        if (totalVoterCount > 0) {
-            uint256 voterAssignmentToken = SafeMath.div(
-                SUPPORTER_ASSIGNMENT_TOKEN,
-                totalVoterCount
-            );
-            // 投票者への配布を実行
-            _mintTokenForSupporter(voters[pollId], voterAssignmentToken);
-        }
-    }
-
-    /**
-     * @notice start new poll
-     */
-    function _createContributionPoll() internal {
-        pollId++;
+        votingEnabled = _votingEnabled;
     }
 
     /**
      * @notice candidate to the current poll
      */
     function candidateToContributionPoll() external whenNotPaused {
-        //すでにmsg.senderが立候補済みか確認
         for (uint256 index = 0; index < candidates[pollId].length; index++) {
             require(
                 candidates[pollId][index] != msg.sender,
@@ -205,64 +149,31 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
     }
 
     /**
-     * @notice SenderがDAO TokenのTop N(RANK_FOR_VOTE)のホルダーであるかをチェックする
-     */
-    function _isTopHolder() internal view returns (bool) {
-        DAOToken daoToken = DAOToken(daoTokenAddress);
-        if (Array.contains(daoToken.getTop(RANK_FOR_VOTE), msg.sender)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @notice DAOトークンを発行し送付する
-     */
-    function _mintTokenForContributor(
-        address[] memory to,
-        uint256[] memory amount
-    ) internal {
-        require(
-            to.length == amount.length,
-            "to and amount must be same length"
-        );
-        DAOToken daoToken = DAOToken(daoTokenAddress);
-        for (uint256 index = 0; index < to.length; index++) {
-            daoToken.mint(to[index], amount[index]);
-        }
-    }
-
-    /**
-     * @notice DAOトークンを発行し送付する
-     */
-    function _mintTokenForSupporter(address[] memory to, uint256 amount)
-        internal
-    {
-        DAOToken daoToken = DAOToken(daoTokenAddress);
-        for (uint256 index = 0; index < to.length; index++) {
-            daoToken.mint(to[index], amount);
-        }
-    }
-
-    /**
-     * @notice vote to the current poll
+     * @notice vote to the current poll.
+     * @dev Voters assign points to candidates and register their votes.
+     * Points are normalized to a total of 100 points.
+     * A voted point for oneself will always be 0.
      */
     function vote(address[] memory _candidates, uint256[] memory _points)
         external
         whenNotPaused
         returns (bool)
     {
-        // DAOトークンのTOP N(RANK_FOR_VOTE)に入っていない場合は投票することはできない
-        require(_isTopHolder(), "You are not in the top RANK_FOR_VOTE holder.");
-
-        // Check if the voter is already voted
-        // TODO:投票を上書きする処理を書いた後にこの制限をなくす
+        // Check if votig is enabled
         require(
-            !Array.contains(voters[pollId], msg.sender),
-            "You are already voted."
+            votingEnabled,
+            "Voting is not enabled right now. Contact the admin to start voting."
         );
 
-        // Check if the candidate is valid
+        // if the voter is not in the top N(RANK_FOR_VOTE) of DAO token holders,
+        require(_isTopHolder(), "You are not in the top RANK_FOR_VOTE holder.");
+
+        address[] memory voters = getCurrentVoters();
+
+        // Check if the voter is already voted
+        require(!Array.contains(voters, msg.sender), "You are already voted.");
+
+        // Check if the candidate is not empty
         require(_candidates.length != 0, "Candidates must not be empty.");
 
         // Check if the points and candidates are the same length
@@ -288,37 +199,219 @@ contract ContributionPoll is AccessControl, Ownable, Pausable, ReentrancyGuard {
                 "The points are not valid. (points < VOTE_MAX_POINT)"
             );
 
-            // 自分のポイントは必ずゼロにする
+            // A voted point for oneself will always be 0.
             if (_candidates[index] == msg.sender) {
                 _points[index] = 0;
             }
         }
 
-        //投票を記録
         Vote memory _vote = Vote({
             voter: msg.sender,
             candidates: _candidates,
             points: _points
         });
+
+        uint256 totalPoints = _calculateTotalPoint(_vote);
+
+        // normalize the points to a total of 100 points
+        for (
+            uint256 candidateIndex = 0;
+            candidateIndex < _vote.candidates.length;
+            candidateIndex++
+        ) {
+            _vote.points[candidateIndex] = SafeMath.div(
+                SafeMath.mul(_vote.points[candidateIndex], 100),
+                totalPoints
+            );
+        }
+
+        // save the vote to the list of votes
         votes[pollId].push(_vote);
-
-        // 投票した人を記録
-        voters[pollId].push(msg.sender);
-
         return true;
+    }
+
+    /**
+     * @notice Settle the current poll, and start new poll
+     * @dev only poll admin can execute this function and it is expected that external cron system calls this function weekly or bi-weekly.
+     */
+    function settleCurrentPollAndCreateNewPoll()
+        external
+        whenNotPaused
+        nonReentrant
+    {
+        require(
+            hasRole(POLL_ADMIN_ROLE, msg.sender),
+            "Caller is not a poll admin"
+        );
+        _settleContributionPoll();
+        _createContributionPoll();
+    }
+
+    /**
+     * @notice Settle the current poll and aggregate the result
+     */
+    function _settleContributionPoll() internal {
+        // Add up votes for each candidate
+        address[] memory summedCandidates = candidates[pollId];
+        uint256[] memory summedPoints = new uint256[](
+            candidates[pollId].length
+        );
+        address[] memory voters = getCurrentVoters();
+        for (uint256 index = 0; index < votes[pollId].length; index++) {
+            Vote memory _vote = votes[pollId][index];
+            for (
+                uint256 candidateIndex = 0;
+                candidateIndex < _vote.candidates.length;
+                candidateIndex++
+            ) {
+                address _candidate = _vote.candidates[candidateIndex];
+                uint256 _point = _vote.points[candidateIndex];
+                for (
+                    uint256 summedCandidateIndex = 0;
+                    summedCandidateIndex < summedCandidates.length;
+                    summedCandidateIndex++
+                ) {
+                    if (summedCandidates[summedCandidateIndex] == _candidate) {
+                        summedPoints[summedCandidateIndex] = SafeMath.add(
+                            summedPoints[summedCandidateIndex],
+                            _point
+                        );
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Decide how much to distribute to Contributors
+        uint256 totalPoints = 0;
+        for (uint256 index = 0; index < summedPoints.length; index++) {
+            uint256 _points = summedPoints[index];
+            totalPoints = SafeMath.add(totalPoints, _points);
+        }
+
+        uint256[] memory assignmentToken = new uint256[](
+            candidates[pollId].length
+        );
+        if (totalPoints > 0) {
+            for (uint256 index = 0; index < summedCandidates.length; index++) {
+                uint256 _points = summedPoints[index];
+                assignmentToken[index] = SafeMath.div(
+                    SafeMath.mul(_points, CONTRIBUTOR_ASSIGNMENT_TOKEN),
+                    totalPoints
+                );
+            }
+            _mintTokenForContributor(summedCandidates, assignmentToken);
+        }
+
+        // Decide how much to distribute to Supporters
+        uint256 totalVoterCount = voters.length;
+        if (totalVoterCount > 0) {
+            uint256 voterAssignmentToken = SafeMath.div(
+                SUPPORTER_ASSIGNMENT_TOKEN,
+                totalVoterCount
+            );
+            _mintTokenForSupporter(voters, voterAssignmentToken);
+        }
+    }
+
+    /**
+     * @notice start new poll
+     */
+    function _createContributionPoll() internal {
+        pollId++;
+    }
+
+    /**
+     * @notice Check if the Sender is a DAO Token Top N (RANK_FOR_VOTE) holder
+     */
+    function _isTopHolder() internal view returns (bool) {
+        DAOToken daoToken = DAOToken(daoTokenAddress);
+        if (Array.contains(daoToken.getTopHolders(RANK_FOR_VOTE), msg.sender)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @notice Mint dao token for contributors
+     */
+    function _mintTokenForContributor(
+        address[] memory to,
+        uint256[] memory amount
+    ) internal {
+        require(
+            to.length == amount.length,
+            "to and amount must be same length"
+        );
+        DAOToken daoToken = DAOToken(daoTokenAddress);
+        for (uint256 index = 0; index < to.length; index++) {
+            daoToken.mint(to[index], amount[index]);
+        }
+    }
+
+    /**
+     * @notice Mint dao token for supporters
+     */
+    function _mintTokenForSupporter(address[] memory to, uint256 amount)
+        internal
+    {
+        DAOToken daoToken = DAOToken(daoTokenAddress);
+        for (uint256 index = 0; index < to.length; index++) {
+            daoToken.mint(to[index], amount);
+        }
+    }
+
+    /**
+     * @notice Sum up the points of the vote
+     */
+    function _calculateTotalPoint(Vote memory _vote)
+        internal
+        pure
+        returns (uint256)
+    {
+        uint256 totalPoints = 0;
+        for (
+            uint256 candidateIndex = 0;
+            candidateIndex < _vote.candidates.length;
+            candidateIndex++
+        ) {
+            totalPoints = SafeMath.add(
+                totalPoints,
+                _vote.points[candidateIndex]
+            );
+        }
+
+        require(
+            totalPoints > 0,
+            "The total points are not valid. (totalPoints <= 0)"
+        );
+
+        return totalPoints;
     }
 
     /**
      * @notice get the current poll's candidates
      */
-    function getCandidates() external view returns (address[] memory) {
+    function getCurrentCandidates() public view returns (address[] memory) {
         return candidates[pollId];
     }
 
     /**
      * @notice get the current poll's votes
      */
-    function getVotes() external view returns (Vote[] memory) {
+    function getCurrentVotes() public view returns (Vote[] memory) {
         return votes[pollId];
+    }
+
+    /**
+     * @notice get the current poll's voters
+     */
+    function getCurrentVoters() public view returns (address[] memory) {
+        Vote[] memory _votes = votes[pollId];
+        address[] memory _voters = new address[](_votes.length);
+        for (uint256 index = 0; index < _votes.length; index++) {
+            _voters[index] = _votes[index].voter;
+        }
+        return _voters;
     }
 }

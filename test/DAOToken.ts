@@ -74,7 +74,7 @@ describe("DAOToken", function () {
 
 
             const expected = [owner.address, otherAccount.address, otherAccount2.address]
-            const result = await token.getTop(3);
+            const result = await token.getTopHolders(3);
             expect(result[0]).to.equal(expected[0]);
             expect(result[1]).to.equal(expected[1]);
             expect(result[2]).to.equal(expected[2]);
@@ -87,7 +87,7 @@ describe("DAOToken", function () {
             await token.connect(owner).transfer(otherAccount2.address, 20);
 
             const expected = [owner.address, otherAccount2.address]
-            const result = await token.getTop(2);
+            const result = await token.getTopHolders(2);
             expect(result[0]).to.equal(expected[0]);
             expect(result[1]).to.equal(expected[1]);
         });
@@ -101,7 +101,7 @@ describe("DAOToken", function () {
 
 
             const expected = [owner.address, otherAccount2.address, otherAccount.address, "0x0000000000000000000000000000000000000000"]
-            const result = await token.getTop(4);
+            const result = await token.getTopHolders(4);
             expect(result[0]).to.equal(expected[0]);
             expect(result[1]).to.equal(expected[1]);
             expect(result[2]).to.equal(expected[2]);
