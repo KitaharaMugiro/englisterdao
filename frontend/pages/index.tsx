@@ -1,24 +1,17 @@
 import { useEffect, useState } from "react";
-import { ethers } from "ethers";
-import artifact from "../src/DAOTokenAbi.json";
+import MetaMaskLoginButton from "../components/web3/MetaMaskLoginButton";
+import MetaMaskLoginState from "../components/web3/MetaMaskLoginState";
+import artifact from "../src/abi/DAOToken.json";
 
 const contractAddress = '0x2279b7a0a67db372996a5fab50d91eaa73d2ebe6'
 export default () => {
     const [count, setCount] = useState(0);
-    const provider = new ethers.providers.JsonRpcProvider();
-    const contract = new ethers.Contract(contractAddress, artifact.abi, provider);
-    const { totalSupply, balanceOf } = contract.functions;
 
-    useEffect(() => {
-        const getTaskCount = async () => {
-            const totalSupplyOfDAOToken = await totalSupply();
-            setCount(Number(totalSupplyOfDAOToken));
-        }
-        getTaskCount()
-    }, [])
 
     return (
         <div>
+            <MetaMaskLoginButton />
+            <MetaMaskLoginState />
             <h1 >{count}</h1>
         </div>
     );
