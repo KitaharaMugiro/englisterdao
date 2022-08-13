@@ -34,20 +34,6 @@ describe("DAOToken", function () {
         });
     });
 
-    describe("Deployment", function () {
-        it("初期発行枚数は100枚である", async function () {
-            const { token } = await loadFixture(deployFixture);
-            const expectedBalance = 100
-            expect(await token.totalSupply()).to.equal(expectedBalance);
-        });
-
-        it("初期発行トークンはownerが保有している", async function () {
-            const { token, owner } = await loadFixture(deployFixture);
-            const expectedBalance = 100
-            expect(await token.balanceOf(owner.address)).to.equal(expectedBalance);
-        });
-    });
-
     describe("Send", function () {
         it("複数のアカウントに対して1度に送金することができる", async function () {
             const { token, owner, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
