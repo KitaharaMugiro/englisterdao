@@ -21,9 +21,16 @@ etherjs を利用してコントラクトと接続するためには、以下が
 ## ABIのコピー
 ```
 cd ./frontend
-cp -rp ../artifacts/contracts/ContributionPoll.sol/ContributionPoll.json src/ContributionPollAbi.json
-cp -rp ../artifacts/contracts/DAOToken.sol/DAOToken.json src/DAOTokenAbi.json
-cp -rp ../artifacts/contracts/DAOTreasury.sol/DAOTreasury.json src/DAOTreasuryAbi.json
+cp -rp ../artifacts/contracts/ContributionPoll.sol/ContributionPoll.json src/abi/
+cp -rp ../artifacts/contracts/DAOToken.sol/DAOToken.json src/abi/
+cp -rp ../artifacts/contracts/DAOTreasury.sol/DAOTreasury.json src/abi/
+```
+
+# 型の自動生成
+
+```
+cd ./frontend
+npx typechain --target=ethers-v5 src/abi/*.json
 ```
 
 # 参考
