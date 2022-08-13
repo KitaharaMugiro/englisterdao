@@ -28,3 +28,28 @@ npx hardhat test
 
 # verify
 npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network goerli {0xCONTRACT_ADDRESS} Englister ENG 100
+
+# compile
+EVMで動かすためのbyte codeおよびABIをartifactsディレクトリに生成する。
+
+```
+npx hardhat compile
+```
+
+# コントラクトのローカルデプロイ
+scripts/deploy.tsが実装されていることを確認する。
+
+```
+npx hardhat node
+```
+
+以下のようなアウトプットが出てくるため、フロントエンドはここと疎通させる。
+
+```
+> Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
+```
+
+以下コマンドでデプロイを行う。
+```
+npx hardhat run scripts/deploy.ts --network localhost
+```
