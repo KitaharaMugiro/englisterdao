@@ -109,6 +109,10 @@ describe("DAOToken", function () {
 
 
     describe("Role Setting", function () {
+        it("ownerでなければロールをつけることはできない", async function () {
+            const { token, owner, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
+            await expect(token.connect(otherAccount).setupBurnerRole(otherAccount.address)).to.be.revertedWith("Ownable: caller is not the owner");
+        });
 
         it("MINTER_ROLEは通貨を新規発行することができる", async function () {
             const { token, otherAccount, otherAccount2 } = await loadFixture(deployFixture);

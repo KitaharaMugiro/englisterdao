@@ -424,9 +424,4 @@ describe("ContributionPoll", function () {
         });
 
     });
-
-    describe("Role Setting", function () {
-        it("", async function () {
-        })
-    })
 });
