@@ -1,8 +1,16 @@
+import CandidateForm from "../components/web3/poll/CandidateForm"
+import CandidateList from "../components/web3/poll/CandidateList"
+import SettleCurrentPollForm from "../components/web3/poll/SettleCurrentPollForm"
+import VoteForm from "../components/web3/poll/VoteForm"
+
 export default () => {
     return <div>
-        <p>立候補者</p>
-        <p>投票する</p>
-        <p>立候補する</p>
-        <p>投票を締め切る(onlyOwner)</p>
+        <CandidateList />
+
+        <VoteForm />
+
+        <CandidateForm />
+
+        <SettleCurrentPollForm />
     </div>
 }
