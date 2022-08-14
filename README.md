@@ -53,3 +53,10 @@ npx hardhat node
 ```
 npx hardhat run scripts/deploy.ts --network localhost
 ```
+
+## デモデータの作成
+
+### 立候補
+```
+npx hardhat run scripts/demo/candidate.ts --network localhost
+```
