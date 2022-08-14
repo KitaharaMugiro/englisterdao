@@ -77,7 +77,10 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard, DAOEvents {
      */
     function getCurrentTokenRate() public view returns (uint256) {
         DAOToken daoToken = DAOToken(_daoTokenAddress);
-        uint256 total_supply = daoToken.totalSupply(); // Get the totalSupply of DAOTokens.
+        uint256 total_supply = daoToken.totalSupply();
+        if (total_supply == 0) {
+            return 0;
+        }
         return SafeMath.div(SafeMath.mul(getBalance(), 1), total_supply);
     }
 }

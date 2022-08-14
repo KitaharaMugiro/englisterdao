@@ -69,6 +69,13 @@ describe("DAOTreasury", function () {
             const expectedValue = ethers.utils.parseEther("0.001");
             expect(await treasury.getCurrentTokenRate()).to.equal(expectedValue);
         });
+
+        it("トークン総発行数が0の場合は0", async function () {
+            const { treasury, token, owner } = await loadFixture(deploy);
+            await treasury.withdraw(await token.balanceOf(owner.address));
+            const expectedValue = 0;
+            expect(await treasury.getCurrentTokenRate()).to.equal(expectedValue);
+        });
     });
 
     describe("withdraw", function () {
