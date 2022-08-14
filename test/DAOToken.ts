@@ -4,11 +4,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 
 describe("DAOToken", function () {
-    // We define a fixture to reuse the same setup in every test.
-    // We use loadFixture to run this setup once, snapshot that state,
-    // and reset Hardhat Network to that snapshopt in every test.
     async function deployFixture() {
-        // Contracts are deployed using the first signer/account by default
         const [owner, otherAccount, otherAccount2] = await ethers.getSigners();
 
         const EnglisterToken = await ethers.getContractFactory("DAOToken");
@@ -109,28 +105,38 @@ describe("DAOToken", function () {
         });
     })
 
-    describe("Mint", function () {
+
+
+
+    describe("Role Setting", function () {
+
         it("MINTER_ROLEは通貨を新規発行することができる", async function () {
-            //NOT YET IMPLEMENTED
+            const { token, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
+            await token.setupMinterRole(otherAccount.address);
+            await token.connect(otherAccount).mint(otherAccount2.address, 10);
+            expect(await token.balanceOf(otherAccount2.address)).to.equal(10);
         });
-
-        it("MINTER_ROLEは通貨を新規発行し、複数アカウントに配布することができる", async function () {
-            //NOT YET IMPLEMENTED
-        });
-
 
         it("MINTER_ROLEでなければ新規発行することができない", async function () {
-            //NOT YET IMPLEMENTED
+            const { token, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
+            await token.setupMinterRole(otherAccount.address);
+            await expect(token.mint(otherAccount2.address, 10)).revertedWith("Caller is not a minter");
+            await expect(token.connect(otherAccount2).mint(otherAccount2.address, 10)).revertedWith("Caller is not a minter");
         });
-    });
 
-    describe("Burn", function () {
         it("BURNER_ROLEは通貨をバーンすることができる", async function () {
-            //NOT YET IMPLEMENTED
+            const { token, otherAccount, owner } = await loadFixture(deployFixture);
+            await token.setupBurnerRole(otherAccount.address);
+            await token.connect(otherAccount).burn(owner.address, 10);
+            expect(await token.balanceOf(owner.address)).to.equal(90);
         });
 
         it("BURNER_ROLEでなければバーンすることができない", async function () {
-            //NOT YET IMPLEMENTED
+            const { token, owner, otherAccount, otherAccount2 } = await loadFixture(deployFixture);
+            await token.setupBurnerRole(otherAccount.address);
+            await expect(token.burn(owner.address, 10)).revertedWith("Caller is not a burner");
+            await expect(token.connect(otherAccount2).burn(owner.address, 10)).revertedWith("Caller is not a burner");
         });
-    });
+
+    })
 });
