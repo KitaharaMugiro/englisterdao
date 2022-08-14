@@ -1,17 +1,3 @@
-# Sample Hardhat Project
-
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
-
 # 環境構築
 以下を参考にhardhatを導入した。  
 https://hardhat.org/hardhat-runner/docs/getting-started
@@ -21,42 +7,46 @@ https://hardhat.org/hardhat-runner/docs/getting-started
 npm ci
 ```
 
-テストを実行する。
-```
-npx hardhat test
-```
+# コントラクトのローカルネットワークへのデプロイ手順
+scripts/deploy.tsが適切に実装されていることを確認する。
 
-# verify
-npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network goerli {0xCONTRACT_ADDRESS} Englister ENG 100
-
-# compile
-EVMで動かすためのbyte codeおよびABIをartifactsディレクトリに生成する。
+## ノードの立ち上げ
+`npx hardhat node`でノードが立ち上がり、以下のようなアウトプットが出てくる。
+フロントエンドはここに表示されたURL(以下の場合は http://127.0.0.1:8545/ )と疎通させる。
 
 ```
-npx hardhat compile
+$ npx hardhat node
+Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
+
+Accounts
+========
+
+WARNING: These accounts, and their private keys, are publicly known.
+Any funds sent to them on Mainnet or any other live network WILL BE LOST.
+
+Account #0: ...
+Private Key: ...
+
+...
+
+WARNING: These accounts, and their private keys, are publicly known.
+Any funds sent to them on Mainnet or any other live network WILL BE LOST.
 ```
 
-# コントラクトのローカルデプロイ
-scripts/deploy.tsが実装されていることを確認する。
-
-```
-npx hardhat node
-```
-
-以下のようなアウトプットが出てくるため、フロントエンドはここと疎通させる。
-
-```
-> Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
-```
-
+## デプロイ
 以下コマンドでデプロイを行う。
 ```
 npx hardhat run scripts/deploy.ts --network localhost
 ```
 
 ## デモデータの作成
+### 立候補データ
+複数のアカウントが現在開催されているpollに立候補します。
 
-### 立候補
 ```
 npx hardhat run scripts/demo/candidate.ts --network localhost
 ```
+
+# verify
+npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network goerli {0xCONTRACT_ADDRESS} Englister ENG 100
+
