@@ -1,4 +1,5 @@
 import useContributionPoll from "../../../hooks/useContributionPoll"
+import ContributorList from "../../spreadsheet/ContributorList"
 
 export default () => {
     const { pollId, candidates } = useContributionPoll()
@@ -10,5 +11,6 @@ export default () => {
                 <p>({index + 1})  {candidate}</p>
             </div>
         ))}
+        <ContributorList filterAddressList={candidates} />
     </div>
 }
