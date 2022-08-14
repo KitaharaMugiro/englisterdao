@@ -36,10 +36,9 @@ export interface DAOTreasuryInterface extends utils.Interface {
     "owner()": FunctionFragment;
     "paused()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "requestForTokenToEth(uint256)": FunctionFragment;
     "setDAOTokenAddress(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "withdraw()": FunctionFragment;
+    "withdraw(uint256)": FunctionFragment;
   };
 
   getFunction(
@@ -50,7 +49,6 @@ export interface DAOTreasuryInterface extends utils.Interface {
       | "owner"
       | "paused"
       | "renounceOwnership"
-      | "requestForTokenToEth"
       | "setDAOTokenAddress"
       | "transferOwnership"
       | "withdraw"
@@ -72,10 +70,6 @@ export interface DAOTreasuryInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "requestForTokenToEth",
-    values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setDAOTokenAddress",
     values: [PromiseOrValue<string>]
   ): string;
@@ -83,7 +77,10 @@ export interface DAOTreasuryInterface extends utils.Interface {
     functionFragment: "transferOwnership",
     values: [PromiseOrValue<string>]
   ): string;
-  encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "withdraw",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
 
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getBalance", data: BytesLike): Result;
@@ -95,10 +92,6 @@ export interface DAOTreasuryInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "requestForTokenToEth",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -117,11 +110,11 @@ export interface DAOTreasuryInterface extends utils.Interface {
     "Deposited(address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Paused(address)": EventFragment;
-    "RequestForTokenToEth(uint256,uint256)": EventFragment;
     "SettlePoll(int256)": EventFragment;
     "Unpaused(address)": EventFragment;
     "Voted(int256,address)": EventFragment;
     "VotingEnabled(int256,bool)": EventFragment;
+    "WithdrawEth(uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Candidated"): EventFragment;
@@ -129,11 +122,11 @@ export interface DAOTreasuryInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Deposited"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RequestForTokenToEth"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SettlePoll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Voted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "VotingEnabled"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WithdrawEth"): EventFragment;
 }
 
 export interface CandidatedEventObject {
@@ -184,18 +177,6 @@ export type PausedEvent = TypedEvent<[string], PausedEventObject>;
 
 export type PausedEventFilter = TypedEventFilter<PausedEvent>;
 
-export interface RequestForTokenToEthEventObject {
-  amount: BigNumber;
-  payedAmount: BigNumber;
-}
-export type RequestForTokenToEthEvent = TypedEvent<
-  [BigNumber, BigNumber],
-  RequestForTokenToEthEventObject
->;
-
-export type RequestForTokenToEthEventFilter =
-  TypedEventFilter<RequestForTokenToEthEvent>;
-
 export interface SettlePollEventObject {
   pollId: BigNumber;
 }
@@ -228,6 +209,17 @@ export type VotingEnabledEvent = TypedEvent<
 >;
 
 export type VotingEnabledEventFilter = TypedEventFilter<VotingEnabledEvent>;
+
+export interface WithdrawEthEventObject {
+  amount: BigNumber;
+  payedAmount: BigNumber;
+}
+export type WithdrawEthEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  WithdrawEthEventObject
+>;
+
+export type WithdrawEthEventFilter = TypedEventFilter<WithdrawEthEvent>;
 
 export interface DAOTreasury extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -272,11 +264,6 @@ export interface DAOTreasury extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    requestForTokenToEth(
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     setDAOTokenAddress(
       _address: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -288,6 +275,7 @@ export interface DAOTreasury extends BaseContract {
     ): Promise<ContractTransaction>;
 
     withdraw(
+      _amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
@@ -308,11 +296,6 @@ export interface DAOTreasury extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  requestForTokenToEth(
-    _amount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   setDAOTokenAddress(
     _address: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -324,6 +307,7 @@ export interface DAOTreasury extends BaseContract {
   ): Promise<ContractTransaction>;
 
   withdraw(
+    _amount: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -340,11 +324,6 @@ export interface DAOTreasury extends BaseContract {
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    requestForTokenToEth(
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     setDAOTokenAddress(
       _address: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -355,7 +334,10 @@ export interface DAOTreasury extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    withdraw(overrides?: CallOverrides): Promise<boolean>;
+    withdraw(
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {
@@ -392,15 +374,6 @@ export interface DAOTreasury extends BaseContract {
     "Paused(address)"(account?: null): PausedEventFilter;
     Paused(account?: null): PausedEventFilter;
 
-    "RequestForTokenToEth(uint256,uint256)"(
-      amount?: null,
-      payedAmount?: null
-    ): RequestForTokenToEthEventFilter;
-    RequestForTokenToEth(
-      amount?: null,
-      payedAmount?: null
-    ): RequestForTokenToEthEventFilter;
-
     "SettlePoll(int256)"(pollId?: null): SettlePollEventFilter;
     SettlePoll(pollId?: null): SettlePollEventFilter;
 
@@ -421,6 +394,12 @@ export interface DAOTreasury extends BaseContract {
       enabled?: null
     ): VotingEnabledEventFilter;
     VotingEnabled(pollId?: null, enabled?: null): VotingEnabledEventFilter;
+
+    "WithdrawEth(uint256,uint256)"(
+      amount?: null,
+      payedAmount?: null
+    ): WithdrawEthEventFilter;
+    WithdrawEth(amount?: null, payedAmount?: null): WithdrawEthEventFilter;
   };
 
   estimateGas: {
@@ -440,11 +419,6 @@ export interface DAOTreasury extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    requestForTokenToEth(
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     setDAOTokenAddress(
       _address: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -456,6 +430,7 @@ export interface DAOTreasury extends BaseContract {
     ): Promise<BigNumber>;
 
     withdraw(
+      _amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
@@ -479,11 +454,6 @@ export interface DAOTreasury extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    requestForTokenToEth(
-      _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     setDAOTokenAddress(
       _address: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -495,6 +465,7 @@ export interface DAOTreasury extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     withdraw(
+      _amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };

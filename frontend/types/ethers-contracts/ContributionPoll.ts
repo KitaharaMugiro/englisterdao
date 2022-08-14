@@ -359,7 +359,6 @@ export interface ContributionPollInterface extends utils.Interface {
     "Deposited(address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Paused(address)": EventFragment;
-    "RequestForTokenToEth(uint256,uint256)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
@@ -367,6 +366,7 @@ export interface ContributionPollInterface extends utils.Interface {
     "Unpaused(address)": EventFragment;
     "Voted(int256,address)": EventFragment;
     "VotingEnabled(int256,bool)": EventFragment;
+    "WithdrawEth(uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Candidated"): EventFragment;
@@ -374,7 +374,6 @@ export interface ContributionPollInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Deposited"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RequestForTokenToEth"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
@@ -382,6 +381,7 @@ export interface ContributionPollInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Voted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "VotingEnabled"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WithdrawEth"): EventFragment;
 }
 
 export interface CandidatedEventObject {
@@ -431,18 +431,6 @@ export interface PausedEventObject {
 export type PausedEvent = TypedEvent<[string], PausedEventObject>;
 
 export type PausedEventFilter = TypedEventFilter<PausedEvent>;
-
-export interface RequestForTokenToEthEventObject {
-  amount: BigNumber;
-  payedAmount: BigNumber;
-}
-export type RequestForTokenToEthEvent = TypedEvent<
-  [BigNumber, BigNumber],
-  RequestForTokenToEthEventObject
->;
-
-export type RequestForTokenToEthEventFilter =
-  TypedEventFilter<RequestForTokenToEthEvent>;
 
 export interface RoleAdminChangedEventObject {
   role: string;
@@ -513,6 +501,17 @@ export type VotingEnabledEvent = TypedEvent<
 >;
 
 export type VotingEnabledEventFilter = TypedEventFilter<VotingEnabledEvent>;
+
+export interface WithdrawEthEventObject {
+  amount: BigNumber;
+  payedAmount: BigNumber;
+}
+export type WithdrawEthEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  WithdrawEthEventObject
+>;
+
+export type WithdrawEthEventFilter = TypedEventFilter<WithdrawEthEvent>;
 
 export interface ContributionPoll extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -970,15 +969,6 @@ export interface ContributionPoll extends BaseContract {
     "Paused(address)"(account?: null): PausedEventFilter;
     Paused(account?: null): PausedEventFilter;
 
-    "RequestForTokenToEth(uint256,uint256)"(
-      amount?: null,
-      payedAmount?: null
-    ): RequestForTokenToEthEventFilter;
-    RequestForTokenToEth(
-      amount?: null,
-      payedAmount?: null
-    ): RequestForTokenToEthEventFilter;
-
     "RoleAdminChanged(bytes32,bytes32,bytes32)"(
       role?: PromiseOrValue<BytesLike> | null,
       previousAdminRole?: PromiseOrValue<BytesLike> | null,
@@ -1032,6 +1022,12 @@ export interface ContributionPoll extends BaseContract {
       enabled?: null
     ): VotingEnabledEventFilter;
     VotingEnabled(pollId?: null, enabled?: null): VotingEnabledEventFilter;
+
+    "WithdrawEth(uint256,uint256)"(
+      amount?: null,
+      payedAmount?: null
+    ): WithdrawEthEventFilter;
+    WithdrawEth(amount?: null, payedAmount?: null): WithdrawEthEventFilter;
   };
 
   estimateGas: {

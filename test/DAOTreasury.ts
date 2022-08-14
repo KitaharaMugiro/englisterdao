@@ -71,14 +71,14 @@ describe("DAOTreasury", function () {
         });
     });
 
-    describe("requestForTokenToEth", function () {
+    describe("withdraw", function () {
         it("指定が0トークンの場合はエラーとなること", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
-            await expect(treasury.connect(otherAccount).requestForTokenToEth(0)).revertedWith("amount must be greater than 0");
+            await expect(treasury.connect(otherAccount).withdraw(0)).revertedWith("amount must be greater than 0");
         });
         it("DAOトークンが0のアカウントはエラーとなること", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
-            await expect(treasury.connect(otherAccount).requestForTokenToEth(1)).revertedWith("token balance is not enough");
+            await expect(treasury.connect(otherAccount).withdraw(1)).revertedWith("token balance is not enough");
         });
         it("DAOトークンが足りないアカウントはエラーとなること", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
@@ -89,8 +89,8 @@ describe("DAOTreasury", function () {
 
 
             // 単体テスト
-            await expect(treasury.connect(otherAccount).requestForTokenToEth(11)).revertedWith("token balance is not enough");
-            await expect(treasury.connect(otherAccount2).requestForTokenToEth(21)).revertedWith("token balance is not enough");
+            await expect(treasury.connect(otherAccount).withdraw(11)).revertedWith("token balance is not enough");
+            await expect(treasury.connect(otherAccount2).withdraw(21)).revertedWith("token balance is not enough");
         });
         it("DAOトークンの換金（残トークン数を確認）", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
@@ -106,7 +106,7 @@ describe("DAOTreasury", function () {
             await token.connect(owner).transfer(otherAccount2.address, 40);
 
             // 30トークンを換金(otherAccount)
-            let rtn1 = await treasury.connect(otherAccount).requestForTokenToEth(30);
+            let rtn1 = await treasury.connect(otherAccount).withdraw(30);
             // トレジャリー残：970000000000 wei ( = 1000000000000 wei - (1000000000000 wei * 30 / 1000) )
             expect(await treasury.getBalance()).to.equal(970000000000);
             console.log("treasury.getBalance = %s", await treasury.getBalance());
@@ -115,7 +115,7 @@ describe("DAOTreasury", function () {
             console.log("token.totalSupply = %s", await token.totalSupply());
 
             // 20トークンを換金(otherAccount2)
-            let rtn2 = await treasury.connect(otherAccount2).requestForTokenToEth(20);
+            let rtn2 = await treasury.connect(otherAccount2).withdraw(20);
             // トレジャリー残：950000000000 wei ( = 970000000000 wei - (970000000000 wei * 20 / 970) )
             expect(await treasury.getBalance()).to.equal(950000000000);
             console.log("treasury.getBalance = %s", await treasury.getBalance());

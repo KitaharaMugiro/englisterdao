@@ -30,18 +30,9 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard, DAOEvents {
     }
 
     /**
-     * @notice withdraw the full amount to the owner's wallet.
-     * @dev The owner has previledge to withdraw the full amount.
-     */
-    function withdraw() external onlyOwner returns (bool) {
-        Address.sendValue(payable(this.owner()), address(this).balance);
-        return true;
-    }
-
-    /**
      * @notice Exchange DAOTokens to Ethereum(ETH).
      */
-    function requestForTokenToEth(uint256 _amount)
+    function withdraw(uint256 _amount)
         external
         whenNotPaused
         nonReentrant
@@ -69,7 +60,7 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard, DAOEvents {
         // Burn the exchanged DAOTokens.
         daoToken.burn(address(msg.sender), _amount);
 
-        emit RequestForTokenToEth(_amount, pay_val);
+        emit WithdrawEth(_amount, pay_val);
         return pay_val;
     }
 

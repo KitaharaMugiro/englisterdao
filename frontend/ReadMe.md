@@ -33,5 +33,11 @@ cd ./frontend
 npx typechain --target=ethers-v5 src/abi/*.json
 ```
 
+
+# 注意
+コントラクト側を修正した場合は以下を再度実施する必要がある。
+* コントラクトのデプロイ
+* コントラクトアドレスの修正(env.local)
+* 型の自動生成
 # 参考
 https://zenn.dev/linnefromice/articles/create-simple-dapps-with-hardhat-and-react-ts

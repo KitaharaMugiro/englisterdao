@@ -29,7 +29,7 @@ export default () => {
 
     const renderForm = () => {
         if (candidates.length === 0) {
-            return <p>投票は終了しました</p>
+            return <p>立候補はいません</p>
         }
 
         return <div>

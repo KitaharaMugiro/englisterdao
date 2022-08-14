@@ -276,7 +276,6 @@ export interface DAOTokenInterface extends utils.Interface {
     "CreatePoll(int256)": EventFragment;
     "Deposited(address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
-    "RequestForTokenToEth(uint256,uint256)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
@@ -284,6 +283,7 @@ export interface DAOTokenInterface extends utils.Interface {
     "Transfer(address,address,uint256)": EventFragment;
     "Voted(int256,address)": EventFragment;
     "VotingEnabled(int256,bool)": EventFragment;
+    "WithdrawEth(uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
@@ -291,7 +291,6 @@ export interface DAOTokenInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "CreatePoll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposited"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RequestForTokenToEth"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
@@ -299,6 +298,7 @@ export interface DAOTokenInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Voted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "VotingEnabled"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WithdrawEth"): EventFragment;
 }
 
 export interface ApprovalEventObject {
@@ -353,18 +353,6 @@ export type OwnershipTransferredEvent = TypedEvent<
 
 export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
-
-export interface RequestForTokenToEthEventObject {
-  amount: BigNumber;
-  payedAmount: BigNumber;
-}
-export type RequestForTokenToEthEvent = TypedEvent<
-  [BigNumber, BigNumber],
-  RequestForTokenToEthEventObject
->;
-
-export type RequestForTokenToEthEventFilter =
-  TypedEventFilter<RequestForTokenToEthEvent>;
 
 export interface RoleAdminChangedEventObject {
   role: string;
@@ -440,6 +428,17 @@ export type VotingEnabledEvent = TypedEvent<
 >;
 
 export type VotingEnabledEventFilter = TypedEventFilter<VotingEnabledEvent>;
+
+export interface WithdrawEthEventObject {
+  amount: BigNumber;
+  payedAmount: BigNumber;
+}
+export type WithdrawEthEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  WithdrawEthEventObject
+>;
+
+export type WithdrawEthEventFilter = TypedEventFilter<WithdrawEthEvent>;
 
 export interface DAOToken extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -895,15 +894,6 @@ export interface DAOToken extends BaseContract {
       newOwner?: PromiseOrValue<string> | null
     ): OwnershipTransferredEventFilter;
 
-    "RequestForTokenToEth(uint256,uint256)"(
-      amount?: null,
-      payedAmount?: null
-    ): RequestForTokenToEthEventFilter;
-    RequestForTokenToEth(
-      amount?: null,
-      payedAmount?: null
-    ): RequestForTokenToEthEventFilter;
-
     "RoleAdminChanged(bytes32,bytes32,bytes32)"(
       role?: PromiseOrValue<BytesLike> | null,
       previousAdminRole?: PromiseOrValue<BytesLike> | null,
@@ -965,6 +955,12 @@ export interface DAOToken extends BaseContract {
       enabled?: null
     ): VotingEnabledEventFilter;
     VotingEnabled(pollId?: null, enabled?: null): VotingEnabledEventFilter;
+
+    "WithdrawEth(uint256,uint256)"(
+      amount?: null,
+      payedAmount?: null
+    ): WithdrawEthEventFilter;
+    WithdrawEth(amount?: null, payedAmount?: null): WithdrawEthEventFilter;
   };
 
   estimateGas: {

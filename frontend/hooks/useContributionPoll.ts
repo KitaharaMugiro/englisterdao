@@ -10,7 +10,7 @@ export default () => {
 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRIBUTIONPOLL_CONTRACT_ADDRESS as string
     const provider = new ethers.providers.JsonRpcProvider();
-    const signer = provider.getSigner();
+    const signer = provider.getSigner(); //WARN: metamaskのログインと関係なく、Ownerのアドレスを取得している
     const contract = new ethers.Contract(contractAddress, artifact.abi, provider);
     const contractWithSigner = contract.connect(signer) as ContributionPoll;
 

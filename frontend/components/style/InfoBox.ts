@@ -1,0 +1,1 @@
+export const InfoBox = { border: "solid", padding: 10, margin: 10 }

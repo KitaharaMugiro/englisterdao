@@ -7,5 +7,5 @@ interface DAOEvents {
     event Voted(int256 pollId, address indexed voter);
     event Candidated(int256 pollId, address indexed candidate);
     event Deposited(address indexed sender, uint256 amount);
-    event RequestForTokenToEth(uint256 amount, uint256 payedAmount);
+    event WithdrawEth(uint256 amount, uint256 payedAmount);
 }

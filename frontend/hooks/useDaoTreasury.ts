@@ -10,11 +10,11 @@ export default () => {
 
     const contractAddress = process.env.NEXT_PUBLIC_DAOTRESURY_CONTRACT_ADDRESS as string
     const provider = new ethers.providers.JsonRpcProvider();
-    const signer = provider.getSigner();
+    const signer = provider.getSigner(); //WARN: metamaskのログインと関係なく、Ownerのアドレスを取得している
     const contract = new ethers.Contract(contractAddress, artifact.abi, provider);
     const contractWithSigner = contract.connect(signer) as DAOTreasury;
 
-    const { getCurrentTokenRate, getBalance, deposit } = contractWithSigner.functions;
+    const { getCurrentTokenRate, getBalance, deposit, withdraw } = contractWithSigner.functions;
 
     useEffect(() => {
         refresh()
@@ -32,5 +32,11 @@ export default () => {
         setLoading(false);
     }
 
-    return { tokenRate, balance, depositEth, refresh, loading };
+    const withdrawEth = async (amount: number) => {
+        setLoading(true);
+        await withdraw(amount)
+        setLoading(false);
+    }
+
+    return { tokenRate, balance, depositEth, refresh, loading, withdrawEth };
 }
