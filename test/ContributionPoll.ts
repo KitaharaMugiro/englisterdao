@@ -233,7 +233,7 @@ describe("ContributionPoll", function () {
         });
     });
 
-    describe("Settlement and Totalize", function () {
+    describe("Settlement and Aggregate", function () {
         it("投票が実施されなかった場合は、誰にもトークンは送られない", async function () {
             const { poll, token, owner } = await loadFixture(deploy);
             await poll.setDaoTokenAddress(token.address);

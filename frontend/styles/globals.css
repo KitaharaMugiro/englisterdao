@@ -1,0 +1,12 @@
+th,
+td {
+    border: solid 1px;
+    /* 枠線指定 */
+    padding: 10px;
+    /* 余白指定 */
+}
+
+table {
+    border-collapse: collapse;
+    /* セルの線を重ねる */
+}
