@@ -9,7 +9,19 @@ const COINMARKETCAP = process.env.COINMARKETCAP || ''
 const config: HardhatUserConfig = {
   solidity: "0.8.9",
   defaultNetwork: "hardhat",
-
+  networks: {
+    hardhat: {
+      chainId: 1337
+    },
+    localhost: {
+      url: "http://localhost:8545",
+      chainId: 1337
+    },
+    homestead: {
+      url: "http://localhost:8545",
+      chainId: 1337
+    }
+  }
   // hardhat-gas-reporter
   // https://github.com/cgewecke/hardhat-gas-reporter
   // try run: npm run test

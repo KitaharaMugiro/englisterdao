@@ -41,9 +41,15 @@ npx typechain --target=ethers-v5 src/abi/*.json
 ```
 
 # 注意
+## コントラクトの更新
 コントラクト側を修正した場合は以下を再度実施する必要がある。
 * コントラクトのデプロイ
 * コントラクトアドレスの修正(env.local)
 * 型の自動生成
+
+## Metamaskの設定
+チェインIDが適切にhardhatネットワーク(31137)と一致している必要がある。
+Metamaskで設定を行う(設定方法は詳しい人に聞いてください)
+
 # 参考
 https://zenn.dev/linnefromice/articles/create-simple-dapps-with-hardhat-and-react-ts
