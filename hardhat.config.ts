@@ -11,15 +11,11 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      chainId: 1337
+      chainId: 31337
     },
     localhost: {
       url: "http://localhost:8545",
-      chainId: 1337
-    },
-    homestead: {
-      url: "http://localhost:8545",
-      chainId: 1337
+      chainId: 31337
     }
   }
   // hardhat-gas-reporter

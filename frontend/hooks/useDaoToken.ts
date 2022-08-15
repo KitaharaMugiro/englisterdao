@@ -13,12 +13,14 @@ export default () => {
 
     const contractAddress = process.env.NEXT_PUBLIC_DAOTOKEN_CONTRACT_ADDRESS as string
 
-    const getContractWithSigner = () => {
+    const getContractWithSigner = async () => {
         const provider = new ethers.providers.Web3Provider((window as any).ethereum)
+        await provider.send('eth_requestAccounts', []);
         const signer = provider.getSigner();
         const contract = new ethers.Contract(contractAddress, artifact.abi, provider);
         return contract.connect(signer) as DAOToken
     }
+
     const getContract = () => {
         const provider = new ethers.providers.Web3Provider((window as any).ethereum)
         const contract = new ethers.Contract(contractAddress, artifact.abi, provider);
