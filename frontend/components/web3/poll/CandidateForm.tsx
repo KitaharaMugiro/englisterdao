@@ -11,7 +11,6 @@ export default () => {
         } catch {
             throw new Error("立候補に失敗しました")
         }
-        window.location.reload()
     }
 
     return <div>

@@ -33,6 +33,15 @@ npm ci
 npm run dev
 ```
 
+## Metamask
+コントラクトとの接続にはMetamaskを利用します。
+
+* Metamaskをインストールしてください。
+* Hardhatのアカウントをimportしてください(ownerと普通のaccountがあればOK)
+* 接続先をLocalhostにしてください
+
+
+
 # 型の自動生成
 
 ```
@@ -51,5 +60,8 @@ npx typechain --target=ethers-v5 src/abi/*.json
 チェインIDが適切にhardhatネットワーク(31137)と一致している必要がある。
 Metamaskで設定を行う(設定方法は詳しい人に聞いてください)
 
+## Metamaskのキャッシュクリア
+不可解なエラーが出る場合は、Metamaskのキャッシュをクリアしてください。
+高度な設定 > リセットから実施できます。
 # 参考
 https://zenn.dev/linnefromice/articles/create-simple-dapps-with-hardhat-and-react-ts

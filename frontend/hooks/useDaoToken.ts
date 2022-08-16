@@ -34,13 +34,13 @@ export default () => {
             const signer = provider.getSigner();
             getContract().functions.name().then(n => setTokenName(n[0]));
             getContract().functions.symbol().then(s => setTokenSymbol(s[0]));
-            getContract().functions.totalSupply().then(t => setTokenTotalSupply(Number(t[0])));
+            getContract().functions.totalSupply().then(t => setTokenTotalSupply(Number(ethers.utils.formatEther(t[0]))));
             if (address) {
-                getContract().functions.balanceOf(signer.getAddress()).then(b => setYourBalance(Number(b[0])));
+                getContract().functions.balanceOf(signer.getAddress()).then(b => setYourBalance(Number(ethers.utils.formatEther(b[0]))));
             }
         }
         dataFetch()
-    }, [])
+    }, [address])
 
     return { tokenName, tokenSymbol, tokenTotalSupply, yourBalance };
 }

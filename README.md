@@ -8,33 +8,16 @@ npm ci
 ```
 
 # コントラクトのローカルネットワークへのデプロイ手順
-scripts/deploy.tsが適切に実装されていることを確認する。
+ノードを立ち上げ、scripts/deploy.tsを実行してコントラクトをデプロイする。
 
 ## ノードの立ち上げ
-`npx hardhat node`でノードが立ち上がり、以下のようなアウトプットが出てくる。
-フロントエンドはここに表示されたURL(以下の場合は http://127.0.0.1:8545/ )と疎通させる。
 
 ```
 $ npx hardhat node
-Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
-
-Accounts
-========
-
-WARNING: These accounts, and their private keys, are publicly known.
-Any funds sent to them on Mainnet or any other live network WILL BE LOST.
-
-Account #0: ...
-Private Key: ...
-
-...
-
-WARNING: These accounts, and their private keys, are publicly known.
-Any funds sent to them on Mainnet or any other live network WILL BE LOST.
 ```
 
 ## デプロイ
-以下コマンドでデプロイを行う。
+
 ```
 npx hardhat run scripts/deploy.ts --network localhost
 ```

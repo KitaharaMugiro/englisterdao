@@ -12,8 +12,6 @@ export default () => {
         } catch {
             throw new Error("引き出しに失敗しました");
         }
-
-        window.location.reload()
     }
 
     return <div>

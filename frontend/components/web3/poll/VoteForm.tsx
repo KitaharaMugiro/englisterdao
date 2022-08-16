@@ -22,7 +22,6 @@ export default () => {
         try {
             if (vote)
                 await vote(_candidates, _points)
-            window.location.reload()
         } catch {
             throw new Error("投票に失敗しました");
         }

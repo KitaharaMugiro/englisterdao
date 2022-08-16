@@ -9,8 +9,8 @@ export default () => {
         <div>
             <MetaMaskLoginButton />
             <DAOTokenTotalSupply />
-            <UserHoldTokenInfo />
             <DAOTreasuryInfo />
+            <UserHoldTokenInfo />
             <a href="/poll">投票する</a>
             <br />
             <a href="/deposit">入出金する</a>

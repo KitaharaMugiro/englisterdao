@@ -5,7 +5,15 @@ export default () => {
     const { tokenRate, balance } = useDaoTreasury()
 
     return <div style={InfoBox}>
-        <p>トレジャリーに保管されているETH: {balance}</p>
-        <p>1トークンあたりの交換レート: {tokenRate}</p>
+        <div style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ margin: 10, marginRight: 20 }}>
+                <img width={70} src="https://tyoudoii-illust.com/wp-content/uploads/2021/03/money_bag_simple-320x320.png" />
+            </div>
+            <div>
+                <p>トレジャリーに保管されているETH: <b>{balance}</b></p>
+                <p>1トークンあたりの交換レート: <b>{tokenRate}</b></p>
+            </div>
+        </div>
+
     </div>
 }
