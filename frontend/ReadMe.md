@@ -14,7 +14,6 @@ env.localにコントラクトがデプロイされたアドレスを設定し�
 
 |項目|内容|
 |---|---|
-|NEXT_PUBLIC_NETWORK_ADDRESS|接続先URL|
 |NEXT_PUBLIC_DAOTOKEN_CONTRACT_ADDRESS|DAOTokenのコントラクトアドレス|
 |NEXT_PUBLIC_DAOTRESURY_CONTRACT_ADDRESS|DAOTresuryのコントラクトアドレス|
 |NEXT_PUBLIC_CONTRIBUTIONPOLL_CONTRACT_ADDRESS|ContributionPollのコントラクトアドレス|

@@ -30,6 +30,12 @@ npx hardhat run scripts/deploy.ts --network localhost
 npx hardhat run scripts/demo/candidate.ts --network localhost
 ```
 
+# Guerli devへのデプロイ
+.envファイルを作成して適切な値を入れたのち、以下のコマンドでデプロイを実行
+
+```
+npx hardhat run scripts/deploy.ts --network goerli 
+```
 # verify
 npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network goerli {0xCONTRACT_ADDRESS} Englister ENG 100
 
