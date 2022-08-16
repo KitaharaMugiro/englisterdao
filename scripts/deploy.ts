@@ -6,8 +6,8 @@ async function main() {
 
   // Deploy DaoToken
   const EnglisterToken = await ethers.getContractFactory("DAOToken");
-  const NAME = "Napier"
-  const SYMBOL = "NAP"
+  const NAME = "Englister"
+  const SYMBOL = "ENG"
   const INITIAL_SUPPLY = ethers.utils.parseEther("100");
   const token = await EnglisterToken.deploy(NAME, SYMBOL, INITIAL_SUPPLY);
   await token.deployed();

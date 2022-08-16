@@ -36,6 +36,14 @@ npx hardhat run scripts/demo/candidate.ts --network localhost
 ```
 npx hardhat run scripts/deploy.ts --network goerli 
 ```
-# verify
-npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network goerli {0xCONTRACT_ADDRESS} Englister ENG 100
+# EtherscanでVerifyする(goerli)
+
+```
+npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network goerli 0x4966f4b22AA708905ddc7c040777647698f72FfE Englister ENG 100000000000000000000
+
+npx hardhat verify --contract contracts/DAOTreasury.sol:DAOTreasury --network goerli 0x280BCD89619D3Cd34EAaB7Cda5b7869D9eE4402c 
+
+npx hardhat verify --contract contracts/ContributionPoll.sol:ContributionPoll --network goerli 0x09b2a61a3492846116eb2f6D1Ba2d02EA6292c62 
+```
+
 
