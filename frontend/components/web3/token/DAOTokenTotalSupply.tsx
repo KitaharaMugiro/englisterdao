@@ -3,7 +3,7 @@ import useDaoToken from "../../../hooks/useDaoToken";
 import { InfoBox } from "../../style/InfoBox";
 
 export default () => {
-    const { tokenName, tokenTotalSupply } = useDaoToken()
+    const { tokenName, tokenTotalSupply, tokenSymbol } = useDaoToken()
 
     return <div style={InfoBox}>
         <div style={{ display: "flex", alignItems: "center" }}>
@@ -12,7 +12,7 @@ export default () => {
             </div>
             <div>
                 <p>トークン名: <b>{tokenName}</b></p>
-                <p>総発行数: <b>{tokenTotalSupply}</b></p>
+                <p>総発行数: <b>{tokenTotalSupply} {tokenSymbol}</b></p>
             </div>
         </div>
 

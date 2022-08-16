@@ -47,7 +47,7 @@ export default () => {
     const withdrawEth = async (amount: number) => {
         setLoading(true);
         const contract = await getContractWithSigner();
-        await contract.functions.withdraw(amount)
+        await contract.functions.withdraw(ethers.utils.parseEther(amount.toString()))
         setLoading(false);
     }
 
