@@ -18,7 +18,7 @@ describe("ContributionPoll", function () {
         const EnglisterToken = await ethers.getContractFactory("DAOToken");
         const NAME = "Englister"
         const SYMBOL = "ENG"
-        const INITIAL_SUPPLY = 100;
+        const INITIAL_SUPPLY = ethers.utils.parseEther("100");
         const token = await EnglisterToken.deploy(NAME, SYMBOL, INITIAL_SUPPLY);
 
         // 権限設定
@@ -239,7 +239,7 @@ describe("ContributionPoll", function () {
             await poll.setDaoTokenAddress(token.address);
             await poll.settleCurrentPollAndCreateNewPoll();
             const balance = await token.balanceOf(owner.address);
-            expect(balance).to.eq(100);
+            expect(balance).to.eq(ethers.utils.parseEther("100"));
         });
 
         it("投票が実施された場合、投票者と貢献者にトークンが送られる(1)", async function () {
@@ -254,9 +254,9 @@ describe("ContributionPoll", function () {
             await poll.settleCurrentPollAndCreateNewPoll();
 
             const balance = await token.balanceOf(owner.address);
-            expect(balance).to.eq(100 + 3000);
+            expect(balance).to.eq(ethers.utils.parseEther("3100"));
             const balance2 = await token.balanceOf(otherAccount.address);
-            expect(balance2).to.eq(5000);
+            expect(balance2).to.eq(ethers.utils.parseEther("5000"));
         });
 
         it("投票が実施された場合、投票者と貢献者にトークンが送られる(2)", async function () {
@@ -265,7 +265,7 @@ describe("ContributionPoll", function () {
             // - 貢献者が1人 (otherAccount)
             const { token, owner, poll, otherAccount, otherAccount2 } = await loadFixture(deploy);
 
-            await token.transfer(otherAccount2.address, 30);
+            await token.transfer(otherAccount2.address, ethers.utils.parseEther("30"));
             await poll.connect(otherAccount).candidateToContributionPoll()
             await poll.vote([otherAccount.address], [5])
             await poll.connect(otherAccount2).vote([otherAccount.address], [10])
@@ -274,23 +274,21 @@ describe("ContributionPoll", function () {
             await poll.settleCurrentPollAndCreateNewPoll();
 
             const balance = await token.balanceOf(owner.address);
-            expect(balance).to.eq(70 + 1500);
+            expect(balance).to.eq(ethers.utils.parseEther("1570"));
             const balance2 = await token.balanceOf(otherAccount2.address);
-            expect(balance2).to.eq(30 + 1500);
+            expect(balance2).to.eq(ethers.utils.parseEther("1530"));
             const balance3 = await token.balanceOf(otherAccount.address);
-            expect(balance3).to.eq(5000);
+            expect(balance3).to.eq(ethers.utils.parseEther("5000"));
         });
 
         it("投票が実施された場合、投票者と貢献者にトークンが送られる(3)", async function () {
             // パターン3: 
             // - 投票者が2人 (owner, otherAccount2)
             // - 貢献者が1人 (otherAccount)
-            // SUPPORTER_ASSIGNMENT_TOKEN = 5に設定し、割り切れないケース
-            // 割り切れない場合は余りを無視して計算する(ex: 5 / 2 = 2)
             const { token, owner, poll, otherAccount, otherAccount2 } = await loadFixture(deploy);
 
-            await poll.setSupporterAssignmentToken(5);
-            await token.transfer(otherAccount2.address, 30);
+            await poll.setSupporterAssignmentToken(ethers.utils.parseEther("5"));
+            await token.transfer(otherAccount2.address, ethers.utils.parseEther("30"));
             await poll.connect(otherAccount).candidateToContributionPoll()
             await poll.vote([otherAccount.address], [5])
             await poll.connect(otherAccount2).vote([otherAccount.address], [10])
@@ -299,11 +297,11 @@ describe("ContributionPoll", function () {
             await poll.settleCurrentPollAndCreateNewPoll();
 
             const balance = await token.balanceOf(owner.address);
-            expect(balance).to.eq(70 + 2);
+            expect(balance).to.eq(ethers.utils.parseEther("72.5"));
             const balance2 = await token.balanceOf(otherAccount2.address);
-            expect(balance2).to.eq(30 + 2);
+            expect(balance2).to.eq(ethers.utils.parseEther("32.5"));
             const balance3 = await token.balanceOf(otherAccount.address);
-            expect(balance3).to.eq(5000);
+            expect(balance3).to.eq(ethers.utils.parseEther("5000"));
         });
 
         it("投票が実施された場合、投票者と貢献者にトークンが送られる(4)", async function () {
@@ -319,11 +317,11 @@ describe("ContributionPoll", function () {
             await poll.settleCurrentPollAndCreateNewPoll();
 
             const balance = await token.balanceOf(owner.address);
-            expect(balance).to.eq(100 + 3000);
+            expect(balance).to.eq(ethers.utils.parseEther("3100"));
             const balance2 = await token.balanceOf(otherAccount.address);
-            expect(balance2).to.eq(2000);
+            expect(balance2).to.eq(ethers.utils.parseEther("2000"));
             const balance3 = await token.balanceOf(otherAccount2.address);
-            expect(balance3).to.eq(3000);
+            expect(balance3).to.eq(ethers.utils.parseEther("3000"));
         });
 
         it("投票が実施された場合、投票者と貢献者にトークンが送られる(5)", async function () {
@@ -332,7 +330,7 @@ describe("ContributionPoll", function () {
             // - 貢献者が2人 (otherAccount, otherAccount2)
             const { token, owner, poll, otherAccount, otherAccount2 } = await loadFixture(deploy);
 
-            await token.transfer(otherAccount.address, 30);
+            await token.transfer(otherAccount.address, ethers.utils.parseEther("30"));
             await poll.connect(otherAccount).candidateToContributionPoll()
             await poll.connect(otherAccount2).candidateToContributionPoll()
             await poll.vote([otherAccount.address, otherAccount2.address], [1, 1])
@@ -341,11 +339,11 @@ describe("ContributionPoll", function () {
             await poll.settleCurrentPollAndCreateNewPoll();
 
             const balance = await token.balanceOf(owner.address);
-            expect(balance).to.eq(70 + 1500);
+            expect(balance).to.eq(ethers.utils.parseEther("1570"));
             const balance2 = await token.balanceOf(otherAccount.address);
-            expect(balance2).to.eq(30 + 1500 + 1250);
+            expect(balance2).to.eq(ethers.utils.parseEther("2780"));
             const balance3 = await token.balanceOf(otherAccount2.address);
-            expect(balance3).to.eq(3750);
+            expect(balance3).to.eq(ethers.utils.parseEther("3750"));
         });
 
         it("誰も投票しなかった場合(貢献者は存在する)", async function () {
@@ -353,13 +351,13 @@ describe("ContributionPoll", function () {
             // - 貢献者が2人 (otherAccount, otherAccount2)
             const { token, owner, poll, otherAccount, otherAccount2 } = await loadFixture(deploy);
 
-            await token.transfer(otherAccount.address, 40);
+            await token.transfer(otherAccount.address, ethers.utils.parseEther("40"));
 
             // 初期状態を確認
             const balanceOwner = await token.balanceOf(owner.address);
-            expect(balanceOwner).to.eq(60);
+            expect(balanceOwner).to.eq(ethers.utils.parseEther("60"));
             const balanceAccount1 = await token.balanceOf(otherAccount.address);
-            expect(balanceAccount1).to.eq(40);
+            expect(balanceAccount1).to.eq(ethers.utils.parseEther("40"));
             const balanceAccount2 = await token.balanceOf(otherAccount2.address);
             expect(balanceAccount2).to.eq(0);
 
@@ -372,9 +370,9 @@ describe("ContributionPoll", function () {
 
             // 変わっていないことを確認
             const balance = await token.balanceOf(owner.address);
-            expect(balance).to.eq(60);
+            expect(balance).to.eq(ethers.utils.parseEther("60"));
             const balance2 = await token.balanceOf(otherAccount.address);
-            expect(balance2).to.eq(40);
+            expect(balance2).to.eq(ethers.utils.parseEther("40"));
             const balance3 = await token.balanceOf(otherAccount2.address);
             expect(balance3).to.eq(0);
         });
@@ -384,13 +382,13 @@ describe("ContributionPoll", function () {
             // - 貢献者が2人 (otherAccount, otherAccount2)
             const { token, owner, poll, otherAccount, otherAccount2 } = await loadFixture(deploy);
 
-            await token.transfer(otherAccount.address, 30);
+            await token.transfer(otherAccount.address, ethers.utils.parseEther("30"));
 
             // 初期状態を確認
             const balanceOwner = await token.balanceOf(owner.address);
-            expect(balanceOwner).to.eq(70);
+            expect(balanceOwner).to.eq(ethers.utils.parseEther("70"));
             const balanceAccount1 = await token.balanceOf(otherAccount.address);
-            expect(balanceAccount1).to.eq(30);
+            expect(balanceAccount1).to.eq(ethers.utils.parseEther("30"));
             const balanceAccount2 = await token.balanceOf(otherAccount2.address);
             expect(balanceAccount2).to.eq(0);
 
@@ -416,11 +414,11 @@ describe("ContributionPoll", function () {
 
             // 結果
             const balance = await token.balanceOf(owner.address);
-            expect(balance).to.eq(70 + voterAssignmentToken);
+            expect(balance).to.eq(ethers.utils.parseEther(String(70 + voterAssignmentToken)));
             const balance2 = await token.balanceOf(otherAccount.address);
-            expect(balance2).to.eq(30 + voterAssignmentToken + assignmentTokenAccount);
+            expect(balance2).to.eq(ethers.utils.parseEther(String(30 + voterAssignmentToken + assignmentTokenAccount)));
             const balance3 = await token.balanceOf(otherAccount2.address);
-            expect(balance3).to.eq(assignmentTokenAccount2);
+            expect(balance3).to.eq(ethers.utils.parseEther(String(assignmentTokenAccount2)));
         });
 
     });
