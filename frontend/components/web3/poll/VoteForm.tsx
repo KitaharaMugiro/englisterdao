@@ -1,15 +1,62 @@
 import { useEffect, useState } from "react"
+import useGoogleSheets from "use-google-sheets"
 import useContributionPoll from "../../../hooks/useContributionPoll"
+import { GOOGLE_API_KEY, GOOGLE_SHEETS_ID } from "../../../secret"
 
 interface Vote {
     candidate: string
     point: number
 }
 
+const NAME_KEY = "Contributor名（Discord名：例mugi#9179）"
+const CONTRIBUTION_KEY = "貢献内容(エビデンスURLがあると良い)"
+const ADRESS_KEY = "MetaMaskアドレス"
 export default () => {
     const { pollId, candidates, vote } = useContributionPoll()
 
     const [votes, setVotes] = useState<Vote[]>([])
+
+    const { data, loading, error } = useGoogleSheets({
+        apiKey: GOOGLE_API_KEY,
+        sheetId: GOOGLE_SHEETS_ID,
+    });
+
+    const contributors = data[0] ? data[0].data.map((row: any) => {
+        return {
+            name: row[NAME_KEY],
+            contribution: row[CONTRIBUTION_KEY],
+            address: row[ADRESS_KEY],
+        }
+    }) : []
+
+    const getContributorContent = (address: string) => {
+        const info = contributors.find(contributor => contributor.address === address)
+        if (loading) {
+            return "Loading..."
+        }
+        if (error) {
+            return "スプレッドシート連携の失敗(APIキーなどの設定問題かも)" + JSON.stringify(error)
+        }
+        if (!info) {
+            return "SpreadSheetに登録されていません"
+        }
+        return <table>
+            <thead>
+                <tr>
+                    <th>名前</th>
+                    <th>貢献内容</th>
+                    <th>アドレス</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{info.name}</td>
+                    <td>{info.contribution}</td>
+                    <td>{info.address}</td>
+                </tr>
+            </tbody>
+        </table>
+    }
 
     useEffect(() => {
         const _votes = candidates?.map(candidate => ({ candidate, point: 0 }))
@@ -22,8 +69,10 @@ export default () => {
         try {
             if (vote)
                 await vote(_candidates, _points)
-        } catch {
-            throw new Error("投票に失敗しました");
+        } catch (e) {
+            console.log(e)
+            throw new Error("投票に失敗しました")
+
         }
     }
 
@@ -54,9 +103,9 @@ export default () => {
                     setVotes(newVotes)
                 }
 
-                return <div key={candidate}>
-                    <p>{candidate}</p>
-                    <select name="ご用件" onChange={onChange}>
+                return <div key={candidate} style={{ marginTop: 20, marginBottom: 20 }}>
+                    {getContributorContent(candidate)}
+                    <select onChange={onChange}>
                         <option value={0}>🤔Umm...(0)</option>
                         <option value={1}>🙂OK(1)</option>
                         <option value={3}>😄Nice(3)</option>
@@ -69,7 +118,7 @@ export default () => {
     }
 
     return <div>
-        <h4>投票する</h4>
+        <h3>貢献度投票 第{pollId}回</h3>
         {renderForm()}
         <button onClick={onClickVote}>投票</button>
     </div>

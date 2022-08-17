@@ -37,6 +37,7 @@ npx hardhat run scripts/demo/candidate.ts --network localhost
 npx hardhat run scripts/deploy.ts --network goerli 
 ```
 # EtherscanでVerifyする(goerli)
+これにより、Etherscan上でソースコードを確認できるようになる
 
 ```
 npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network goerli 0x4966f4b22AA708905ddc7c040777647698f72FfE Englister ENG 100000000000000000000
