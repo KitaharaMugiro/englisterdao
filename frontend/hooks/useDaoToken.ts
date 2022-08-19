@@ -9,8 +9,9 @@ export default () => {
     const [tokenSymbol, setTokenSymbol] = useState("");
     const [tokenTotalSupply, setTokenTotalSupply] = useState(0);
     const [yourBalance, setYourBalance] = useState(0);
+    const [topHolders, setTopHolders] = useState<string[]>([])
     const { address, login } = useMetaMask()
-
+    const isTopHolder = topHolders.includes(address)
     const contractAddress = process.env.NEXT_PUBLIC_DAOTOKEN_CONTRACT_ADDRESS as string
 
     const getContractWithSigner = async () => {
@@ -29,12 +30,12 @@ export default () => {
 
     useEffect(() => {
         const dataFetch = async () => {
-            //const provider = new ethers.providers.JsonRpcProvider(); //WARN: metamaskのログインと関係なく、Ownerのアドレスを取得している
             const provider = new ethers.providers.Web3Provider((window as any).ethereum)
             const signer = provider.getSigner();
             getContract().functions.name().then(n => setTokenName(n[0]));
             getContract().functions.symbol().then(s => setTokenSymbol(s[0]));
             getContract().functions.totalSupply().then(t => setTokenTotalSupply(Number(ethers.utils.formatEther(t[0]))));
+            getContract().functions.getTopHolders(10).then(t => setTopHolders(t[0]));
             if (address) {
                 getContract().functions.balanceOf(signer.getAddress()).then(b => setYourBalance(Number(ethers.utils.formatEther(b[0]))));
             }
@@ -42,5 +43,5 @@ export default () => {
         dataFetch()
     }, [address])
 
-    return { tokenName, tokenSymbol, tokenTotalSupply, yourBalance };
+    return { tokenName, tokenSymbol, tokenTotalSupply, yourBalance, topHolders, isTopHolder };
 }

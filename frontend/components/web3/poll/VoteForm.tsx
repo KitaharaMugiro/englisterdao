@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import useGoogleSheets from "use-google-sheets"
 import useContributionPoll from "../../../hooks/useContributionPoll"
+import useDaoToken from "../../../hooks/useDaoToken"
+import useMetaMask from "../../../hooks/useMetaMask"
 import { GOOGLE_API_KEY, GOOGLE_SHEETS_ID } from "../../../secret"
 
 interface Vote {
@@ -13,6 +15,8 @@ const CONTRIBUTION_KEY = "貢献内容(エビデンスURLがあると良い)"
 const ADRESS_KEY = "MetaMaskアドレス"
 export default () => {
     const { pollId, candidates, vote } = useContributionPoll()
+    const { address } = useMetaMask()
+    const { topHolders, isTopHolder, tokenName } = useDaoToken()
 
     const [votes, setVotes] = useState<Vote[]>([])
 
@@ -117,9 +121,20 @@ export default () => {
         </div>
     }
 
+    const renderVote = () => {
+        if (!isTopHolder) {
+            return <p>
+                {tokenName}のTopHolderでなければ投票できません。
+                トップホルダー↓
+                {topHolders.map(address => <div key={address}>{address}</div>)}
+            </p>
+        }
+        return <button onClick={onClickVote}>投票</button>
+    }
+
     return <div>
         <h3>貢献度投票 第{pollId}回</h3>
         {renderForm()}
-        <button onClick={onClickVote}>投票</button>
+        {renderVote()}
     </div>
 }
