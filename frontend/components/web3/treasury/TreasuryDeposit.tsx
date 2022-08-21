@@ -7,7 +7,6 @@ export default () => {
 
     const onClickDeposit = async () => {
         await depositEth(Number(value))
-        window.location.reload()
     }
 
     return <div>

@@ -8,7 +8,7 @@ async function main() {
   const EnglisterToken = await ethers.getContractFactory("DAOToken");
   const NAME = "Englister"
   const SYMBOL = "ENG"
-  const INITIAL_SUPPLY = 100;
+  const INITIAL_SUPPLY = ethers.utils.parseEther("100");
   const token = await EnglisterToken.deploy(NAME, SYMBOL, INITIAL_SUPPLY);
   await token.deployed();
   console.log("Englister DAOToken deployed to", token.address);

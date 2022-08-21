@@ -6,12 +6,13 @@ export default () => {
 
     const onClickCandidate = async () => {
         try {
-            await candidateToContributionPoll()
+            if (candidateToContributionPoll)
+                await candidateToContributionPoll()
         } catch {
             throw new Error("立候補に失敗しました")
         }
-        window.location.reload()
     }
+
     return <div>
         <h4>立候補する</h4>
         <button onClick={onClickCandidate}>立候補</button>

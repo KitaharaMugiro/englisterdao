@@ -8,33 +8,16 @@ npm ci
 ```
 
 # コントラクトのローカルネットワークへのデプロイ手順
-scripts/deploy.tsが適切に実装されていることを確認する。
+ノードを立ち上げ、scripts/deploy.tsを実行してコントラクトをデプロイする。
 
 ## ノードの立ち上げ
-`npx hardhat node`でノードが立ち上がり、以下のようなアウトプットが出てくる。
-フロントエンドはここに表示されたURL(以下の場合は http://127.0.0.1:8545/ )と疎通させる。
 
 ```
 $ npx hardhat node
-Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
-
-Accounts
-========
-
-WARNING: These accounts, and their private keys, are publicly known.
-Any funds sent to them on Mainnet or any other live network WILL BE LOST.
-
-Account #0: ...
-Private Key: ...
-
-...
-
-WARNING: These accounts, and their private keys, are publicly known.
-Any funds sent to them on Mainnet or any other live network WILL BE LOST.
 ```
 
 ## デプロイ
-以下コマンドでデプロイを行う。
+
 ```
 npx hardhat run scripts/deploy.ts --network localhost
 ```
@@ -47,6 +30,21 @@ npx hardhat run scripts/deploy.ts --network localhost
 npx hardhat run scripts/demo/candidate.ts --network localhost
 ```
 
-# verify
-npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network goerli {0xCONTRACT_ADDRESS} Englister ENG 100
+# Guerli devへのデプロイ
+.envファイルを作成して適切な値を入れたのち、以下のコマンドでデプロイを実行
+
+```
+npx hardhat run scripts/deploy.ts --network goerli 
+```
+# EtherscanでVerifyする(goerli)
+これにより、Etherscan上でソースコードを確認できるようになる
+
+```
+npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network goerli 0x4966f4b22AA708905ddc7c040777647698f72FfE Englister ENG 100000000000000000000
+
+npx hardhat verify --contract contracts/DAOTreasury.sol:DAOTreasury --network goerli 0x280BCD89619D3Cd34EAaB7Cda5b7869D9eE4402c 
+
+npx hardhat verify --contract contracts/ContributionPoll.sol:ContributionPoll --network goerli 0x09b2a61a3492846116eb2f6D1Ba2d02EA6292c62 
+```
+
 

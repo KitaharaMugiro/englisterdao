@@ -81,6 +81,10 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard, DAOEvents {
         if (total_supply == 0) {
             return 0;
         }
-        return SafeMath.div(SafeMath.mul(getBalance(), 1), total_supply);
+        return
+            SafeMath.div(
+                SafeMath.mul(getBalance(), 1000000000000000000),
+                total_supply
+            );
     }
 }

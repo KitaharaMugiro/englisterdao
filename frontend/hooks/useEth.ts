@@ -1,21 +1,24 @@
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
-import artifact from "../src/abi/DAOTreasury.json";
-import { DAOTreasury } from "../types/ethers-contracts";
+import useMetaMask from "./useMetaMask";
 
 export default () => {
     const [balance, setBalance] = useState(0);
+    const { address, login } = useMetaMask()
 
-    const provider = new ethers.providers.JsonRpcProvider();
-    const signer = provider.getSigner(); //WARN: metamaskのログインと関係なく、Ownerのアドレスを取得している
+    const getSigner = () => {
+        if (!address) return undefined
+        const provider = new ethers.providers.Web3Provider((window as any).ethereum)
+        return provider.getSigner()
+    }
 
     useEffect(() => {
         refresh()
-    }, [])
+    }, [address])
 
-    const refresh = () => {
-        signer.getBalance().then(b => setBalance(Number(ethers.utils.formatEther(b))));
+    const refresh = async () => {
+        getSigner()?.getBalance().then(b => setBalance(Number(ethers.utils.formatEther(b))));
     }
 
-    return { balance, refresh };
+    return { balance };
 }

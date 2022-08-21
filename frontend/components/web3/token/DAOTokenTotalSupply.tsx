@@ -3,10 +3,18 @@ import useDaoToken from "../../../hooks/useDaoToken";
 import { InfoBox } from "../../style/InfoBox";
 
 export default () => {
-    const { tokenName, tokenTotalSupply } = useDaoToken()
+    const { tokenName, tokenTotalSupply, tokenSymbol } = useDaoToken()
 
     return <div style={InfoBox}>
-        <p>トークン名: {tokenName}</p>
-        <p>総発行数: {tokenTotalSupply}</p>
+        <div style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ margin: 10, marginRight: 20 }}>
+                <img width={70} src="https://tyoudoii-illust.com/wp-content/uploads/2021/02/coin_simple-279x300.png" />
+            </div>
+            <div>
+                <p>トークン名: <b>{tokenName}</b></p>
+                <p>総発行数: <b>{tokenTotalSupply} {tokenSymbol}</b></p>
+            </div>
+        </div>
+
     </div>
 }
