@@ -133,4 +133,37 @@ describe("DAOTreasury", function () {
             expect(await token.balanceOf(otherAccount2.address)).to.equal(expectedValue2);
         });
     });
+
+    describe("destroy", function () {
+        it("トレジャリーを破壊し、全てのETHを引き出すことができる", async function () {
+            const { token, treasury, owner, otherAccount } = await loadFixture(deploy);
+
+            await treasury.deposit({ value: ethers.utils.parseEther("1.0") });
+            await treasury.connect(otherAccount).deposit({ value: ethers.utils.parseEther("1.0") });
+
+            //ownerのETH残高を取得
+            const ownerBalanceBefore = await ethers.provider.getBalance(owner.address);
+            expect(ownerBalanceBefore).to.gt(ethers.utils.parseEther("9998.0"));
+            expect(ownerBalanceBefore).to.lt(ethers.utils.parseEther("9999.0"));
+
+            //トレジャリーを破壊
+            await treasury.destroy();
+
+            //ownerのETH残高を取得
+            const ownerBalanceAfter = await ethers.provider.getBalance(owner.address);
+            expect(ownerBalanceAfter).to.gt(ethers.utils.parseEther("10000.0"));
+            expect(ownerBalanceAfter).to.lt(ethers.utils.parseEther("10001.0"));
+        });
+
+        it("トレジャリーを破壊すると預入等は出来なくなる", async function () {
+            const { token, treasury, owner, otherAccount } = await loadFixture(deploy);
+
+            //トレジャリーを破壊
+            await treasury.destroy();
+
+            //預入
+            await expect(treasury.deposit({ value: ethers.utils.parseEther("1.0") })).revertedWith("Pausable: paused");
+        });
+
+    });
 });

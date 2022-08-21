@@ -83,4 +83,13 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard, DAOEvents {
                 total_supply
             );
     }
+
+    /**
+     * @notice destroy the contract.
+     */
+    function destroy() external onlyOwner {
+        //全てのETHをownerに転送する
+        Address.sendValue(payable(owner()), getBalance());
+        _pause();
+    }
 }

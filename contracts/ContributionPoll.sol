@@ -412,4 +412,18 @@ contract ContributionPoll is
         }
         return _voters;
     }
+
+    /**
+     * @notice pause the contract
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @notice unpause the contract
+     */
+    function unpause() external onlyOwner {
+        _unpause();
+    }
 }
