@@ -422,4 +422,21 @@ describe("ContributionPoll", function () {
         });
 
     });
+
+    describe("Settlement and Aggregate", function () {
+        it("トークンを送られた相手はTop Holderになる", async function () {
+            const { token, poll, otherAccount, otherAccount2 } = await loadFixture(deploy);
+
+            await token.transfer(otherAccount.address, ethers.utils.parseEther("30"));
+
+
+            expect(await poll._isTopHolder()).to.equal(true);
+            expect(await poll.connect(otherAccount)._isTopHolder()).to.equal(true);
+            expect(await poll.connect(otherAccount2)._isTopHolder()).to.equal(false);
+
+            await poll.connect(otherAccount2).candidateToContributionPoll();
+            await poll.connect(otherAccount).vote([otherAccount2.address], [10]);
+        })
+
+    });
 });

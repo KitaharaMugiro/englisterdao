@@ -68,17 +68,14 @@ contract DAOToken is ERC20, AccessControl, Ownable, DAOEvents {
     }
 
     /**
-     * @notice send tokens to address
+     *
      */
-    function transfer(address to, uint256 amount)
-        public
-        override
-        returns (bool)
-    {
-        _transfer(msg.sender, to, amount);
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal override {
         _addHolder(to);
-        emit Transfer(msg.sender, to, amount);
-        return true;
     }
 
     /**

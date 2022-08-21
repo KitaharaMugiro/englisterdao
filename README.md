@@ -48,3 +48,19 @@ npx hardhat verify --contract contracts/ContributionPoll.sol:ContributionPoll --
 ```
 
 
+# Polygonへのデプロイ
+https://docs.polygon.technology/docs/develop/hardhat/
+を参考にテストネットにデプロイを行なった
+
+## mumbai testnetをmetamaskに追加
+https://rpc-mumbai.maticvigil.com/
+をメタマスクに追加する。
+
+## mumbai testnetのMATICを取得
+https://mumbaifaucet.com/
+
+## デプロイ
+
+```
+npx hardhat run scripts/deploy.ts --network matic
+```
