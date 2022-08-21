@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "hardhat/console.sol";
 import "./lib/SafeMath.sol";
 import "./DAOToken.sol";
 import "./interface/DAOEvents.sol";
@@ -42,26 +41,23 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard, DAOEvents {
 
         DAOToken daoToken = DAOToken(_daoTokenAddress);
 
-        uint256 balance = daoToken.balanceOf(address(msg.sender));
-        require((balance >= _amount), "token balance is not enough");
-
         // Transfer Ethereum(ETH).
         uint256 total_supply = daoToken.totalSupply(); // Get the totalSupply of DAOTokens.
 
         // Calculate the payment value.
-        uint256 pay_val = SafeMath.div(
+        uint256 paymentAmount = SafeMath.div(
             SafeMath.mul(getBalance(), _amount),
             total_supply
         );
 
-        // https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3008
-        Address.sendValue(payable(msg.sender), pay_val);
-
         // Burn the exchanged DAOTokens.
-        daoToken.burn(address(msg.sender), _amount);
+        daoToken.burn(msg.sender, _amount);
 
-        emit WithdrawEth(_amount, pay_val);
-        return pay_val;
+        // https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3008
+        Address.sendValue(payable(msg.sender), paymentAmount);
+
+        emit WithdrawEth(_amount, paymentAmount);
+        return paymentAmount;
     }
 
     /**

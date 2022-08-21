@@ -4,7 +4,6 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "hardhat/console.sol";
 import "./lib/Array.sol";
 import "./DAOToken.sol";
 import "./lib/SafeMath.sol";
@@ -174,9 +173,6 @@ contract ContributionPoll is
             "Voting is not enabled right now. Contact the admin to start voting."
         );
 
-        // if the voter is not in the top N(RANK_FOR_VOTE) of DAO token holders,
-        require(_isTopHolder(), "You are not in the top RANK_FOR_VOTE holder.");
-
         address[] memory voters = getCurrentVoters();
 
         // Check if the voter is already voted
@@ -332,17 +328,6 @@ contract ContributionPoll is
     function _createContributionPoll() internal {
         pollId++;
         emit CreatePoll(pollId);
-    }
-
-    /**
-     * @notice Check if the Sender is a DAO Token Top N (RANK_FOR_VOTE) holder
-     */
-    function _isTopHolder() public view returns (bool) {
-        DAOToken daoToken = DAOToken(daoTokenAddress);
-        if (Array.contains(daoToken.getTopHolders(RANK_FOR_VOTE), msg.sender)) {
-            return true;
-        }
-        return false;
     }
 
     /**

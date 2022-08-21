@@ -109,15 +109,6 @@ describe("ContributionPoll", function () {
             await expect(poll.vote([otherAccount.address], [1])).to.be.revertedWith("You are already voted.");
         });
 
-        it("DAOトークンのTOP10の保有者でなければ投票できない", async function () {
-            const { poll, otherAccount, owner, token } = await loadFixture(deploy);
-
-            await poll.setDaoTokenAddress(token.address);
-            await poll.connect(owner).candidateToContributionPoll()
-
-            await expect(poll.connect(otherAccount).vote([owner.address], [1])).to.be.revertedWith("You are not in the top RANK_FOR_VOTE holder.");
-        });
-
         it("投票で21ポイント以上をつけることはできない", async function () {
             const { poll, otherAccount, token } = await loadFixture(deploy);
 
@@ -407,8 +398,6 @@ describe("ContributionPoll", function () {
             const assignmentTokenAccount = (10 * 100 / 10) * 5000 / 200;
             const assignmentTokenAccount2 = (8 * 100 / 8) * 5000 / 200;
             // 投票得点は、投票者がどの割合で候補者へ報酬を割り振りたいかなので、得点は異なるが報酬は同じになる
-            console.log("assignmentToken:Account = %s", assignmentTokenAccount);
-            console.log("assignmentToken:Account2 = %s", assignmentTokenAccount2);
             // 投票者への報酬
             const voterAssignmentToken = 1500; // (3000 / 投票者2人)
 
@@ -420,23 +409,6 @@ describe("ContributionPoll", function () {
             const balance3 = await token.balanceOf(otherAccount2.address);
             expect(balance3).to.eq(ethers.utils.parseEther(String(assignmentTokenAccount2)));
         });
-
-    });
-
-    describe("Settlement and Aggregate", function () {
-        it("トークンを送られた相手はTop Holderになる", async function () {
-            const { token, poll, otherAccount, otherAccount2 } = await loadFixture(deploy);
-
-            await token.transfer(otherAccount.address, ethers.utils.parseEther("30"));
-
-
-            expect(await poll._isTopHolder()).to.equal(true);
-            expect(await poll.connect(otherAccount)._isTopHolder()).to.equal(true);
-            expect(await poll.connect(otherAccount2)._isTopHolder()).to.equal(false);
-
-            await poll.connect(otherAccount2).candidateToContributionPoll();
-            await poll.connect(otherAccount).vote([otherAccount2.address], [10]);
-        })
 
     });
 });

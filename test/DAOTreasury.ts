@@ -24,8 +24,8 @@ describe("DAOTreasury", function () {
         const token = await EnglisterToken.deploy(NAME, SYMBOL, INITIAL_SUPPLY);
 
         // 権限設定
-        await treasury.setDAOTokenAddress(token.address);
         await token.setupBurnerRole(treasury.address);
+        await treasury.setDAOTokenAddress(token.address);
 
         return { token, treasury, owner, otherAccount, otherAccount2 };
     }
@@ -46,7 +46,6 @@ describe("DAOTreasury", function () {
             // 単体テスト
             const expectedValue = ethers.utils.parseEther("1.0");
             expect(await treasury.getBalance()).to.equal(expectedValue);
-            //console.log("treasury.getBalance = %s", await treasury.getBalance());
         });
     });
 
@@ -81,10 +80,14 @@ describe("DAOTreasury", function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
             await expect(treasury.connect(otherAccount).withdraw(0)).revertedWith("amount must be greater than 0");
         });
+
+
         it("DAOトークンが0のアカウントはエラーとなること", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
-            await expect(treasury.connect(otherAccount).withdraw(1)).revertedWith("token balance is not enough");
+            await expect(treasury.connect(otherAccount).withdraw(1)).revertedWith("ERC20: burn amount exceeds balance");
         });
+
+
         it("DAOトークンが足りないアカウントはエラーとなること", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
 
@@ -93,9 +96,11 @@ describe("DAOTreasury", function () {
             await token.connect(owner).transfer(otherAccount2.address, ethers.utils.parseEther("20"));
 
             // 単体テスト
-            await expect(treasury.connect(otherAccount).withdraw(ethers.utils.parseEther("11"))).revertedWith("token balance is not enough");
-            await expect(treasury.connect(otherAccount2).withdraw(ethers.utils.parseEther("21"))).revertedWith("token balance is not enough");
+            await expect(treasury.connect(otherAccount).withdraw(ethers.utils.parseEther("11"))).revertedWith("ERC20: burn amount exceeds balance");
+            await expect(treasury.connect(otherAccount2).withdraw(ethers.utils.parseEther("21"))).revertedWith("ERC20: burn amount exceeds balance");
         });
+
+
         it("DAOトークンの換金（残トークン数を確認）", async function () {
             const { token, treasury, owner, otherAccount, otherAccount2 } = await loadFixture(deploy);
 
@@ -111,19 +116,15 @@ describe("DAOTreasury", function () {
             let rtn1 = await treasury.connect(otherAccount).withdraw(ethers.utils.parseEther("30"));
             // トレジャリー残：970000000000 wei ( = 1000000000000 wei - (1000000000000 wei * 30 / 1000) )
             expect(await treasury.getBalance()).to.equal(970000000000);
-            console.log("treasury.getBalance = %s", await treasury.getBalance());
             // DAOトークン総数：970 ( = 1000 - 30 )
             expect(await token.totalSupply()).to.equal(ethers.utils.parseEther("970"));
-            console.log("token.totalSupply = %s", await token.totalSupply());
 
             // 20トークンを換金(otherAccount2)
             let rtn2 = await treasury.connect(otherAccount2).withdraw(ethers.utils.parseEther("20"));
             // トレジャリー残：950000000000 wei ( = 970000000000 wei - (970000000000 wei * 20 / 970) )
             expect(await treasury.getBalance()).to.equal(950000000000);
-            console.log("treasury.getBalance = %s", await treasury.getBalance());
             // DAOトークン総数：950 ( = 970 - 20 )
             expect(await token.totalSupply()).to.equal(ethers.utils.parseEther("950"));
-            console.log("token.totalSupply = %s", await token.totalSupply());
 
             // 単体テスト（残トークン数を確認）
             const expectedValue1 = 0;
