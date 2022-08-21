@@ -337,7 +337,7 @@ contract ContributionPoll is
     /**
      * @notice Check if the Sender is a DAO Token Top N (RANK_FOR_VOTE) holder
      */
-    function _isTopHolder() internal view returns (bool) {
+    function _isTopHolder() public view returns (bool) {
         DAOToken daoToken = DAOToken(daoTokenAddress);
         if (Array.contains(daoToken.getTopHolders(RANK_FOR_VOTE), msg.sender)) {
             return true;

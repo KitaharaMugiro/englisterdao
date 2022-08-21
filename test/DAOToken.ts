@@ -125,5 +125,6 @@ describe("DAOToken", function () {
             await expect(token.connect(otherAccount2).burn(owner.address, ethers.utils.parseEther("10"))).revertedWith("Caller is not a burner");
         });
 
+
     })
 });
