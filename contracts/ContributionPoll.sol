@@ -4,7 +4,6 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "hardhat/console.sol";
 import "./lib/Array.sol";
 import "./DAOToken.sol";
 import "./lib/SafeMath.sol";
@@ -34,9 +33,9 @@ contract ContributionPoll is
     // DAO token address to distribute
     address public daoTokenAddress;
 
-    // 投票はDAOトークンを保有ランキングがRANK_FOR_VOTEよりも上位の場合に可能
-    // votes are possible only if the holder has a ranking higher than RANK_FOR_VOTE
-    uint256 public RANK_FOR_VOTE = 10;
+    // 投票はDAOトークンをREQUIRED_TOKEN_FOR_VOTEよりも多く保持しているアドレスのみ可能
+    // Voting is only possible for addresses that hold more than REQUIRED_TOKEN_FOR_VOTE DAO tokens
+    uint256 public REQUIRED_TOKEN_FOR_VOTE = 0;
 
     // 立候補者(貢献者)に割り当てられるDAOトークンの総数
     // total amount of DAO tokens to be distributed to candidates(contributors)
@@ -79,15 +78,15 @@ contract ContributionPoll is
     }
 
     /**
-     * @notice Set RANK_FOR_VOTE
-     * @dev only poll admin can set RANK_FOR_VOTE
+     * @notice Set REQUIRED_TOKEN_FOR_VOTE
+     * @dev only poll admin can set REQUIRED_TOKEN_FOR_VOTE
      */
-    function setRankForVote(uint256 _rankForVote) external {
+    function setRequiredTokenForVote(uint256 _rankForVote) external {
         require(
             hasRole(POLL_ADMIN_ROLE, msg.sender),
             "Caller is not a poll admin"
         );
-        RANK_FOR_VOTE = _rankForVote;
+        REQUIRED_TOKEN_FOR_VOTE = _rankForVote;
     }
 
     /**
@@ -158,6 +157,14 @@ contract ContributionPoll is
     }
 
     /**
+     * @notice check if the voter has enough DAO token to vote
+     */
+    function _isEligibleToVote(address _address) internal view returns (bool) {
+        DAOToken daoToken = DAOToken(daoTokenAddress);
+        return daoToken.balanceOf(_address) >= REQUIRED_TOKEN_FOR_VOTE;
+    }
+
+    /**
      * @notice vote to the current poll.
      * @dev Voters assign points to candidates and register their votes.
      * Points are normalized to a total of 100 points.
@@ -174,10 +181,10 @@ contract ContributionPoll is
             "Voting is not enabled right now. Contact the admin to start voting."
         );
 
-        // if the voter is not in the top N(RANK_FOR_VOTE) of DAO token holders,
-        require(_isTopHolder(), "You are not in the top RANK_FOR_VOTE holder.");
-
         address[] memory voters = getCurrentVoters();
+
+        // Check if the voter is eligible to vote
+        require(_isEligibleToVote(msg.sender), "You are not eligible to vote.");
 
         // Check if the voter is already voted
         require(!Array.contains(voters, msg.sender), "You are already voted.");
@@ -335,17 +342,6 @@ contract ContributionPoll is
     }
 
     /**
-     * @notice Check if the Sender is a DAO Token Top N (RANK_FOR_VOTE) holder
-     */
-    function _isTopHolder() public view returns (bool) {
-        DAOToken daoToken = DAOToken(daoTokenAddress);
-        if (Array.contains(daoToken.getTopHolders(RANK_FOR_VOTE), msg.sender)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * @notice Mint dao token for contributors
      */
     function _mintTokenForContributor(
@@ -426,5 +422,19 @@ contract ContributionPoll is
             _voters[index] = _votes[index].voter;
         }
         return _voters;
+    }
+
+    /**
+     * @notice pause the contract
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @notice unpause the contract
+     */
+    function unpause() external onlyOwner {
+        _unpause();
     }
 }
