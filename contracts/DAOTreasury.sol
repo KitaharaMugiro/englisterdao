@@ -29,12 +29,11 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard, DAOEvents {
     }
 
     /**
-     * @notice Exchange DAOTokens to Ethereum(ETH).
+     * @notice Exchange DAOTokens to Native Token(ETH, MATIC).
      */
-    function withdraw(uint256 _amount)
-        external
+    function _withdrawBy(address _to, uint256 _amount)
+        internal
         whenNotPaused
-        nonReentrant
         returns (uint256)
     {
         require((_amount > 0), "amount must be greater than 0");
@@ -42,22 +41,65 @@ contract DAOTreasury is Ownable, Pausable, ReentrancyGuard, DAOEvents {
         DAOToken daoToken = DAOToken(_daoTokenAddress);
 
         // Transfer Ethereum(ETH).
-        uint256 total_supply = daoToken.totalSupply(); // Get the totalSupply of DAOTokens.
+        uint256 totalSupply = daoToken.totalSupply(); // Get the totalSupply of DAOTokens.
 
         // Calculate the payment value.
         uint256 paymentAmount = SafeMath.div(
             SafeMath.mul(getBalance(), _amount),
-            total_supply
+            totalSupply
         );
 
         // Burn the exchanged DAOTokens.
-        daoToken.burn(msg.sender, _amount);
+        daoToken.burn(_to, _amount);
 
         // https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3008
-        Address.sendValue(payable(msg.sender), paymentAmount);
+        Address.sendValue(payable(_to), paymentAmount);
 
         emit WithdrawEth(_amount, paymentAmount);
         return paymentAmount;
+    }
+
+    /**
+     * @notice Exchange DAOTokens to Native Token(ETH, MATIC).
+     */
+    function withdrawProxy(
+        address _to,
+        address _from,
+        uint256 _amount
+    ) external whenNotPaused nonReentrant returns (uint256) {
+        require((_amount > 0), "amount must be greater than 0");
+
+        DAOToken daoToken = DAOToken(_daoTokenAddress);
+
+        // Transfer Ethereum(ETH).
+        uint256 totalSupply = daoToken.totalSupply(); // Get the totalSupply of DAOTokens.
+
+        // Calculate the payment value.
+        uint256 paymentAmount = SafeMath.div(
+            SafeMath.mul(getBalance(), _amount),
+            totalSupply
+        );
+
+        // Burn the exchanged DAOTokens.
+        daoToken.burn(_from, _amount);
+
+        // https://github.com/OpenZeppelin/openzeppelin-contracts/issues/3008
+        Address.sendValue(payable(_to), paymentAmount);
+
+        emit WithdrawEth(_amount, paymentAmount);
+        return paymentAmount;
+    }
+
+    /**
+     * @notice Exchange DAOTokens to Native Token(ETH, MATIC).
+     */
+    function withdraw(uint256 _amount)
+        external
+        whenNotPaused
+        nonReentrant
+        returns (uint256)
+    {
+        return _withdrawBy(msg.sender, _amount);
     }
 
     /**
