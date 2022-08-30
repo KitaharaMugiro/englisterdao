@@ -192,4 +192,37 @@ describe("TokenSupplySystem", function () {
             expect(await token.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("10"));
         })
     })
+
+    describe("payAndPayWithNative", function () {
+        it("native tokenとDAOトークン両方に引き換えることも可能", async () => {
+            const { token, tokenSupplySystem, otherAccount } = await loadFixture(deployFixture);
+            const ownerBalanceBefore = await ethers.provider.getBalance(otherAccount.address);
+
+            await tokenSupplySystem.mint(ethers.utils.parseEther("100"));
+            await tokenSupplySystem.payAndPayWithNative(
+                otherAccount.address,
+                ethers.utils.parseEther("50"),
+                ethers.utils.parseEther("50"),
+                ethers.utils.parseEther("0"));
+
+            const ownerBalanceAfter = await ethers.provider.getBalance(otherAccount.address);
+            expect(await tokenSupplySystem.unclaimedBalance()).to.equal(ethers.utils.parseEther("0"));
+            expect(await token.balanceOf(otherAccount.address)).to.equal(ethers.utils.parseEther("50"));
+            expect(ownerBalanceAfter).to.equal(ethers.utils.parseEther("500").add(ownerBalanceBefore));
+        })
+
+        it("手数料を指定することが可能で、手数料はオーナーのウォレットに行く", async () => {
+            const { token, tokenSupplySystem, otherAccount, owner } = await loadFixture(deployFixture);
+            await tokenSupplySystem.mint(ethers.utils.parseEther("100"));
+            await tokenSupplySystem.payAndPayWithNative(
+                otherAccount.address,
+                ethers.utils.parseEther("50"),
+                ethers.utils.parseEther("20"),
+                ethers.utils.parseEther("10")
+            );
+
+            expect(await tokenSupplySystem.unclaimedBalance()).to.equal(ethers.utils.parseEther("20"));
+            expect(await token.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("10"));
+        })
+    })
 });

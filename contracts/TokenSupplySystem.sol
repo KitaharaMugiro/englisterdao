@@ -41,6 +41,18 @@ contract TokenSupplySystem is Ownable, Pausable, ReentrancyGuard {
         DAOToken(daoTokenAddress).mint(address(this), value);
     }
 
+    function _pay(
+        address _to,
+        uint256 _amount,
+        uint256 _fee
+    ) internal {
+        require(unclaimedBalance() >= _amount + _fee, "insufficient balance");
+        DAOToken(daoTokenAddress).transfer(_to, _amount);
+        if (_fee > 0) {
+            DAOToken(daoTokenAddress).transfer(owner(), _fee);
+        }
+    }
+
     /**
      * @notice send Dao Token inside this contract to the specified address.
      */
@@ -49,11 +61,7 @@ contract TokenSupplySystem is Ownable, Pausable, ReentrancyGuard {
         uint256 _amount,
         uint256 _fee
     ) public onlyOwner {
-        require(unclaimedBalance() >= _amount, "insufficient balance");
-        DAOToken(daoTokenAddress).transfer(_to, _amount);
-        if (_fee > 0) {
-            DAOToken(daoTokenAddress).transfer(owner(), _fee);
-        }
+        _pay(_to, _amount, _fee);
     }
 
     /**
@@ -67,7 +75,7 @@ contract TokenSupplySystem is Ownable, Pausable, ReentrancyGuard {
         require(_to.length == _amount.length, "length mismatch");
         require(_to.length == _fee.length, "length mismatch");
         for (uint256 i = 0; i < _to.length; i++) {
-            pay(_to[i], _amount[i], _fee[i]);
+            _pay(_to[i], _amount[i], _fee[i]);
         }
     }
 
@@ -78,15 +86,12 @@ contract TokenSupplySystem is Ownable, Pausable, ReentrancyGuard {
         return DAOToken(daoTokenAddress).balanceOf(address(this));
     }
 
-    /**
-     * @notice convert DAO token into ETH and send it to the specified address.
-     */
-    function payWithNative(
+    function _payWithNative(
         address _to,
         uint256 _amount,
         uint256 _fee
-    ) public onlyOwner nonReentrant whenNotPaused {
-        require(unclaimedBalance() >= _amount, "insufficient balance");
+    ) internal {
+        require(unclaimedBalance() >= _amount + _fee, "insufficient balance");
         DAOTreasury(daoTreasuryAddress).withdrawProxy(
             _to,
             address(this),
@@ -96,5 +101,33 @@ contract TokenSupplySystem is Ownable, Pausable, ReentrancyGuard {
         if (_fee > 0) {
             DAOToken(daoTokenAddress).transfer(address(this.owner()), _fee);
         }
+    }
+
+    /**
+     * @notice convert DAO token into ETH and send it to the specified address.
+     */
+    function payWithNative(
+        address _to,
+        uint256 _amount,
+        uint256 _fee
+    ) public onlyOwner nonReentrant whenNotPaused {
+        _payWithNative(_to, _amount, _fee);
+    }
+
+    /**
+     * @notice pay and payWithNative
+     */
+    function payAndPayWithNative(
+        address _to,
+        uint256 _amount,
+        uint256 _amountNative,
+        uint256 _fee
+    ) public onlyOwner nonReentrant whenNotPaused {
+        require(
+            unclaimedBalance() >= _amount + _amountNative + _fee,
+            "insufficient balance"
+        );
+        _pay(_to, _amount, 0);
+        _payWithNative(_to, _amountNative, _fee);
     }
 }

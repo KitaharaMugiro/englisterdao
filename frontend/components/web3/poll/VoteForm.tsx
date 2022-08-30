@@ -16,7 +16,7 @@ const ADRESS_KEY = "MetaMaskアドレス"
 export default () => {
     const { pollId, candidates, vote } = useContributionPoll()
     const { address } = useMetaMask()
-    const { topHolders, isTopHolder, tokenName } = useDaoToken()
+    const { tokenName } = useDaoToken()
 
     const [votes, setVotes] = useState<Vote[]>([])
 
@@ -122,13 +122,6 @@ export default () => {
     }
 
     const renderVote = () => {
-        if (!isTopHolder) {
-            return <p>
-                {tokenName}のTopHolderでなければ投票できません。
-                トップホルダー↓
-                {topHolders.map(address => <div key={address}>{address}</div>)}
-            </p>
-        }
         return <button onClick={onClickVote}>投票</button>
     }
 

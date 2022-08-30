@@ -17,12 +17,14 @@ env.localにコントラクトがデプロイされたアドレスを設定し�
 |NEXT_PUBLIC_DAOTOKEN_CONTRACT_ADDRESS|DAOTokenのコントラクトアドレス|
 |NEXT_PUBLIC_DAOTRESURY_CONTRACT_ADDRESS|DAOTresuryのコントラクトアドレス|
 |NEXT_PUBLIC_CONTRIBUTIONPOLL_CONTRACT_ADDRESS|ContributionPollのコントラクトアドレス|
+|NEXT_PUBLIC_TOKENSUPPLYSYSTEM_CONTRACT_ADDRESS|TokenSupplySystemのコントラクトアドレス|
 ## ABIのコピー
 ```
 cd ./frontend
 cp -rp ../artifacts/contracts/ContributionPoll.sol/ContributionPoll.json src/abi/
 cp -rp ../artifacts/contracts/DAOToken.sol/DAOToken.json src/abi/
 cp -rp ../artifacts/contracts/DAOTreasury.sol/DAOTreasury.json src/abi/
+cp -rp ../artifacts/contracts/TokenSupplySystem.sol/TokenSupplySystem.json src/abi/
 ```
 
 # フロントエンドのローカル立ち上げ

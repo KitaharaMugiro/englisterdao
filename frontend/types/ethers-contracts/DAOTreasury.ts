@@ -31,6 +31,7 @@ import type {
 export interface DAOTreasuryInterface extends utils.Interface {
   functions: {
     "deposit()": FunctionFragment;
+    "destroy()": FunctionFragment;
     "getBalance()": FunctionFragment;
     "getCurrentTokenRate()": FunctionFragment;
     "owner()": FunctionFragment;
@@ -39,11 +40,13 @@ export interface DAOTreasuryInterface extends utils.Interface {
     "setDAOTokenAddress(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "withdraw(uint256)": FunctionFragment;
+    "withdrawProxy(address,address,uint256)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
       | "deposit"
+      | "destroy"
       | "getBalance"
       | "getCurrentTokenRate"
       | "owner"
@@ -52,9 +55,11 @@ export interface DAOTreasuryInterface extends utils.Interface {
       | "setDAOTokenAddress"
       | "transferOwnership"
       | "withdraw"
+      | "withdrawProxy"
   ): FunctionFragment;
 
   encodeFunctionData(functionFragment: "deposit", values?: undefined): string;
+  encodeFunctionData(functionFragment: "destroy", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getBalance",
     values?: undefined
@@ -81,8 +86,17 @@ export interface DAOTreasuryInterface extends utils.Interface {
     functionFragment: "withdraw",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawProxy",
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>
+    ]
+  ): string;
 
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "destroy", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getBalance", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getCurrentTokenRate",
@@ -103,6 +117,10 @@ export interface DAOTreasuryInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawProxy",
+    data: BytesLike
+  ): Result;
 
   events: {
     "Candidated(int256,address)": EventFragment;
@@ -252,6 +270,10 @@ export interface DAOTreasury extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    destroy(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     getBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getCurrentTokenRate(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -278,10 +300,21 @@ export interface DAOTreasury extends BaseContract {
       _amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    withdrawProxy(
+      _to: PromiseOrValue<string>,
+      _from: PromiseOrValue<string>,
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
   };
 
   deposit(
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  destroy(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   getBalance(overrides?: CallOverrides): Promise<BigNumber>;
@@ -311,8 +344,17 @@ export interface DAOTreasury extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  withdrawProxy(
+    _to: PromiseOrValue<string>,
+    _from: PromiseOrValue<string>,
+    _amount: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     deposit(overrides?: CallOverrides): Promise<boolean>;
+
+    destroy(overrides?: CallOverrides): Promise<void>;
 
     getBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -335,6 +377,13 @@ export interface DAOTreasury extends BaseContract {
     ): Promise<void>;
 
     withdraw(
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    withdrawProxy(
+      _to: PromiseOrValue<string>,
+      _from: PromiseOrValue<string>,
       _amount: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -407,6 +456,10 @@ export interface DAOTreasury extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    destroy(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     getBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     getCurrentTokenRate(overrides?: CallOverrides): Promise<BigNumber>;
@@ -433,11 +486,22 @@ export interface DAOTreasury extends BaseContract {
       _amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    withdrawProxy(
+      _to: PromiseOrValue<string>,
+      _from: PromiseOrValue<string>,
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     deposit(
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    destroy(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     getBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -465,6 +529,13 @@ export interface DAOTreasury extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     withdraw(
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdrawProxy(
+      _to: PromiseOrValue<string>,
+      _from: PromiseOrValue<string>,
       _amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;

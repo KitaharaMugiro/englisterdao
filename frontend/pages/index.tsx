@@ -8,7 +8,6 @@ export default () => {
 
     return (
         <div>
-            <MetaMaskLoginButton />
             <DAOTokenTotalSupply />
             <DAOTreasuryInfo />
             <UserHoldTokenInfo />

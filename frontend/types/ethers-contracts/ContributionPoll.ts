@@ -44,7 +44,7 @@ export interface ContributionPollInterface extends utils.Interface {
     "CONTRIBUTOR_ASSIGNMENT_TOKEN()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "POLL_ADMIN_ROLE()": FunctionFragment;
-    "RANK_FOR_VOTE()": FunctionFragment;
+    "REQUIRED_TOKEN_FOR_VOTE()": FunctionFragment;
     "SUPPORTER_ASSIGNMENT_TOKEN()": FunctionFragment;
     "VOTE_MAX_POINT()": FunctionFragment;
     "candidateToContributionPoll()": FunctionFragment;
@@ -57,6 +57,7 @@ export interface ContributionPollInterface extends utils.Interface {
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "owner()": FunctionFragment;
+    "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "pollId()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
@@ -65,13 +66,14 @@ export interface ContributionPollInterface extends utils.Interface {
     "setContributorAssignmentToken(uint256)": FunctionFragment;
     "setDaoTokenAddress(address)": FunctionFragment;
     "setPollAdminRole(address)": FunctionFragment;
-    "setRankForVote(uint256)": FunctionFragment;
+    "setRequiredTokenForVote(uint256)": FunctionFragment;
     "setSupporterAssignmentToken(uint256)": FunctionFragment;
     "setVoteMaxPoint(uint256)": FunctionFragment;
     "setVotingEnabled(bool)": FunctionFragment;
     "settleCurrentPollAndCreateNewPoll()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "unpause()": FunctionFragment;
     "vote(address[],uint256[])": FunctionFragment;
     "votes(int256,uint256)": FunctionFragment;
     "votingEnabled()": FunctionFragment;
@@ -82,7 +84,7 @@ export interface ContributionPollInterface extends utils.Interface {
       | "CONTRIBUTOR_ASSIGNMENT_TOKEN"
       | "DEFAULT_ADMIN_ROLE"
       | "POLL_ADMIN_ROLE"
-      | "RANK_FOR_VOTE"
+      | "REQUIRED_TOKEN_FOR_VOTE"
       | "SUPPORTER_ASSIGNMENT_TOKEN"
       | "VOTE_MAX_POINT"
       | "candidateToContributionPoll"
@@ -95,6 +97,7 @@ export interface ContributionPollInterface extends utils.Interface {
       | "grantRole"
       | "hasRole"
       | "owner"
+      | "pause"
       | "paused"
       | "pollId"
       | "renounceOwnership"
@@ -103,13 +106,14 @@ export interface ContributionPollInterface extends utils.Interface {
       | "setContributorAssignmentToken"
       | "setDaoTokenAddress"
       | "setPollAdminRole"
-      | "setRankForVote"
+      | "setRequiredTokenForVote"
       | "setSupporterAssignmentToken"
       | "setVoteMaxPoint"
       | "setVotingEnabled"
       | "settleCurrentPollAndCreateNewPoll"
       | "supportsInterface"
       | "transferOwnership"
+      | "unpause"
       | "vote"
       | "votes"
       | "votingEnabled"
@@ -128,7 +132,7 @@ export interface ContributionPollInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "RANK_FOR_VOTE",
+    functionFragment: "REQUIRED_TOKEN_FOR_VOTE",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -176,6 +180,7 @@ export interface ContributionPollInterface extends utils.Interface {
     values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(functionFragment: "pollId", values?: undefined): string;
   encodeFunctionData(
@@ -203,7 +208,7 @@ export interface ContributionPollInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "setRankForVote",
+    functionFragment: "setRequiredTokenForVote",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
@@ -230,6 +235,7 @@ export interface ContributionPollInterface extends utils.Interface {
     functionFragment: "transferOwnership",
     values: [PromiseOrValue<string>]
   ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "vote",
     values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]
@@ -256,7 +262,7 @@ export interface ContributionPollInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "RANK_FOR_VOTE",
+    functionFragment: "REQUIRED_TOKEN_FOR_VOTE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -295,6 +301,7 @@ export interface ContributionPollInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pollId", data: BytesLike): Result;
   decodeFunctionResult(
@@ -319,7 +326,7 @@ export interface ContributionPollInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setRankForVote",
+    functionFragment: "setRequiredTokenForVote",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -346,6 +353,7 @@ export interface ContributionPollInterface extends utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "vote", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "votes", data: BytesLike): Result;
   decodeFunctionResult(
@@ -548,7 +556,7 @@ export interface ContributionPoll extends BaseContract {
 
     POLL_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    RANK_FOR_VOTE(overrides?: CallOverrides): Promise<[BigNumber]>;
+    REQUIRED_TOKEN_FOR_VOTE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     SUPPORTER_ASSIGNMENT_TOKEN(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -591,6 +599,10 @@ export interface ContributionPoll extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
+    pause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
     pollId(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -626,7 +638,7 @@ export interface ContributionPoll extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    setRankForVote(
+    setRequiredTokenForVote(
       _rankForVote: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -660,6 +672,10 @@ export interface ContributionPoll extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    unpause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     vote(
       _candidates: PromiseOrValue<string>[],
       _points: PromiseOrValue<BigNumberish>[],
@@ -681,7 +697,7 @@ export interface ContributionPoll extends BaseContract {
 
   POLL_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  RANK_FOR_VOTE(overrides?: CallOverrides): Promise<BigNumber>;
+  REQUIRED_TOKEN_FOR_VOTE(overrides?: CallOverrides): Promise<BigNumber>;
 
   SUPPORTER_ASSIGNMENT_TOKEN(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -724,6 +740,10 @@ export interface ContributionPoll extends BaseContract {
 
   owner(overrides?: CallOverrides): Promise<string>;
 
+  pause(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   paused(overrides?: CallOverrides): Promise<boolean>;
 
   pollId(overrides?: CallOverrides): Promise<BigNumber>;
@@ -759,7 +779,7 @@ export interface ContributionPoll extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  setRankForVote(
+  setRequiredTokenForVote(
     _rankForVote: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -793,6 +813,10 @@ export interface ContributionPoll extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  unpause(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   vote(
     _candidates: PromiseOrValue<string>[],
     _points: PromiseOrValue<BigNumberish>[],
@@ -814,7 +838,7 @@ export interface ContributionPoll extends BaseContract {
 
     POLL_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    RANK_FOR_VOTE(overrides?: CallOverrides): Promise<BigNumber>;
+    REQUIRED_TOKEN_FOR_VOTE(overrides?: CallOverrides): Promise<BigNumber>;
 
     SUPPORTER_ASSIGNMENT_TOKEN(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -855,6 +879,8 @@ export interface ContributionPoll extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<string>;
 
+    pause(overrides?: CallOverrides): Promise<void>;
+
     paused(overrides?: CallOverrides): Promise<boolean>;
 
     pollId(overrides?: CallOverrides): Promise<BigNumber>;
@@ -888,7 +914,7 @@ export interface ContributionPoll extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setRankForVote(
+    setRequiredTokenForVote(
       _rankForVote: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -919,6 +945,8 @@ export interface ContributionPoll extends BaseContract {
       newOwner: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    unpause(overrides?: CallOverrides): Promise<void>;
 
     vote(
       _candidates: PromiseOrValue<string>[],
@@ -1037,7 +1065,7 @@ export interface ContributionPoll extends BaseContract {
 
     POLL_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    RANK_FOR_VOTE(overrides?: CallOverrides): Promise<BigNumber>;
+    REQUIRED_TOKEN_FOR_VOTE(overrides?: CallOverrides): Promise<BigNumber>;
 
     SUPPORTER_ASSIGNMENT_TOKEN(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1080,6 +1108,10 @@ export interface ContributionPoll extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
+    pause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     paused(overrides?: CallOverrides): Promise<BigNumber>;
 
     pollId(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1115,7 +1147,7 @@ export interface ContributionPoll extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    setRankForVote(
+    setRequiredTokenForVote(
       _rankForVote: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -1149,6 +1181,10 @@ export interface ContributionPoll extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    unpause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     vote(
       _candidates: PromiseOrValue<string>[],
       _points: PromiseOrValue<BigNumberish>[],
@@ -1175,7 +1211,9 @@ export interface ContributionPoll extends BaseContract {
 
     POLL_ADMIN_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    RANK_FOR_VOTE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    REQUIRED_TOKEN_FOR_VOTE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     SUPPORTER_ASSIGNMENT_TOKEN(
       overrides?: CallOverrides
@@ -1222,6 +1260,10 @@ export interface ContributionPoll extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    pause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pollId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1257,7 +1299,7 @@ export interface ContributionPoll extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    setRankForVote(
+    setRequiredTokenForVote(
       _rankForVote: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
@@ -1288,6 +1330,10 @@ export interface ContributionPoll extends BaseContract {
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    unpause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

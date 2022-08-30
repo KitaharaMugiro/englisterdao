@@ -32,22 +32,28 @@ export interface DAOTokenInterface extends utils.Interface {
     "BURNER_ROLE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
+    "PAUSER_ROLE()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
+    "burn(uint256)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
+    "burnFrom(address,uint256)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
-    "getTopHolders(uint256)": FunctionFragment;
+    "getRoleMember(bytes32,uint256)": FunctionFragment;
+    "getRoleMemberCount(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
-    "owner()": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
+    "pause()": FunctionFragment;
+    "paused()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
+    "revokeBurnerRole(address)": FunctionFragment;
+    "revokeMinterRole(address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
     "setupBurnerRole(address)": FunctionFragment;
     "setupMinterRole(address)": FunctionFragment;
@@ -56,7 +62,7 @@ export interface DAOTokenInterface extends utils.Interface {
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
+    "unpause()": FunctionFragment;
   };
 
   getFunction(
@@ -64,22 +70,28 @@ export interface DAOTokenInterface extends utils.Interface {
       | "BURNER_ROLE"
       | "DEFAULT_ADMIN_ROLE"
       | "MINTER_ROLE"
+      | "PAUSER_ROLE"
       | "allowance"
       | "approve"
       | "balanceOf"
-      | "burn"
+      | "burn(uint256)"
+      | "burn(address,uint256)"
+      | "burnFrom"
       | "decimals"
       | "decreaseAllowance"
       | "getRoleAdmin"
-      | "getTopHolders"
+      | "getRoleMember"
+      | "getRoleMemberCount"
       | "grantRole"
       | "hasRole"
       | "increaseAllowance"
       | "mint"
       | "name"
-      | "owner"
-      | "renounceOwnership"
+      | "pause"
+      | "paused"
       | "renounceRole"
+      | "revokeBurnerRole"
+      | "revokeMinterRole"
       | "revokeRole"
       | "setupBurnerRole"
       | "setupMinterRole"
@@ -88,7 +100,7 @@ export interface DAOTokenInterface extends utils.Interface {
       | "totalSupply"
       | "transfer"
       | "transferFrom"
-      | "transferOwnership"
+      | "unpause"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -104,6 +116,10 @@ export interface DAOTokenInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "PAUSER_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "allowance",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
@@ -116,7 +132,15 @@ export interface DAOTokenInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "burn",
+    functionFragment: "burn(uint256)",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "burn(address,uint256)",
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "burnFrom",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
@@ -129,8 +153,12 @@ export interface DAOTokenInterface extends utils.Interface {
     values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
-    functionFragment: "getTopHolders",
-    values: [PromiseOrValue<BigNumberish>]
+    functionFragment: "getRoleMember",
+    values: [PromiseOrValue<BytesLike>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRoleMemberCount",
+    values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "grantRole",
@@ -149,14 +177,19 @@ export interface DAOTokenInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceRole",
     values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "revokeBurnerRole",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "revokeMinterRole",
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "revokeRole",
@@ -191,10 +224,7 @@ export interface DAOTokenInterface extends utils.Interface {
       PromiseOrValue<BigNumberish>
     ]
   ): string;
-  encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [PromiseOrValue<string>]
-  ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "BURNER_ROLE",
@@ -208,10 +238,22 @@ export interface DAOTokenInterface extends utils.Interface {
     functionFragment: "MINTER_ROLE",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "PAUSER_ROLE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "burn(uint256)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "burn(address,uint256)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "burnFrom", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
@@ -222,7 +264,11 @@ export interface DAOTokenInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getTopHolders",
+    functionFragment: "getRoleMember",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoleMemberCount",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
@@ -233,13 +279,18 @@ export interface DAOTokenInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceOwnership",
+    functionFragment: "renounceRole",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "renounceRole",
+    functionFragment: "revokeBurnerRole",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "revokeMinterRole",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
@@ -265,40 +316,25 @@ export interface DAOTokenInterface extends utils.Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
-    "Candidated(int256,address)": EventFragment;
-    "CreatePoll(int256)": EventFragment;
-    "Deposited(address,uint256)": EventFragment;
-    "OwnershipTransferred(address,address)": EventFragment;
+    "Paused(address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
-    "SettlePoll(int256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
-    "Voted(int256,address)": EventFragment;
-    "VotingEnabled(int256,bool)": EventFragment;
-    "WithdrawEth(uint256,uint256)": EventFragment;
+    "Unpaused(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Candidated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "CreatePoll"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Deposited"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SettlePoll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Voted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VotingEnabled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "WithdrawEth"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
 export interface ApprovalEventObject {
@@ -313,46 +349,12 @@ export type ApprovalEvent = TypedEvent<
 
 export type ApprovalEventFilter = TypedEventFilter<ApprovalEvent>;
 
-export interface CandidatedEventObject {
-  pollId: BigNumber;
-  candidate: string;
+export interface PausedEventObject {
+  account: string;
 }
-export type CandidatedEvent = TypedEvent<
-  [BigNumber, string],
-  CandidatedEventObject
->;
+export type PausedEvent = TypedEvent<[string], PausedEventObject>;
 
-export type CandidatedEventFilter = TypedEventFilter<CandidatedEvent>;
-
-export interface CreatePollEventObject {
-  pollId: BigNumber;
-}
-export type CreatePollEvent = TypedEvent<[BigNumber], CreatePollEventObject>;
-
-export type CreatePollEventFilter = TypedEventFilter<CreatePollEvent>;
-
-export interface DepositedEventObject {
-  sender: string;
-  amount: BigNumber;
-}
-export type DepositedEvent = TypedEvent<
-  [string, BigNumber],
-  DepositedEventObject
->;
-
-export type DepositedEventFilter = TypedEventFilter<DepositedEvent>;
-
-export interface OwnershipTransferredEventObject {
-  previousOwner: string;
-  newOwner: string;
-}
-export type OwnershipTransferredEvent = TypedEvent<
-  [string, string],
-  OwnershipTransferredEventObject
->;
-
-export type OwnershipTransferredEventFilter =
-  TypedEventFilter<OwnershipTransferredEvent>;
+export type PausedEventFilter = TypedEventFilter<PausedEvent>;
 
 export interface RoleAdminChangedEventObject {
   role: string;
@@ -391,13 +393,6 @@ export type RoleRevokedEvent = TypedEvent<
 
 export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
 
-export interface SettlePollEventObject {
-  pollId: BigNumber;
-}
-export type SettlePollEvent = TypedEvent<[BigNumber], SettlePollEventObject>;
-
-export type SettlePollEventFilter = TypedEventFilter<SettlePollEvent>;
-
 export interface TransferEventObject {
   from: string;
   to: string;
@@ -410,35 +405,12 @@ export type TransferEvent = TypedEvent<
 
 export type TransferEventFilter = TypedEventFilter<TransferEvent>;
 
-export interface VotedEventObject {
-  pollId: BigNumber;
-  voter: string;
+export interface UnpausedEventObject {
+  account: string;
 }
-export type VotedEvent = TypedEvent<[BigNumber, string], VotedEventObject>;
+export type UnpausedEvent = TypedEvent<[string], UnpausedEventObject>;
 
-export type VotedEventFilter = TypedEventFilter<VotedEvent>;
-
-export interface VotingEnabledEventObject {
-  pollId: BigNumber;
-  enabled: boolean;
-}
-export type VotingEnabledEvent = TypedEvent<
-  [BigNumber, boolean],
-  VotingEnabledEventObject
->;
-
-export type VotingEnabledEventFilter = TypedEventFilter<VotingEnabledEvent>;
-
-export interface WithdrawEthEventObject {
-  amount: BigNumber;
-  payedAmount: BigNumber;
-}
-export type WithdrawEthEvent = TypedEvent<
-  [BigNumber, BigNumber],
-  WithdrawEthEventObject
->;
-
-export type WithdrawEthEventFilter = TypedEventFilter<WithdrawEthEvent>;
+export type UnpausedEventFilter = TypedEventFilter<UnpausedEvent>;
 
 export interface DAOToken extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -473,6 +445,8 @@ export interface DAOToken extends BaseContract {
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
+    PAUSER_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
     allowance(
       owner: PromiseOrValue<string>,
       spender: PromiseOrValue<string>,
@@ -490,8 +464,19 @@ export interface DAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    burn(
-      from: PromiseOrValue<string>,
+    "burn(uint256)"(
+      amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    "burn(address,uint256)"(
+      holder: PromiseOrValue<string>,
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    burnFrom(
+      account: PromiseOrValue<string>,
       amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -509,10 +494,16 @@ export interface DAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    getTopHolders(
-      _limit: PromiseOrValue<BigNumberish>,
+    getRoleMember(
+      role: PromiseOrValue<BytesLike>,
+      index: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<[string[]]>;
+    ): Promise<[string]>;
+
+    getRoleMemberCount(
+      role: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     grantRole(
       role: PromiseOrValue<BytesLike>,
@@ -540,15 +531,25 @@ export interface DAOToken extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    owner(overrides?: CallOverrides): Promise<[string]>;
-
-    renounceOwnership(
+    pause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<[boolean]>;
 
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    revokeBurnerRole(
+      _burner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    revokeMinterRole(
+      _minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -559,12 +560,12 @@ export interface DAOToken extends BaseContract {
     ): Promise<ContractTransaction>;
 
     setupBurnerRole(
-      contractAddress: PromiseOrValue<string>,
+      _burner: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     setupMinterRole(
-      contractAddress: PromiseOrValue<string>,
+      _minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -590,8 +591,7 @@ export interface DAOToken extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
+    unpause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
@@ -601,6 +601,8 @@ export interface DAOToken extends BaseContract {
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
   MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  PAUSER_ROLE(overrides?: CallOverrides): Promise<string>;
 
   allowance(
     owner: PromiseOrValue<string>,
@@ -619,8 +621,19 @@ export interface DAOToken extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  burn(
-    from: PromiseOrValue<string>,
+  "burn(uint256)"(
+    amount: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  "burn(address,uint256)"(
+    holder: PromiseOrValue<string>,
+    _amount: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  burnFrom(
+    account: PromiseOrValue<string>,
     amount: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -638,10 +651,16 @@ export interface DAOToken extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  getTopHolders(
-    _limit: PromiseOrValue<BigNumberish>,
+  getRoleMember(
+    role: PromiseOrValue<BytesLike>,
+    index: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
-  ): Promise<string[]>;
+  ): Promise<string>;
+
+  getRoleMemberCount(
+    role: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   grantRole(
     role: PromiseOrValue<BytesLike>,
@@ -669,15 +688,25 @@ export interface DAOToken extends BaseContract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  owner(overrides?: CallOverrides): Promise<string>;
-
-  renounceOwnership(
+  pause(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  paused(overrides?: CallOverrides): Promise<boolean>;
 
   renounceRole(
     role: PromiseOrValue<BytesLike>,
     account: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  revokeBurnerRole(
+    _burner: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  revokeMinterRole(
+    _minter: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -688,12 +717,12 @@ export interface DAOToken extends BaseContract {
   ): Promise<ContractTransaction>;
 
   setupBurnerRole(
-    contractAddress: PromiseOrValue<string>,
+    _burner: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   setupMinterRole(
-    contractAddress: PromiseOrValue<string>,
+    _minter: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -719,8 +748,7 @@ export interface DAOToken extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  transferOwnership(
-    newOwner: PromiseOrValue<string>,
+  unpause(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -730,6 +758,8 @@ export interface DAOToken extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    PAUSER_ROLE(overrides?: CallOverrides): Promise<string>;
 
     allowance(
       owner: PromiseOrValue<string>,
@@ -748,8 +778,19 @@ export interface DAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    burn(
-      from: PromiseOrValue<string>,
+    "burn(uint256)"(
+      amount: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "burn(address,uint256)"(
+      holder: PromiseOrValue<string>,
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    burnFrom(
+      account: PromiseOrValue<string>,
       amount: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -767,10 +808,16 @@ export interface DAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    getTopHolders(
-      _limit: PromiseOrValue<BigNumberish>,
+    getRoleMember(
+      role: PromiseOrValue<BytesLike>,
+      index: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<string[]>;
+    ): Promise<string>;
+
+    getRoleMemberCount(
+      role: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     grantRole(
       role: PromiseOrValue<BytesLike>,
@@ -798,13 +845,23 @@ export interface DAOToken extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    owner(overrides?: CallOverrides): Promise<string>;
+    pause(overrides?: CallOverrides): Promise<void>;
 
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
+    paused(overrides?: CallOverrides): Promise<boolean>;
 
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    revokeBurnerRole(
+      _burner: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    revokeMinterRole(
+      _minter: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -815,12 +872,12 @@ export interface DAOToken extends BaseContract {
     ): Promise<void>;
 
     setupBurnerRole(
-      contractAddress: PromiseOrValue<string>,
+      _burner: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setupMinterRole(
-      contractAddress: PromiseOrValue<string>,
+      _minter: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -846,10 +903,7 @@ export interface DAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    unpause(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -864,35 +918,8 @@ export interface DAOToken extends BaseContract {
       value?: null
     ): ApprovalEventFilter;
 
-    "Candidated(int256,address)"(
-      pollId?: null,
-      candidate?: PromiseOrValue<string> | null
-    ): CandidatedEventFilter;
-    Candidated(
-      pollId?: null,
-      candidate?: PromiseOrValue<string> | null
-    ): CandidatedEventFilter;
-
-    "CreatePoll(int256)"(pollId?: null): CreatePollEventFilter;
-    CreatePoll(pollId?: null): CreatePollEventFilter;
-
-    "Deposited(address,uint256)"(
-      sender?: PromiseOrValue<string> | null,
-      amount?: null
-    ): DepositedEventFilter;
-    Deposited(
-      sender?: PromiseOrValue<string> | null,
-      amount?: null
-    ): DepositedEventFilter;
-
-    "OwnershipTransferred(address,address)"(
-      previousOwner?: PromiseOrValue<string> | null,
-      newOwner?: PromiseOrValue<string> | null
-    ): OwnershipTransferredEventFilter;
-    OwnershipTransferred(
-      previousOwner?: PromiseOrValue<string> | null,
-      newOwner?: PromiseOrValue<string> | null
-    ): OwnershipTransferredEventFilter;
+    "Paused(address)"(account?: null): PausedEventFilter;
+    Paused(account?: null): PausedEventFilter;
 
     "RoleAdminChanged(bytes32,bytes32,bytes32)"(
       role?: PromiseOrValue<BytesLike> | null,
@@ -927,9 +954,6 @@ export interface DAOToken extends BaseContract {
       sender?: PromiseOrValue<string> | null
     ): RoleRevokedEventFilter;
 
-    "SettlePoll(int256)"(pollId?: null): SettlePollEventFilter;
-    SettlePoll(pollId?: null): SettlePollEventFilter;
-
     "Transfer(address,address,uint256)"(
       from?: PromiseOrValue<string> | null,
       to?: PromiseOrValue<string> | null,
@@ -941,26 +965,8 @@ export interface DAOToken extends BaseContract {
       value?: null
     ): TransferEventFilter;
 
-    "Voted(int256,address)"(
-      pollId?: null,
-      voter?: PromiseOrValue<string> | null
-    ): VotedEventFilter;
-    Voted(
-      pollId?: null,
-      voter?: PromiseOrValue<string> | null
-    ): VotedEventFilter;
-
-    "VotingEnabled(int256,bool)"(
-      pollId?: null,
-      enabled?: null
-    ): VotingEnabledEventFilter;
-    VotingEnabled(pollId?: null, enabled?: null): VotingEnabledEventFilter;
-
-    "WithdrawEth(uint256,uint256)"(
-      amount?: null,
-      payedAmount?: null
-    ): WithdrawEthEventFilter;
-    WithdrawEth(amount?: null, payedAmount?: null): WithdrawEthEventFilter;
+    "Unpaused(address)"(account?: null): UnpausedEventFilter;
+    Unpaused(account?: null): UnpausedEventFilter;
   };
 
   estimateGas: {
@@ -969,6 +975,8 @@ export interface DAOToken extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PAUSER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     allowance(
       owner: PromiseOrValue<string>,
@@ -987,8 +995,19 @@ export interface DAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    burn(
-      from: PromiseOrValue<string>,
+    "burn(uint256)"(
+      amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    "burn(address,uint256)"(
+      holder: PromiseOrValue<string>,
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    burnFrom(
+      account: PromiseOrValue<string>,
       amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -1006,8 +1025,14 @@ export interface DAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getTopHolders(
-      _limit: PromiseOrValue<BigNumberish>,
+    getRoleMember(
+      role: PromiseOrValue<BytesLike>,
+      index: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getRoleMemberCount(
+      role: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1037,15 +1062,25 @@ export interface DAOToken extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    renounceOwnership(
+    pause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    paused(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    revokeBurnerRole(
+      _burner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    revokeMinterRole(
+      _minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1056,12 +1091,12 @@ export interface DAOToken extends BaseContract {
     ): Promise<BigNumber>;
 
     setupBurnerRole(
-      contractAddress: PromiseOrValue<string>,
+      _burner: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     setupMinterRole(
-      contractAddress: PromiseOrValue<string>,
+      _minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1087,8 +1122,7 @@ export interface DAOToken extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
+    unpause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
@@ -1101,6 +1135,8 @@ export interface DAOToken extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    PAUSER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     allowance(
       owner: PromiseOrValue<string>,
@@ -1119,8 +1155,19 @@ export interface DAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    burn(
-      from: PromiseOrValue<string>,
+    "burn(uint256)"(
+      amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "burn(address,uint256)"(
+      holder: PromiseOrValue<string>,
+      _amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    burnFrom(
+      account: PromiseOrValue<string>,
       amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
@@ -1138,8 +1185,14 @@ export interface DAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getTopHolders(
-      _limit: PromiseOrValue<BigNumberish>,
+    getRoleMember(
+      role: PromiseOrValue<BytesLike>,
+      index: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getRoleMemberCount(
+      role: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1169,15 +1222,25 @@ export interface DAOToken extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    renounceOwnership(
+    pause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     renounceRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    revokeBurnerRole(
+      _burner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    revokeMinterRole(
+      _minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1188,12 +1251,12 @@ export interface DAOToken extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     setupBurnerRole(
-      contractAddress: PromiseOrValue<string>,
+      _burner: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     setupMinterRole(
-      contractAddress: PromiseOrValue<string>,
+      _minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1219,8 +1282,7 @@ export interface DAOToken extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
+    unpause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };

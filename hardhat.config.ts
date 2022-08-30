@@ -11,11 +11,13 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      chainId: 31337
+      chainId: 31337,
+      allowUnlimitedContractSize: true
     },
     localhost: {
       url: "http://localhost:8545",
-      chainId: 31337
+      chainId: 31337,
+      allowUnlimitedContractSize: true,
     },
     goerli: {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
