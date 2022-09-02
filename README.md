@@ -30,21 +30,28 @@ npx hardhat run scripts/deploy.ts --network localhost
 npx hardhat run scripts/demo/candidate.ts --network localhost
 ```
 
-# Guerli devへのデプロイ
+# GuerliもしくはMumbaiへのデプロイ
 .envファイルを作成して適切な値を入れたのち、以下のコマンドでデプロイを実行
 
 ```
+# Goerliへのデプロイ
 npx hardhat run scripts/deploy.ts --network goerli 
+
+# Mumbaiへのデプロイ
+npx hardhat run scripts/deploy.ts --network maticmum
 ```
-# EtherscanでVerifyする(goerli)
-これにより、Etherscan上でソースコードを確認できるようになる
+# EtherscanでVerifyする
+Etherscan上でソースコードを確認できるようになる
 
+例(ネットワーク名、コントラクトアドレス、初期値は適切に変更すること)
 ```
-npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network goerli 0x4966f4b22AA708905ddc7c040777647698f72FfE Englister ENG 100000000000000000000
+npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network maticmum 0x5427aC1c36c560D602D41dD0F2609DB296dd3CF9 Englister ENG 0
 
-npx hardhat verify --contract contracts/DAOTreasury.sol:DAOTreasury --network goerli 0x280BCD89619D3Cd34EAaB7Cda5b7869D9eE4402c 
+npx hardhat verify --contract contracts/DAOTreasury.sol:DAOTreasury --network maticmum 0x80CF3dEdf0F03441bd47037Dfa8640eF9f35626a 
 
-npx hardhat verify --contract contracts/ContributionPoll.sol:ContributionPoll --network goerli 0x09b2a61a3492846116eb2f6D1Ba2d02EA6292c62 
+npx hardhat verify --contract contracts/ContributionPoll.sol:ContributionPoll --network maticmum 0x7674214b5daedb9069D55e6F6C47F2c936E47d1B 
+
+npx hardhat verify --contract contracts/TokenSupplySystem.sol:TokenSupplySystem --network maticmum 0x77F78729699342EdB653553525570aE2c4F6B98B 
 ```
 
 

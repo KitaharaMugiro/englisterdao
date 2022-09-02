@@ -9,6 +9,7 @@ export default () => {
     const [tokenSymbol, setTokenSymbol] = useState("");
     const [tokenTotalSupply, setTokenTotalSupply] = useState(0);
     const [yourBalance, setYourBalance] = useState(0);
+    const [holders, setHolders] = useState(0);
     const { address, login } = useMetaMask()
     const contractAddress = process.env.NEXT_PUBLIC_DAOTOKEN_CONTRACT_ADDRESS as string
 
@@ -40,5 +41,10 @@ export default () => {
         dataFetch()
     }, [address])
 
-    return { tokenName, tokenSymbol, tokenTotalSupply, yourBalance };
+    const getTestEvent = () => {
+        const test = getContract().filters.Transfer()
+        console.log(test)
+    }
+
+    return { tokenName, tokenSymbol, tokenTotalSupply, yourBalance, getTestEvent };
 }

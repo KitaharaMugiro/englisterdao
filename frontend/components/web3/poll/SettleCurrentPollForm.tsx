@@ -12,7 +12,7 @@ export default () => {
         }
     }
     return <div>
-        <h4>投票を締め切る(onlyOwner)</h4>
+        <h3>投票を締め切る(onlyOwner)</h3>
         <button onClick={onClickSettle}>締め切る</button>
     </div>
 }

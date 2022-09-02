@@ -14,7 +14,9 @@ export default () => {
     }
 
     return <div>
-        <h4>立候補する</h4>
+        <h3 >立候補する</h3>
         <button onClick={onClickCandidate}>立候補</button>
+        <br />
+        <a target="_blank" href="https://docs.google.com/spreadsheets/d/15ANGqCgZA8o-QjyjbsWrOiu9nJrAKvSnP54liTZr6t4">スプレッドシート</a>に必要事項を記入してから上記のボタンを押してください。
     </div>
 }

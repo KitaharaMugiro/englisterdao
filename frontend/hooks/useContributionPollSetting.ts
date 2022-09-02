@@ -14,6 +14,7 @@ export default () => {
     const [SUPPORTER_ASSIGNMENT_TOKEN, setSUPPORTER_ASSIGNMENT_TOKEN] = useState(0)
     const [VOTE_MAX_POINT, setVOTE_MAX_POINT] = useState(0)
     const [votingEnabled, setSetVotingEnabled] = useState(true)
+    const [pollId, setPollId] = useState(0)
 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRIBUTIONPOLL_CONTRACT_ADDRESS as string
     const getContractWithSigner = () => {
@@ -38,6 +39,7 @@ export default () => {
         getContract().functions.SUPPORTER_ASSIGNMENT_TOKEN().then(t => setSUPPORTER_ASSIGNMENT_TOKEN(Number(ethers.utils.formatEther(t[0]))));
         getContract().functions.VOTE_MAX_POINT().then(t => setVOTE_MAX_POINT(Number(t[0])));
         getContract().functions.votingEnabled().then(t => setSetVotingEnabled(t[0]));
+        getContract().functions.pollId().then(t => setPollId(Number(t[0])));
     }, [address]);
 
     return {
@@ -48,6 +50,7 @@ export default () => {
         SUPPORTER_ASSIGNMENT_TOKEN,
         VOTE_MAX_POINT,
         votingEnabled,
+        pollId,
         setDaoTokenAddress: getContractWithSigner()?.functions?.setDaoTokenAddress,
         setRequiredTokenForVote: getContractWithSigner()?.functions?.setRequiredTokenForVote,
         setContributorAssignmentToken: getContractWithSigner()?.functions?.setContributorAssignmentToken,

@@ -14,9 +14,8 @@ const NAME_KEY = "Contributor名（Discord名：例mugi#9179）"
 const CONTRIBUTION_KEY = "貢献内容(エビデンスURLがあると良い)"
 const ADRESS_KEY = "MetaMaskアドレス"
 export default () => {
-    const { pollId, candidates, vote } = useContributionPoll()
-    const { address } = useMetaMask()
-    const { tokenName } = useDaoToken()
+    const { candidates, vote } = useContributionPoll()
+
 
     const [votes, setVotes] = useState<Vote[]>([])
 
@@ -126,7 +125,7 @@ export default () => {
     }
 
     return <div>
-        <h3>貢献度投票 第{pollId}回</h3>
+        <h3 >投票する</h3>
         {renderForm()}
         {renderVote()}
     </div>

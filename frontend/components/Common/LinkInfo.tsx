@@ -11,6 +11,10 @@ export default () => {
                 <a href="/poll">投票する</a>
                 <br />
                 <a href="/deposit">入出金する</a>
+                <br />
+                <a href="/admin/reward">Rewardシステム(onlyOwner)</a>
+                <br />
+                <a href="/admin/setting">設定値変更(onlyOwner)</a>
             </div>
         </div>
 

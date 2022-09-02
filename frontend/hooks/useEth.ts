@@ -4,6 +4,7 @@ import useMetaMask from "./useMetaMask";
 
 export default () => {
     const [balance, setBalance] = useState(0);
+    const [network, setNetwork] = useState("")
     const { address, login } = useMetaMask()
 
     const getSigner = () => {
@@ -12,13 +13,25 @@ export default () => {
         return provider.getSigner()
     }
 
+    const getNetwork = () => {
+        const provider = new ethers.providers.Web3Provider((window as any).ethereum)
+        return provider.getNetwork()
+    }
+
     useEffect(() => {
         refresh()
     }, [address])
 
     const refresh = async () => {
         getSigner()?.getBalance().then(b => setBalance(Number(ethers.utils.formatEther(b))));
+        getNetwork().then(n => {
+            if (n.name === "unknown") setNetwork("Unknown")
+            else if (n.name === "maticmum") setNetwork("Mumbai")
+            else if (n.name === "homestead") setNetwork("Mainnet")
+            else setNetwork(n.name)
+        }
+        )
     }
 
-    return { balance };
+    return { balance, network };
 }

@@ -23,7 +23,7 @@ const config: HardhatUserConfig = {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
       accounts: [`${process.env.PRIVATE_KEY}`]
     },
-    matic: {
+    maticmum: {
       url: "https://rpc-mumbai.maticvigil.com",
       accounts: [`${process.env.PRIVATE_KEY}`]
     }
@@ -40,9 +40,12 @@ const config: HardhatUserConfig = {
   //   coinmarketcap: COINMARKETCAP,
   // },
 
+
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_TOKEN
-  },
+    apiKey: {
+      polygonMumbai: process.env.POLIGONSCAN_API_TOKEN!
+    }
+  }
 };
 
 export default config;

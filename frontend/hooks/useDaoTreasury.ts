@@ -51,5 +51,8 @@ export default () => {
         setLoading(false);
     }
 
-    return { tokenRate, balance, depositEth, refresh, loading, withdrawEth };
+    return {
+        tokenRate, balance, depositEth, refresh, loading, withdrawEth,
+        history: getContract().filters["Deposited(address,uint256)"]
+    };
 }
