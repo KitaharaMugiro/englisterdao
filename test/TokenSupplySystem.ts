@@ -224,5 +224,42 @@ describe("TokenSupplySystem", function () {
             expect(await tokenSupplySystem.unclaimedBalance()).to.equal(ethers.utils.parseEther("20"));
             expect(await token.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("10"));
         })
+
+        it("いずれかがゼロでもエラーが起きない", async () => {
+            const { token, tokenSupplySystem, otherAccount, owner } = await loadFixture(deployFixture);
+            await tokenSupplySystem.mint(ethers.utils.parseEther("100"));
+            const balanceBefore = await ethers.provider.getBalance(otherAccount.address);
+
+            await tokenSupplySystem.payAndPayWithNative(
+                otherAccount.address,
+                ethers.utils.parseEther("10"),
+                ethers.utils.parseEther("0"),
+                ethers.utils.parseEther("0")
+            );
+            await tokenSupplySystem.payAndPayWithNative(
+                otherAccount.address,
+                ethers.utils.parseEther("0"),
+                ethers.utils.parseEther("10"),
+                ethers.utils.parseEther("0")
+            );
+            await tokenSupplySystem.payAndPayWithNative(
+                otherAccount.address,
+                ethers.utils.parseEther("0"),
+                ethers.utils.parseEther("0"),
+                ethers.utils.parseEther("10")
+            );
+            await tokenSupplySystem.payAndPayWithNative(
+                otherAccount.address,
+                ethers.utils.parseEther("0"),
+                ethers.utils.parseEther("0"),
+                ethers.utils.parseEther("0")
+            );
+            const balanceAfter = await ethers.provider.getBalance(otherAccount.address);
+
+            expect(await tokenSupplySystem.unclaimedBalance()).to.equal(ethers.utils.parseEther("70"));
+            expect(await token.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("10"));
+            expect(await token.balanceOf(otherAccount.address)).to.equal(ethers.utils.parseEther("10"));
+            expect(balanceAfter).to.equal(ethers.utils.parseEther("100").add(balanceBefore));
+        })
     })
 });

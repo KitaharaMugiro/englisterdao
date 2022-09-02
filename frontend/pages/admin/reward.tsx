@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useTokenSupplySystem from "../hooks/useTokenSupplySystem";
+import useTokenSupplySystem from "../../hooks/useTokenSupplySystem";
 
 export default () => {
     const { payAndPayWithNative, unclaimedBalance, mint } = useTokenSupplySystem()
@@ -22,8 +22,8 @@ export default () => {
 
     return <div>
         <div>
-            まだある {unclaimedBalance}
-            <h2>Mint(トークンを入力)</h2>
+            Unclaimed Balance: {unclaimedBalance}
+            <h2>Mint(MintしたいDAOトークンを入力)</h2>
             <input onChange={(e) => setMintAmount(e.target.value)} value={mintAmount}></input>
             <button onClick={onMint}>
                 Mint
@@ -33,6 +33,7 @@ export default () => {
         <br />
 
         <br />
+        <h2>Unclaimed Balanceを送金(全てDAOトークンを入力)</h2>
         <input placeholder="address" value={address} onChange={e => setAddress(e.target.value)} />
         <input placeholder="ENG交換" value={amount} onChange={e => setAmount(e.target.value)} />
         <input placeholder="Native交換" value={nativeAmount} onChange={e => setNativeAmount(e.target.value)} />

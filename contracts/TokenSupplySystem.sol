@@ -92,11 +92,13 @@ contract TokenSupplySystem is Ownable, Pausable, ReentrancyGuard {
         uint256 _fee
     ) internal {
         require(unclaimedBalance() >= _amount + _fee, "insufficient balance");
-        DAOTreasury(daoTreasuryAddress).withdrawProxy(
-            _to,
-            address(this),
-            _amount
-        );
+        if (_amount > 0) {
+            DAOTreasury(daoTreasuryAddress).withdrawProxy(
+                _to,
+                address(this),
+                _amount
+            );
+        }
 
         if (_fee > 0) {
             DAOToken(daoTokenAddress).transfer(address(this.owner()), _fee);
