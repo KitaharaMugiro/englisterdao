@@ -14,7 +14,7 @@ const NAME_KEY = "Contributor名（Discord名：例mugi#9179）"
 const CONTRIBUTION_KEY = "貢献内容(エビデンスURLがあると良い)"
 const ADRESS_KEY = "MetaMaskアドレス"
 export default () => {
-    const { candidates, vote } = useContributionPoll()
+    const { candidates, vote, voters, completedVote } = useContributionPoll()
 
 
     const [votes, setVotes] = useState<Vote[]>([])
@@ -121,11 +121,14 @@ export default () => {
     }
 
     const renderVote = () => {
+        if (completedVote) {
+            return <button disabled>投票済み</button>
+        }
         return <button onClick={onClickVote}>投票</button>
     }
 
     return <div>
-        <h3 >投票する</h3>
+        <h3 >投票する ({voters.length}人が投票済み)</h3>
         {renderForm()}
         {renderVote()}
     </div>
