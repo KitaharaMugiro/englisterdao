@@ -5,7 +5,7 @@ import useMetaMask from "./useMetaMask";
 export default () => {
     const [balance, setBalance] = useState(0);
     const [network, setNetwork] = useState("")
-    const { address, login } = useMetaMask()
+    const { address } = useMetaMask()
 
     const getSigner = () => {
         if (!address) return undefined

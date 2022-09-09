@@ -11,6 +11,7 @@ const MyApp = ({ Component, pageProps }: any) => {
     return <SafeHydrate>
         {typeof window === 'undefined' ? null :
             <div>
+                <title>Englister DAO</title>
                 <NetworkCheck />
                 <Component {...pageProps} />
                 <Footer />
