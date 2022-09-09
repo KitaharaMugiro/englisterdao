@@ -46,5 +46,5 @@ export default () => {
         console.log(test)
     }
 
-    return { tokenName, tokenSymbol, tokenTotalSupply, yourBalance, getTestEvent };
+    return { tokenName, tokenSymbol, tokenTotalSupply, yourBalance, getTestEvent, contractAddress };
 }
