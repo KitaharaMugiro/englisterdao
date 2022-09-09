@@ -9,15 +9,25 @@ export default () => {
     const [fee, setFee] = useState("")
     const [mintAmount, setMintAmount] = useState("")
     const total = Number(amount) + Number(nativeAmount) + Number(fee)
+    const [errorMessaage, setErrorMessage] = useState("")
 
     const onSend = async () => {
-        if (payAndPayWithNative)
-            await payAndPayWithNative(address, Number(amount), Number(nativeAmount), Number(fee))
+        try {
+            if (payAndPayWithNative)
+                await payAndPayWithNative(address, Number(amount), Number(nativeAmount), Number(fee))
+        } catch (e: any) {
+            setErrorMessage(e.message)
+        }
     }
 
     const onMint = async () => {
-        if (mint)
-            await mint(Number(mintAmount))
+        try {
+            if (mint)
+                await mint(Number(mintAmount))
+        } catch (e: any) {
+            setErrorMessage(e.message)
+        }
+
     }
 
     return <div>
@@ -40,5 +50,7 @@ export default () => {
         <input placeholder="手数料" value={fee} onChange={e => setFee(e.target.value)} />
         <input placeholder="総額" value={total} />
         <button onClick={onSend}>送金</button>
+
+        <div style={{ color: "red" }}>{errorMessaage}</div>
     </div>;
 }

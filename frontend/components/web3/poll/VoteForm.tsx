@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react"
 import useGoogleSheets from "use-google-sheets"
 import useContributionPoll from "../../../hooks/useContributionPoll"
-import useDaoToken from "../../../hooks/useDaoToken"
-import useMetaMask from "../../../hooks/useMetaMask"
 import { GOOGLE_API_KEY, GOOGLE_SHEETS_ID } from "../../../secret"
 
 interface Vote {
@@ -15,7 +13,7 @@ const CONTRIBUTION_KEY = "貢献内容(エビデンスURLがあると良い)"
 const ADRESS_KEY = "MetaMaskアドレス"
 export default () => {
     const { candidates, vote, voters, completedVote } = useContributionPoll()
-
+    const [errorMessaage, setErrorMessage] = useState("")
 
     const [votes, setVotes] = useState<Vote[]>([])
 
@@ -32,8 +30,7 @@ export default () => {
         }
     }) : []
 
-    const getContributorContent = (address: string) => {
-        const info = contributors.find(contributor => contributor.address === address)
+    const getContributorContent = (info: any) => {
         if (loading) {
             return "Loading..."
         }
@@ -41,7 +38,7 @@ export default () => {
             return "スプレッドシート連携の失敗(APIキーなどの設定問題かも)" + JSON.stringify(error)
         }
         if (!info) {
-            return "SpreadSheetに登録されていません"
+            return "スプレッドシートに貢献が登録されていません"
         }
         return <table>
             <thead>
@@ -72,10 +69,8 @@ export default () => {
         try {
             if (vote)
                 await vote(_candidates, _points)
-        } catch (e) {
-            console.log(e)
-            throw new Error("投票に失敗しました")
-
+        } catch (e: any) {
+            setErrorMessage(e.message)
         }
     }
 
@@ -83,9 +78,10 @@ export default () => {
         if (candidates?.length === 0) {
             return <p>立候補はいません</p>
         }
-
         return <div>
             {candidates?.map(candidate => {
+                const info = contributors.find(contributor => contributor.address === candidate)
+
                 const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
                     const newVotes = votes.map(v => {
                         if (v.candidate === candidate) {
@@ -107,8 +103,8 @@ export default () => {
                 }
 
                 return <div key={candidate} style={{ marginTop: 20, marginBottom: 20 }}>
-                    {getContributorContent(candidate)}
-                    <select onChange={onChange}>
+                    {getContributorContent(info)}
+                    <select onChange={onChange} disabled={!info}>
                         <option value={0}>🤔Umm...(0)</option>
                         <option value={1}>🙂OK(1)</option>
                         <option value={3}>😄Nice(3)</option>
@@ -131,5 +127,6 @@ export default () => {
         <h3 >投票する ({voters.length}人が投票済み)</h3>
         {renderForm()}
         {renderVote()}
+        <div style={{ color: "red" }}>{errorMessaage}</div>
     </div>
 }
