@@ -53,6 +53,7 @@ export default () => {
         return votes
     }
     const completedVote = voters.includes(address as string)
+    const completedCandidate = candidates.includes(address as string)
 
     return {
         pollId,
@@ -61,6 +62,7 @@ export default () => {
         candidateToContributionPoll: getContractWithSigner()?.functions?.candidateToContributionPoll,
         settleCurrentPollAndCreateNewPoll: getContractWithSigner()?.functions?.settleCurrentPollAndCreateNewPoll,
         voters,
-        completedVote
+        completedVote,
+        completedCandidate
     };
 }

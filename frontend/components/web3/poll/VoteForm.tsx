@@ -70,6 +70,7 @@ export default () => {
             if (vote)
                 await vote(_candidates, _points)
         } catch (e: any) {
+            console.log(e)
             setErrorMessage(e.message)
         }
     }
