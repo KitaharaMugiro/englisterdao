@@ -10,7 +10,7 @@ export default () => {
     }
 
     return <div>
-        <h2>入金(ETHを入力)</h2>
+        <h2>入金(ネイティブトークンを入力)</h2>
         <input onChange={(e) => setValue(e.target.value)} value={value}></input>
         <button onClick={onClickDeposit}>
             {loading ? "Loading..." : "Deposit"}

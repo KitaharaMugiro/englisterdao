@@ -8,7 +8,7 @@ async function main() {
   const EnglisterToken = await ethers.getContractFactory("DAOToken");
   const NAME = "Englister"
   const SYMBOL = "ENG"
-  const INITIAL_SUPPLY = ethers.utils.parseEther("100");
+  const INITIAL_SUPPLY = ethers.utils.parseEther("0");
   const token = await EnglisterToken.deploy(NAME, SYMBOL, INITIAL_SUPPLY);
   await token.deployed();
   console.log("Englister DAOToken deployed to", token.address);
@@ -25,14 +25,25 @@ async function main() {
   await poll.deployed();
   console.log("ContributionPoll deployed to", poll.address);
 
+  // Deploy TokenSupplySystem
+  const TokenSupplySystem = await ethers.getContractFactory("TokenSupplySystem");
+  const tokenSupplySystem = await TokenSupplySystem.deploy();
+  await tokenSupplySystem.deployed();
+  console.log("TokenSupplySystem deployed to", tokenSupplySystem.address);
+
   // 権限設定
   await token.setupBurnerRole(treasury.address);
   await token.setupMinterRole(poll.address);
+  await token.setupMinterRole(tokenSupplySystem.address);
 
   await treasury.setDAOTokenAddress(token.address);
 
   await poll.setDaoTokenAddress(token.address);
   await poll.setPollAdminRole(owner.address);
+
+  await tokenSupplySystem.setDAOTokenAddress(token.address);
+  await tokenSupplySystem.setDAOTreasuryAddress(treasury.address);
+
 
 }
 

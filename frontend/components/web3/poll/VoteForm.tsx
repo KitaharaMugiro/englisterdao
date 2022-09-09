@@ -14,9 +14,8 @@ const NAME_KEY = "Contributor名（Discord名：例mugi#9179）"
 const CONTRIBUTION_KEY = "貢献内容(エビデンスURLがあると良い)"
 const ADRESS_KEY = "MetaMaskアドレス"
 export default () => {
-    const { pollId, candidates, vote } = useContributionPoll()
-    const { address } = useMetaMask()
-    const { topHolders, isTopHolder, tokenName } = useDaoToken()
+    const { candidates, vote, voters, completedVote } = useContributionPoll()
+
 
     const [votes, setVotes] = useState<Vote[]>([])
 
@@ -122,18 +121,14 @@ export default () => {
     }
 
     const renderVote = () => {
-        if (!isTopHolder) {
-            return <p>
-                {tokenName}のTopHolderでなければ投票できません。
-                トップホルダー↓
-                {topHolders.map(address => <div key={address}>{address}</div>)}
-            </p>
+        if (completedVote) {
+            return <button disabled>投票済み</button>
         }
         return <button onClick={onClickVote}>投票</button>
     }
 
     return <div>
-        <h3>貢献度投票 第{pollId}回</h3>
+        <h3 >投票する ({voters.length}人が投票済み)</h3>
         {renderForm()}
         {renderVote()}
     </div>

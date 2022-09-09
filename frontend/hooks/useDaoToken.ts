@@ -9,9 +9,8 @@ export default () => {
     const [tokenSymbol, setTokenSymbol] = useState("");
     const [tokenTotalSupply, setTokenTotalSupply] = useState(0);
     const [yourBalance, setYourBalance] = useState(0);
-    const [topHolders, setTopHolders] = useState<string[]>([])
+    const [holders, setHolders] = useState(0);
     const { address, login } = useMetaMask()
-    const isTopHolder = topHolders.includes(address)
     const contractAddress = process.env.NEXT_PUBLIC_DAOTOKEN_CONTRACT_ADDRESS as string
 
     const getContractWithSigner = async () => {
@@ -35,7 +34,6 @@ export default () => {
             getContract().functions.name().then(n => setTokenName(n[0]));
             getContract().functions.symbol().then(s => setTokenSymbol(s[0]));
             getContract().functions.totalSupply().then(t => setTokenTotalSupply(Number(ethers.utils.formatEther(t[0]))));
-            getContract().functions.getTopHolders(10).then(t => setTopHolders(t[0]));
             if (address) {
                 getContract().functions.balanceOf(signer.getAddress()).then(b => setYourBalance(Number(ethers.utils.formatEther(b[0]))));
             }
@@ -43,5 +41,10 @@ export default () => {
         dataFetch()
     }, [address])
 
-    return { tokenName, tokenSymbol, tokenTotalSupply, yourBalance, topHolders, isTopHolder };
+    const getTestEvent = () => {
+        const test = getContract().filters.Transfer()
+        console.log(test)
+    }
+
+    return { tokenName, tokenSymbol, tokenTotalSupply, yourBalance, getTestEvent };
 }

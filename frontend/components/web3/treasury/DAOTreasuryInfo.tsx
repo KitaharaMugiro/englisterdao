@@ -10,8 +10,8 @@ export default () => {
                 <img width={70} src="https://tyoudoii-illust.com/wp-content/uploads/2021/03/money_bag_simple-320x320.png" />
             </div>
             <div>
-                <p>トレジャリーに保管されているETH: <b>{balance} ETH</b></p>
-                <p>1トークンと交換できるETH: <b>{tokenRate} ETH</b></p>
+                <p>トレジャリーに保管されているネイティブトークン: <b>{balance} (ETH or MATIC)</b></p>
+                <p>1トークンと交換できるネイティブトークン: <b>{tokenRate} (ETH or MATIC)</b></p>
             </div>
         </div>
 
