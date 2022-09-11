@@ -1,34 +1,31 @@
-import { useEffect, useState } from "react"
-import { BigNumber, ethers } from "ethers";
+import { useEffect, useState } from "react";
 import artifact from "../src/abi/ContributionPoll.json";
 import { ContributionPoll } from "../types/ethers-contracts";
-import useMetaMask from "./useMetaMask";
+import useMetaMask, { getContract, getContractWithSigner } from "./useMetaMask";
 
 
 export default () => {
     const [voters, setVoters] = useState<string[]>([]);
     const [pollId, setPollId] = useState<number | undefined>(undefined);
     const [candidates, setCandidates] = useState<string[]>([]);
-    const { address, login } = useMetaMask()
+    const { address } = useMetaMask()
 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRIBUTIONPOLL_CONTRACT_ADDRESS as string
-    const getContractWithSigner = () => {
+
+    const _getContractWithSigner = () => {
         if (!address) return undefined
-        const provider = new ethers.providers.Web3Provider((window as any).ethereum)
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(contractAddress, artifact.abi, provider);
-        return contract.connect(signer) as ContributionPoll
+        const contract = getContractWithSigner(contractAddress, artifact.abi)
+        return contract as ContributionPoll
     }
 
-    const getContract = () => {
-        const provider = new ethers.providers.Web3Provider((window as any).ethereum)
-        const contract = new ethers.Contract(contractAddress, artifact.abi, provider);
+    const _getContract = () => {
+        const contract = getContract(contractAddress, artifact.abi)
         return contract as ContributionPoll
     }
 
     useEffect(() => {
-        getContract().functions.pollId().then(id => setPollId(Number(id[0])));
-        getContract().functions.getCurrentCandidates().then(c => setCandidates(c[0]));
+        _getContract().functions.pollId().then(id => setPollId(Number(id[0])));
+        _getContract().functions.getCurrentCandidates().then(c => setCandidates(c[0]));
     }, [address]);
 
     useEffect(() => {
@@ -41,7 +38,7 @@ export default () => {
         const votes = []
         while (true) {
             try {
-                const vote = await getContract().functions.votes(pollId!, index)
+                const vote = await _getContract().functions.votes(pollId!, index)
                 index += 1
                 votes.push(vote[0])
             } catch (e) {
@@ -58,9 +55,9 @@ export default () => {
     return {
         pollId,
         candidates,
-        vote: getContractWithSigner()?.functions?.vote,
-        candidateToContributionPoll: getContractWithSigner()?.functions?.candidateToContributionPoll,
-        settleCurrentPollAndCreateNewPoll: getContractWithSigner()?.functions?.settleCurrentPollAndCreateNewPoll,
+        vote: _getContractWithSigner()?.functions?.vote,
+        candidateToContributionPoll: _getContractWithSigner()?.functions?.candidateToContributionPoll,
+        settleCurrentPollAndCreateNewPoll: _getContractWithSigner()?.functions?.settleCurrentPollAndCreateNewPoll,
         voters,
         completedVote,
         completedCandidate

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { ethers } from "ethers";
 import artifact from "../src/abi/ContributionPoll.json";
 import { ContributionPoll } from "../types/ethers-contracts";
-import useMetaMask from "./useMetaMask";
+import useMetaMask, { getContract, getContractWithSigner } from "./useMetaMask";
 
 
 export default () => {
@@ -17,29 +17,26 @@ export default () => {
     const [pollId, setPollId] = useState(0)
 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRIBUTIONPOLL_CONTRACT_ADDRESS as string
-    const getContractWithSigner = () => {
+    const _getContractWithSigner = () => {
         if (!address) return undefined
-        const provider = new ethers.providers.Web3Provider((window as any).ethereum)
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(contractAddress, artifact.abi, provider);
-        return contract.connect(signer) as ContributionPoll
+        const contract = getContractWithSigner(contractAddress, artifact.abi)
+        return contract as ContributionPoll
     }
 
-    const getContract = () => {
-        const provider = new ethers.providers.Web3Provider((window as any).ethereum)
-        const contract = new ethers.Contract(contractAddress, artifact.abi, provider);
+    const _getContract = () => {
+        const contract = getContract(contractAddress, artifact.abi)
         return contract as ContributionPoll
     }
 
     useEffect(() => {
-        getContract().functions.paused().then(p => setPaused(p[0]));
-        getContract().functions.daoTokenAddress().then(a => setDaoTokenAddress(a[0]));
-        getContract().functions.REQUIRED_TOKEN_FOR_VOTE().then(t => setREQUIRED_TOKEN_FOR_VOTE(Number(ethers.utils.formatEther(t[0]))));
-        getContract().functions.CONTRIBUTOR_ASSIGNMENT_TOKEN().then(t => setCONTRIBUTOR_ASSIGNMENT_TOKEN(Number(ethers.utils.formatEther(t[0]))));
-        getContract().functions.SUPPORTER_ASSIGNMENT_TOKEN().then(t => setSUPPORTER_ASSIGNMENT_TOKEN(Number(ethers.utils.formatEther(t[0]))));
-        getContract().functions.VOTE_MAX_POINT().then(t => setVOTE_MAX_POINT(Number(t[0])));
-        getContract().functions.votingEnabled().then(t => setSetVotingEnabled(t[0]));
-        getContract().functions.pollId().then(t => setPollId(Number(t[0])));
+        _getContract().functions.paused().then(p => setPaused(p[0]));
+        _getContract().functions.daoTokenAddress().then(a => setDaoTokenAddress(a[0]));
+        _getContract().functions.REQUIRED_TOKEN_FOR_VOTE().then(t => setREQUIRED_TOKEN_FOR_VOTE(Number(ethers.utils.formatEther(t[0]))));
+        _getContract().functions.CONTRIBUTOR_ASSIGNMENT_TOKEN().then(t => setCONTRIBUTOR_ASSIGNMENT_TOKEN(Number(ethers.utils.formatEther(t[0]))));
+        _getContract().functions.SUPPORTER_ASSIGNMENT_TOKEN().then(t => setSUPPORTER_ASSIGNMENT_TOKEN(Number(ethers.utils.formatEther(t[0]))));
+        _getContract().functions.VOTE_MAX_POINT().then(t => setVOTE_MAX_POINT(Number(t[0])));
+        _getContract().functions.votingEnabled().then(t => setSetVotingEnabled(t[0]));
+        _getContract().functions.pollId().then(t => setPollId(Number(t[0])));
     }, [address]);
 
     return {
@@ -51,13 +48,13 @@ export default () => {
         VOTE_MAX_POINT,
         votingEnabled,
         pollId,
-        setDaoTokenAddress: getContractWithSigner()?.functions?.setDaoTokenAddress,
-        setRequiredTokenForVote: getContractWithSigner()?.functions?.setRequiredTokenForVote,
-        setContributorAssignmentToken: getContractWithSigner()?.functions?.setContributorAssignmentToken,
-        setSupporterAssignmentToken: getContractWithSigner()?.functions?.setSupporterAssignmentToken,
-        setVoteMaxPoint: getContractWithSigner()?.functions?.setVoteMaxPoint,
-        setVotingEnabled: getContractWithSigner()?.functions?.setVotingEnabled,
-        pause: getContractWithSigner()?.functions?.pause,
-        unpause: getContractWithSigner()?.functions?.unpause,
+        setDaoTokenAddress: _getContractWithSigner()?.functions?.setDaoTokenAddress,
+        setRequiredTokenForVote: _getContractWithSigner()?.functions?.setRequiredTokenForVote,
+        setContributorAssignmentToken: _getContractWithSigner()?.functions?.setContributorAssignmentToken,
+        setSupporterAssignmentToken: _getContractWithSigner()?.functions?.setSupporterAssignmentToken,
+        setVoteMaxPoint: _getContractWithSigner()?.functions?.setVoteMaxPoint,
+        setVotingEnabled: _getContractWithSigner()?.functions?.setVotingEnabled,
+        pause: _getContractWithSigner()?.functions?.pause,
+        unpause: _getContractWithSigner()?.functions?.unpause,
     };
 }
