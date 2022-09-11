@@ -17,26 +17,18 @@ export default () => {
     const [pollId, setPollId] = useState(0)
 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRIBUTIONPOLL_CONTRACT_ADDRESS as string
-    const _getContractWithSigner = () => {
-        if (!address) return undefined
-        const contract = getContractWithSigner(contractAddress, artifact.abi)
-        return contract as ContributionPoll
-    }
-
-    const _getContract = () => {
-        const contract = getContract(contractAddress, artifact.abi)
-        return contract as ContributionPoll
-    }
+    const contract = getContract(contractAddress, artifact.abi) as ContributionPoll
+    const contractWithSigner = getContractWithSigner(contractAddress, artifact.abi) as ContributionPoll
 
     useEffect(() => {
-        _getContract().functions.paused().then(p => setPaused(p[0]));
-        _getContract().functions.daoTokenAddress().then(a => setDaoTokenAddress(a[0]));
-        _getContract().functions.REQUIRED_TOKEN_FOR_VOTE().then(t => setREQUIRED_TOKEN_FOR_VOTE(Number(ethers.utils.formatEther(t[0]))));
-        _getContract().functions.CONTRIBUTOR_ASSIGNMENT_TOKEN().then(t => setCONTRIBUTOR_ASSIGNMENT_TOKEN(Number(ethers.utils.formatEther(t[0]))));
-        _getContract().functions.SUPPORTER_ASSIGNMENT_TOKEN().then(t => setSUPPORTER_ASSIGNMENT_TOKEN(Number(ethers.utils.formatEther(t[0]))));
-        _getContract().functions.VOTE_MAX_POINT().then(t => setVOTE_MAX_POINT(Number(t[0])));
-        _getContract().functions.votingEnabled().then(t => setSetVotingEnabled(t[0]));
-        _getContract().functions.pollId().then(t => setPollId(Number(t[0])));
+        contract.functions.paused().then(p => setPaused(p[0]));
+        contract.functions.daoTokenAddress().then(a => setDaoTokenAddress(a[0]));
+        contract.functions.REQUIRED_TOKEN_FOR_VOTE().then(t => setREQUIRED_TOKEN_FOR_VOTE(Number(ethers.utils.formatEther(t[0]))));
+        contract.functions.CONTRIBUTOR_ASSIGNMENT_TOKEN().then(t => setCONTRIBUTOR_ASSIGNMENT_TOKEN(Number(ethers.utils.formatEther(t[0]))));
+        contract.functions.SUPPORTER_ASSIGNMENT_TOKEN().then(t => setSUPPORTER_ASSIGNMENT_TOKEN(Number(ethers.utils.formatEther(t[0]))));
+        contract.functions.VOTE_MAX_POINT().then(t => setVOTE_MAX_POINT(Number(t[0])));
+        contract.functions.votingEnabled().then(t => setSetVotingEnabled(t[0]));
+        contract.functions.pollId().then(t => setPollId(Number(t[0])));
     }, [address]);
 
     return {
@@ -48,13 +40,13 @@ export default () => {
         VOTE_MAX_POINT,
         votingEnabled,
         pollId,
-        setDaoTokenAddress: _getContractWithSigner()?.functions?.setDaoTokenAddress,
-        setRequiredTokenForVote: _getContractWithSigner()?.functions?.setRequiredTokenForVote,
-        setContributorAssignmentToken: _getContractWithSigner()?.functions?.setContributorAssignmentToken,
-        setSupporterAssignmentToken: _getContractWithSigner()?.functions?.setSupporterAssignmentToken,
-        setVoteMaxPoint: _getContractWithSigner()?.functions?.setVoteMaxPoint,
-        setVotingEnabled: _getContractWithSigner()?.functions?.setVotingEnabled,
-        pause: _getContractWithSigner()?.functions?.pause,
-        unpause: _getContractWithSigner()?.functions?.unpause,
+        setDaoTokenAddress: contractWithSigner.functions.setDaoTokenAddress,
+        setRequiredTokenForVote: contractWithSigner.functions.setRequiredTokenForVote,
+        setContributorAssignmentToken: contractWithSigner.functions.setContributorAssignmentToken,
+        setSupporterAssignmentToken: contractWithSigner.functions.setSupporterAssignmentToken,
+        setVoteMaxPoint: contractWithSigner.functions.setVoteMaxPoint,
+        setVotingEnabled: contractWithSigner.functions.setVotingEnabled,
+        pause: contractWithSigner.functions.pause,
+        unpause: contractWithSigner.functions.unpause,
     };
 }

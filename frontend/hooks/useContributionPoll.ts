@@ -11,21 +11,12 @@ export default () => {
     const { address } = useMetaMask()
 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRIBUTIONPOLL_CONTRACT_ADDRESS as string
-
-    const _getContractWithSigner = () => {
-        if (!address) return undefined
-        const contract = getContractWithSigner(contractAddress, artifact.abi)
-        return contract as ContributionPoll
-    }
-
-    const _getContract = () => {
-        const contract = getContract(contractAddress, artifact.abi)
-        return contract as ContributionPoll
-    }
+    const contract = getContract(contractAddress, artifact.abi) as ContributionPoll
+    const contractWithSigner = getContractWithSigner(contractAddress, artifact.abi) as ContributionPoll
 
     useEffect(() => {
-        _getContract().functions.pollId().then(id => setPollId(Number(id[0])));
-        _getContract().functions.getCurrentCandidates().then(c => setCandidates(c[0]));
+        contract.functions.pollId().then(id => setPollId(Number(id[0])));
+        contract.functions.getCurrentCandidates().then(c => setCandidates(c[0]));
     }, [address]);
 
     useEffect(() => {
@@ -33,12 +24,11 @@ export default () => {
     }, [pollId]);
 
     const getCurrentVoters = async () => {
-        console.log("getCurrentVoters")
         let index = 0
         const votes = []
         while (true) {
             try {
-                const vote = await _getContract().functions.votes(pollId!, index)
+                const vote = await contract.functions.votes(pollId!, index)
                 index += 1
                 votes.push(vote[0])
             } catch (e) {
@@ -55,9 +45,9 @@ export default () => {
     return {
         pollId,
         candidates,
-        vote: _getContractWithSigner()?.functions?.vote,
-        candidateToContributionPoll: _getContractWithSigner()?.functions?.candidateToContributionPoll,
-        settleCurrentPollAndCreateNewPoll: _getContractWithSigner()?.functions?.settleCurrentPollAndCreateNewPoll,
+        vote: contractWithSigner.functions.vote,
+        candidateToContributionPoll: contractWithSigner.functions.candidateToContributionPoll,
+        settleCurrentPollAndCreateNewPoll: contractWithSigner.functions.settleCurrentPollAndCreateNewPoll,
         voters,
         completedVote,
         completedCandidate
