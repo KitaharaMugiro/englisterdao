@@ -7,9 +7,11 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract DAONFT is ERC721, ERC721Enumerable, Pausable, Ownable {
+contract DAONFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
     using Counters for Counters.Counter;
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     Counters.Counter private _tokenIdCounter;
     string private _baseTokenURI;
@@ -20,6 +22,16 @@ contract DAONFT is ERC721, ERC721Enumerable, Pausable, Ownable {
         string memory __baseTokenURI
     ) ERC721(_tokenName, _tokenSymbol) {
         _baseTokenURI = __baseTokenURI;
+        _grantRole(MINTER_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
+
+    function setupMinterRole(address _minter) public {
+        require(
+            hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
+            "DAONFT: must have admin role to setup minter"
+        );
+        _setupRole(MINTER_ROLE, _minter);
     }
 
     function _baseURI() internal view override returns (string memory) {
@@ -28,15 +40,27 @@ contract DAONFT is ERC721, ERC721Enumerable, Pausable, Ownable {
         return _baseTokenURI;
     }
 
-    function pause() public onlyOwner {
+    function pause() public {
+        require(
+            hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
+            "DAONFT: must have admin role to pause"
+        );
         _pause();
     }
 
-    function unpause() public onlyOwner {
+    function unpause() public {
+        require(
+            hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
+            "DAONFT: must have admin role to unpause"
+        );
         _unpause();
     }
 
-    function safeMint(address to) public onlyOwner {
+    function safeMint(address to) public {
+        require(
+            hasRole(MINTER_ROLE, msg.sender),
+            "DAONFT: must have minter role to mint"
+        );
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
@@ -55,7 +79,7 @@ contract DAONFT is ERC721, ERC721Enumerable, Pausable, Ownable {
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, ERC721Enumerable)
+        override(ERC721, ERC721Enumerable, AccessControl)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
