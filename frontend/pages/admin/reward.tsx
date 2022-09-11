@@ -1,7 +1,9 @@
 import { useState } from "react";
+import useMetaMask from "../../hooks/useMetaMask";
 import useTokenSupplySystem from "../../hooks/useTokenSupplySystem";
 
 export default () => {
+    const { login } = useMetaMask();
     const { payAndPayWithNative, unclaimedBalance, mint } = useTokenSupplySystem()
     const [address, setAddress] = useState("")
     const [amount, setAmount] = useState("")
@@ -13,8 +15,8 @@ export default () => {
 
     const onSend = async () => {
         try {
-            if (payAndPayWithNative)
-                await payAndPayWithNative(address, Number(amount), Number(nativeAmount), Number(fee))
+            await login()
+            await payAndPayWithNative(address, Number(amount), Number(nativeAmount), Number(fee))
         } catch (e: any) {
             setErrorMessage(e.message)
         }
@@ -22,8 +24,8 @@ export default () => {
 
     const onMint = async () => {
         try {
-            if (mint)
-                await mint(Number(mintAmount))
+            await login()
+            await mint(Number(mintAmount))
         } catch (e: any) {
             setErrorMessage(e.message)
         }

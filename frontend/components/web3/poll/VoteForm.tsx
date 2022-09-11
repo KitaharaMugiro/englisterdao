@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import useGoogleSheets from "use-google-sheets"
 import useContributionPoll from "../../../hooks/useContributionPoll"
+import useMetaMask from "../../../hooks/useMetaMask"
 import { GOOGLE_API_KEY, GOOGLE_SHEETS_ID } from "../../../secret"
 
 interface Vote {
@@ -12,6 +13,7 @@ const NAME_KEY = "Contributor名（Discord名：例mugi#9179）"
 const CONTRIBUTION_KEY = "貢献内容(エビデンスURLがあると良い)"
 const ADRESS_KEY = "MetaMaskアドレス"
 export default () => {
+    const { login } = useMetaMask()
     const { candidates, vote, voters, completedVote } = useContributionPoll()
     const [errorMessaage, setErrorMessage] = useState("")
 
@@ -67,10 +69,9 @@ export default () => {
         const _candidates = votes.map(vote => vote.candidate)
         const _points = votes.map(vote => vote.point)
         try {
-            if (vote)
-                await vote(_candidates, _points)
+            await login()
+            await vote(_candidates, _points)
         } catch (e: any) {
-            console.log(e)
             setErrorMessage(e.message)
         }
     }

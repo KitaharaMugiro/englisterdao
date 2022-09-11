@@ -1,6 +1,29 @@
 import { useEffect, useState } from "react"
 import { ethers } from "ethers";
 
+export const getProvider = () => {
+    const provider = new ethers.providers.Web3Provider((window as any).ethereum)
+    return provider
+};
+
+export const getSigner = () => {
+    const provider = getProvider()
+    const signer = provider.getSigner();
+    return signer
+}
+
+export const getContractWithSigner = (contractAddress: string, abi: any) => {
+    const signer = getSigner()
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+    return contract
+}
+
+export const getContract = (contractAddress: string, abi: any) => {
+    const provider = getProvider()
+    const contract = new ethers.Contract(contractAddress, abi, provider);
+    return contract
+}
+
 export default () => {
     const [address, setAddress] = useState("")
     const getSignerAddress = async () => {

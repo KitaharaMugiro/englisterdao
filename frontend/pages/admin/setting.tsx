@@ -26,33 +26,31 @@ export default () => {
 
     const { register, handleSubmit } = useForm();
     const onSubmitDaoTokenAddress = handleSubmit(data => {
-        setDaoTokenAddress!(data.address)
+        setDaoTokenAddress(data.address)
     });
     const onSubmitRequiredTokenForVote = handleSubmit(data => {
-        setRequiredTokenForVote!(
+        setRequiredTokenForVote(
             ethers.utils.parseEther(
                 data.requiredTokenForVote
             ))
     });
     const onSubmitContributorAssignmentToken = handleSubmit(data => {
-        setContributorAssignmentToken!(
+        setContributorAssignmentToken(
             ethers.utils.parseEther(
                 data.contirbutorAssignmentToken
             ))
     });
     const onSubmitSupporterAssignmentToken = handleSubmit(data => {
-        setSupporterAssignmentToken!(
+        setSupporterAssignmentToken(
             ethers.utils.parseEther(
                 data.supporterAssignmentToken
             ))
     });
     const onSubmitVoteMaxPoint = handleSubmit(data => {
-        setVoteMaxPoint!(data.voteMaxPoint)
+        setVoteMaxPoint(data.voteMaxPoint)
     });
     const onSubmitVotingEnabled = handleSubmit(data => {
-        console.log(data.checked)
-        console.log(Boolean(data.checked))
-        setVotingEnabled!(data.checked)
+        setVotingEnabled(data.checked)
     });
 
     return <div>
