@@ -1,15 +1,16 @@
 import { useState } from "react"
 import useContributionPoll from "../../../hooks/useContributionPoll"
+import useMetaMask from "../../../hooks/useMetaMask"
 
 export default () => {
-
+    const { login } = useMetaMask()
     const { completedCandidate, candidateToContributionPoll } = useContributionPoll()
     const [errorMessaage, setErrorMessage] = useState("")
 
     const onClickCandidate = async () => {
         try {
-            if (candidateToContributionPoll)
-                await candidateToContributionPoll()
+            await login()
+            await candidateToContributionPoll()
         } catch (e: any) {
             setErrorMessage(e.message)
         }
