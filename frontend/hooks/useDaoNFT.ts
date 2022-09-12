@@ -21,6 +21,7 @@ export default () => {
     useEffect(() => {
         contract.functions.balanceOf(address).then(t => setOwned(t[0].toNumber() > 0))
         contract.functions.tokenURI(0).then(t => {
+            console.log({ url: t[0] })
             fetch(t[0]).then(res => res.json()).then(t => setMetadata(t))
         })
     }, [address]);
