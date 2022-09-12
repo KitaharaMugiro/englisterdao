@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./lib/Array.sol";
 import "./DAOToken.sol";
+import "./DAONFT.sol";
 import "./lib/SafeMath.sol";
 import "./interface/DAOEvents.sol";
 
@@ -33,8 +34,12 @@ contract ContributionPoll is
     // DAO token address to distribute
     address public daoTokenAddress;
 
-    // 投票はDAOトークンをREQUIRED_TOKEN_FOR_VOTEよりも多く保持しているアドレスのみ可能
-    // Voting is only possible for addresses that hold more than REQUIRED_TOKEN_FOR_VOTE DAO tokens
+    // 投票するのに必要なNFTのアドレス
+    // NFT address required to vote
+    address public nftAddress;
+
+    // 投票はDAO NFTをREQUIRED_TOKEN_FOR_VOTEよりも多く保持しているアドレスのみ可能
+    // Voting is only possible for addresses that hold more than REQUIRED_TOKEN_FOR_VOTE DAO NFT
     uint256 public REQUIRED_TOKEN_FOR_VOTE = 0;
 
     // 立候補者(貢献者)に割り当てられるDAOトークンの総数
@@ -67,6 +72,14 @@ contract ContributionPoll is
      */
     function setDaoTokenAddress(address _daoTokenAddress) external onlyOwner {
         daoTokenAddress = _daoTokenAddress;
+    }
+
+    /**
+     * @notice Set NFT Address
+     * @dev only owner can set NFT Address
+     */
+    function setNftAddress(address _nftAddress) external onlyOwner {
+        nftAddress = _nftAddress;
     }
 
     /**
@@ -157,10 +170,10 @@ contract ContributionPoll is
     }
 
     /**
-     * @notice check if the voter has enough DAO token to vote
+     * @notice check if the voter has enough DAO NFT to vote
      */
-    function _isEligibleToVote(address _address) internal view returns (bool) {
-        DAOToken daoToken = DAOToken(daoTokenAddress);
+    function isEligibleToVote(address _address) public view returns (bool) {
+        DAONFT daoToken = DAONFT(nftAddress);
         return daoToken.balanceOf(_address) >= REQUIRED_TOKEN_FOR_VOTE;
     }
 
@@ -184,7 +197,7 @@ contract ContributionPoll is
         address[] memory voters = getCurrentVoters();
 
         // Check if the voter is eligible to vote
-        require(_isEligibleToVote(msg.sender), "You are not eligible to vote.");
+        require(isEligibleToVote(msg.sender), "You are not eligible to vote.");
 
         // Check if the voter is already voted
         require(!Array.contains(voters, msg.sender), "You are already voted.");

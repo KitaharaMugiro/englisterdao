@@ -2,11 +2,15 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { ContributionPoll } from "./ContributionPoll";
+export type { DAONFT } from "./DAONFT";
+export type { DAONFTCrowdSale } from "./DAONFTCrowdSale";
 export type { DAOToken } from "./DAOToken";
 export type { DAOTreasury } from "./DAOTreasury";
 export type { TokenSupplySystem } from "./TokenSupplySystem";
 export * as factories from "./factories";
 export { ContributionPoll__factory } from "./factories/ContributionPoll__factory";
+export { DAONFT__factory } from "./factories/DAONFT__factory";
+export { DAONFTCrowdSale__factory } from "./factories/DAONFTCrowdSale__factory";
 export { DAOToken__factory } from "./factories/DAOToken__factory";
 export { DAOTreasury__factory } from "./factories/DAOTreasury__factory";
 export { TokenSupplySystem__factory } from "./factories/TokenSupplySystem__factory";

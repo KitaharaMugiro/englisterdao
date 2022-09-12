@@ -22,12 +22,16 @@ describe("ContributionPoll", function () {
         const INITIAL_SUPPLY = ethers.utils.parseEther("100");
         const token = await EnglisterToken.deploy(NAME, SYMBOL, INITIAL_SUPPLY);
 
-        // 権限設定
+        // Deploy NFT
+        const DaoNft = await ethers.getContractFactory("DAONFT");
+        const nft = await DaoNft.deploy(NAME, SYMBOL, "https://raw.githubusercontent.com/KitaharaMugiro/englisterdao/main/contracts/metadata/daonft/");
 
+        // 権限設定
         await poll.setPollAdminRole(owner.address);
         await token.setupMinterRole(poll.address);
         await poll.setDaoTokenAddress(token.address);
-        return { token, poll, owner, otherAccount, otherAccount2 };
+        await poll.setNftAddress(nft.address);
+        return { token, poll, nft, owner, otherAccount, otherAccount2 };
     }
 
     describe("Deployment", function () {
@@ -104,21 +108,6 @@ describe("ContributionPoll", function () {
             await poll.vote([otherAccount.address], [1])
             await expect(poll.vote([otherAccount.address], [1])).to.be.revertedWith("You are already voted.");
         });
-
-        it("投票に必要なトークン量を持っていないと投票できない", async function () {
-            const { owner, token, poll, otherAccount, otherAccount2 } = await loadFixture(deploy);
-
-            await poll.setRequiredTokenForVote(100);
-            await poll.candidateToContributionPoll()
-
-            // otherAccountに送金
-            await token.transfer(otherAccount.address, 100);
-            await token.transfer(otherAccount2.address, 99);
-
-            await poll.connect(otherAccount).vote([owner.address], [1])
-            await expect(poll.connect(otherAccount2).vote([owner.address], [1])).to.be.revertedWith("You are not eligible to vote.");
-        });
-
 
         it("投票で21ポイント以上をつけることはできない", async function () {
             const { poll, otherAccount, token } = await loadFixture(deploy);
@@ -420,4 +409,19 @@ describe("ContributionPoll", function () {
         });
 
     });
+
+    describe("投票の権利", function () {
+        it("投票に必要なトークン量を持っていないと投票できない", async function () {
+            const { owner, token, nft, poll, otherAccount, otherAccount2 } = await loadFixture(deploy);
+
+            await poll.setRequiredTokenForVote(1);
+            await poll.candidateToContributionPoll()
+
+            // 投票権を持っているotherAccountとそうでないotherAccount2で投票を行う
+            await nft.safeMint(otherAccount.address);
+
+            await poll.connect(otherAccount).vote([owner.address], [1])
+            await expect(poll.connect(otherAccount2).vote([owner.address], [1])).to.be.revertedWith("You are not eligible to vote.");
+        });
+    })
 });

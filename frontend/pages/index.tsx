@@ -1,3 +1,4 @@
+import AdminLinkInfo from "../components/Common/AdminLinkInfo";
 import LinkInfo from "../components/Common/LinkInfo";
 import MetaMaskLoginButton from "../components/web3/common/MetaMaskLoginButton";
 import DAOTokenTotalSupply from "../components/web3/token/DAOTokenTotalSupply";
@@ -12,6 +13,7 @@ export default () => {
             <DAOTreasuryInfo />
             <UserHoldTokenInfo />
             <LinkInfo />
+            <AdminLinkInfo />
         </div>
     );
 }
