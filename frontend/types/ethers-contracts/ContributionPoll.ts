@@ -56,6 +56,8 @@ export interface ContributionPollInterface extends utils.Interface {
     "getRoleAdmin(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
+    "isEligibleToVote(address)": FunctionFragment;
+    "nftAddress()": FunctionFragment;
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
@@ -65,6 +67,7 @@ export interface ContributionPollInterface extends utils.Interface {
     "revokeRole(bytes32,address)": FunctionFragment;
     "setContributorAssignmentToken(uint256)": FunctionFragment;
     "setDaoTokenAddress(address)": FunctionFragment;
+    "setNftAddress(address)": FunctionFragment;
     "setPollAdminRole(address)": FunctionFragment;
     "setRequiredTokenForVote(uint256)": FunctionFragment;
     "setSupporterAssignmentToken(uint256)": FunctionFragment;
@@ -96,6 +99,8 @@ export interface ContributionPollInterface extends utils.Interface {
       | "getRoleAdmin"
       | "grantRole"
       | "hasRole"
+      | "isEligibleToVote"
+      | "nftAddress"
       | "owner"
       | "pause"
       | "paused"
@@ -105,6 +110,7 @@ export interface ContributionPollInterface extends utils.Interface {
       | "revokeRole"
       | "setContributorAssignmentToken"
       | "setDaoTokenAddress"
+      | "setNftAddress"
       | "setPollAdminRole"
       | "setRequiredTokenForVote"
       | "setSupporterAssignmentToken"
@@ -179,6 +185,14 @@ export interface ContributionPollInterface extends utils.Interface {
     functionFragment: "hasRole",
     values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
   ): string;
+  encodeFunctionData(
+    functionFragment: "isEligibleToVote",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "nftAddress",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
@@ -201,6 +215,10 @@ export interface ContributionPollInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "setDaoTokenAddress",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setNftAddress",
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
@@ -300,6 +318,11 @@ export interface ContributionPollInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isEligibleToVote",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "nftAddress", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
@@ -319,6 +342,10 @@ export interface ContributionPollInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setDaoTokenAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setNftAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -597,6 +624,13 @@ export interface ContributionPoll extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    isEligibleToVote(
+      _address: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    nftAddress(overrides?: CallOverrides): Promise<[string]>;
+
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     pause(
@@ -630,6 +664,11 @@ export interface ContributionPoll extends BaseContract {
 
     setDaoTokenAddress(
       _daoTokenAddress: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    setNftAddress(
+      _nftAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -738,6 +777,13 @@ export interface ContributionPoll extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  isEligibleToVote(
+    _address: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  nftAddress(overrides?: CallOverrides): Promise<string>;
+
   owner(overrides?: CallOverrides): Promise<string>;
 
   pause(
@@ -771,6 +817,11 @@ export interface ContributionPoll extends BaseContract {
 
   setDaoTokenAddress(
     _daoTokenAddress: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  setNftAddress(
+    _nftAddress: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -877,6 +928,13 @@ export interface ContributionPoll extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    isEligibleToVote(
+      _address: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    nftAddress(overrides?: CallOverrides): Promise<string>;
+
     owner(overrides?: CallOverrides): Promise<string>;
 
     pause(overrides?: CallOverrides): Promise<void>;
@@ -906,6 +964,11 @@ export interface ContributionPoll extends BaseContract {
 
     setDaoTokenAddress(
       _daoTokenAddress: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setNftAddress(
+      _nftAddress: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1106,6 +1169,13 @@ export interface ContributionPoll extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    isEligibleToVote(
+      _address: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    nftAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     pause(
@@ -1139,6 +1209,11 @@ export interface ContributionPoll extends BaseContract {
 
     setDaoTokenAddress(
       _daoTokenAddress: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    setNftAddress(
+      _nftAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1258,6 +1333,13 @@ export interface ContributionPoll extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    isEligibleToVote(
+      _address: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    nftAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pause(
@@ -1291,6 +1373,11 @@ export interface ContributionPoll extends BaseContract {
 
     setDaoTokenAddress(
       _daoTokenAddress: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setNftAddress(
+      _nftAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
