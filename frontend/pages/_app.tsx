@@ -31,14 +31,15 @@ const MyApp = ({ Component, pageProps }: any) => {
 
 
     return <SafeHydrate>
-        {typeof window === 'undefined' ? windowErrorRender() :
-            !isMetaMaskInstalled() ? metamaskErrorRender() :
-                <div>
-                    <title>Englister DAO</title>
-                    <NetworkCheck />
-                    <Component {...pageProps} />
-                    <Footer />
-                </div>
+        {
+            typeof window === 'undefined' ? windowErrorRender() :
+                !isMetaMaskInstalled() ? metamaskErrorRender() :
+                    <div>
+                        <title>Englister DAO</title>
+                        <NetworkCheck />
+                        <Component {...pageProps} />
+                        <Footer />
+                    </div>
         }
     </SafeHydrate>
 }

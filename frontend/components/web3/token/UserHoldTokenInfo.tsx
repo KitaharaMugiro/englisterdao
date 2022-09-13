@@ -15,7 +15,13 @@ export default () => {
             </div>
             <div>
                 <p>あなたの保有ネイティブトークン: <b>{balance} MATIC</b></p>
-                <p>あなたの保有トークン数: <b>{yourBalance} {tokenSymbol}</b></p>
+                <p>
+                    あなたの保有トークン数: <b>{yourBalance} {tokenSymbol}</b>
+                    <span style={{ marginLeft: 5, fontSize: 10 }}>
+                        ウォレットにトークンが表示されない場合は<a href="https://button-hearing-b81.notion.site/ENG-d154290e262e4fcb828ec407add0fb5c">こちら</a>
+
+                    </span>
+                </p>
                 <p>あなたの保持割合: <b>{yourBalance / tokenTotalSupply * 100} %</b></p>
                 <p>あなたの保有トークン価値(ネイティブトークン換算): <b>{tokenRate * yourBalance} MATIC</b></p>
             </div>

@@ -5,8 +5,10 @@ import useDaoToken from "../hooks/useDaoToken"
 import useMetaMask from "../hooks/useMetaMask"
 
 export default () => {
+
     const { isWhiteListed, buy, price } = useDaoNFTCrowdSale()
     const { contractAddress, owned, metadata } = useDaoNFT()
+
     const { tokenSymbol, yourBalance } = useDaoToken()
     const [errorMessaage, setErrorMessage] = useState("")
     const { login } = useMetaMask()
@@ -24,9 +26,10 @@ export default () => {
     if (owned) {
         return <div>
             <h3>あなたは既にNFTを持っています</h3>
-            <p>コントラクトアドレス: {contractAddress}</p>
-            <div>{JSON.stringify(metadata)}</div>
-            <img src={metadata?.image || ""} />
+            <p>コントラクトアドレス: <b>{contractAddress}</b></p>
+            <p>名前: <b>{metadata?.name}</b></p>
+            <p>説明: <b>{metadata?.description}</b></p>
+            <img src={metadata?.image} width={600} height={600} />
         </div>
     }
     if (!isWhiteListed) {

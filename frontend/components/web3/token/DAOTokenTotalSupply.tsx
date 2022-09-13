@@ -14,7 +14,6 @@ export default () => {
                 <p>トークン名: <b>{tokenName}</b></p>
                 <p>総発行数: <b>{tokenTotalSupply} {tokenSymbol}</b></p>
                 <p>トークンコントラクトアドレス: {contractAddress}</p>
-                ウォレットにトークンが表示されない場合は<a href="https://button-hearing-b81.notion.site/ENG-d154290e262e4fcb828ec407add0fb5c">こちら</a>
             </div>
         </div>
 

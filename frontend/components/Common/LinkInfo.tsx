@@ -12,7 +12,7 @@ export default () => {
                 <br />
                 <a href="/poll">投票する</a>
                 <br />
-                <a href="/deposit">入出金する</a>
+                <a href="/withdraw">出金する</a>
             </div>
         </div>
     </div>

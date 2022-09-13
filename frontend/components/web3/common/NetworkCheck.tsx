@@ -1,5 +1,6 @@
 import useEth from "../../../hooks/useEth";
 import useMetaMask from "../../../hooks/useMetaMask";
+import style from "./NetworkCheck.module.css";
 
 export default () => {
     const { network } = useEth();
@@ -31,14 +32,23 @@ export default () => {
         }
     }
 
-    if (network !== expectedNetwork) {
-        return (
-            <div>
-                {network !== expectedNetwork && <div style={{ color: "red" }}>現在のネットワークは{network}です。{expectedNetwork}に変更してください。</div>}
-                {renderHowToChangeNetwork()}
+    if (network !== expectedNetwork && network && expectedNetwork) {
+        return <div className={style["modal"]} id="modal">
+            <a className={style["overlay"]}></a>
+            <div className={style["modal-wrapper"]}>
+                <div className={style["modal-contents"]}>
+                    <div className={style["modal-content"]}>
+                        {network !== expectedNetwork &&
+                            <div style={{ color: "red" }}>現在{network}のネットワークに接続しています。<br />
+                                MetaMaskの接続先を{expectedNetwork}に変更してください。</div>}
+                        {renderHowToChangeNetwork()}
+                    </div>
+                </div>
             </div>
-        );
+        </div>
+
     }
+
 
     return <div>
         {addressOrLogin()}

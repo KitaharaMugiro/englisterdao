@@ -29,6 +29,7 @@ export default () => {
         {renderCandidateButton()}
         <div style={{ color: "red" }}>{errorMessaage}</div>
         <br />
-        <a target="_blank" href="https://docs.google.com/spreadsheets/d/15ANGqCgZA8o-QjyjbsWrOiu9nJrAKvSnP54liTZr6t4">スプレッドシート</a>に必要事項を記入してから上記のボタンを押してください。
+        <a target="_blank" href="https://docs.google.com/spreadsheets/d/15ANGqCgZA8o-QjyjbsWrOiu9nJrAKvSnP54liTZr6t4">スプレッドシート</a>
+        に必要事項を記入してから上記のボタンを押してください！貢献内容は後から修正可能です。
     </div>
 }

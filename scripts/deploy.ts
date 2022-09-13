@@ -56,6 +56,8 @@ async function main() {
 
   await poll.setDaoTokenAddress(token.address);
   await poll.setPollAdminRole(owner.address);
+  await poll.setNftAddress(nft.address);
+  await poll.setRequiredTokenForVote(1);
 
   await tokenSupplySystem.setDAOTokenAddress(token.address);
   await tokenSupplySystem.setDAOTreasuryAddress(treasury.address);
