@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import { ethers } from "ethers";
-import artifact from "../src/abi/ContributionPoll.json";
-import { ContributionPoll } from "../types/ethers-contracts";
-import useMetaMask, { getContract, getContractWithSigner } from "./useMetaMask";
+import artifact from "../../src/abi/ContributionPoll.json";
+import { ContributionPoll } from "../../types/ethers-contracts";
+import useMetaMask, { getContract, getContractWithSigner } from "../web3/useMetaMask";
 
 
 export default () => {

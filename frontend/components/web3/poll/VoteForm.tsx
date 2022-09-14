@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import useGoogleSheets from "use-google-sheets"
-import useContributionPoll from "../../../hooks/useContributionPoll"
-import useMetaMask from "../../../hooks/useMetaMask"
+import useContributionPoll from "../../../hooks/dao/useContributionPoll"
+import useMetaMask from "../../../hooks/web3/useMetaMask"
 import { GOOGLE_API_KEY, GOOGLE_SHEETS_ID } from "../../../secret"
 
 interface Vote {
@@ -14,7 +14,7 @@ const CONTRIBUTION_KEY = "貢献内容(エビデンスURLがあると良い)"
 const ADRESS_KEY = "MetaMaskアドレス"
 export default () => {
     const { login } = useMetaMask()
-    const { candidates, vote, voters, completedVote } = useContributionPoll()
+    const { candidates, vote, voters, completedVote, isEligibleToVote } = useContributionPoll()
     const [errorMessaage, setErrorMessage] = useState("")
 
     const [votes, setVotes] = useState<Vote[]>([])
@@ -119,6 +119,12 @@ export default () => {
     }
 
     const renderVote = () => {
+        if (!isEligibleToVote) {
+            return <div>
+                <button disabled>投票</button>
+                <p style={{ color: "red", fontWeight: "bold" }}>投票に必要なメンバーシップ証を保有していません</p>
+            </div>
+        }
         if (completedVote) {
             return <button disabled>投票済み</button>
         }

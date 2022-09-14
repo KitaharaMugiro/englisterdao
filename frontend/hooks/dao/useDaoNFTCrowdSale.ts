@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import useMetaMask, { getContract, getContractWithSigner } from "./useMetaMask";
-import artifact from "../src/abi/DAONFTCrowdSale.json";
-import { DAONFTCrowdSale } from "../types/ethers-contracts/DAONFTCrowdSale";
+import artifact from "../../src/abi/DAONFTCrowdSale.json";
 import { ethers } from "ethers";
+import useMetaMask, { getContract, getContractWithSigner } from "../web3/useMetaMask";
+import { DAONFTCrowdSale } from "../../types/ethers-contracts";
 
 export default () => {
     const { address } = useMetaMask()

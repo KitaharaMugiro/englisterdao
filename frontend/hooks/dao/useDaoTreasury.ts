@@ -1,8 +1,8 @@
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
-import artifact from "../src/abi/DAOTreasury.json";
-import { DAOTreasury } from "../types/ethers-contracts";
-import useMetaMask, { getContract, getContractWithSigner } from "./useMetaMask";
+import artifact from "../../src/abi/DAOTreasury.json";
+import { DAOTreasury } from "../../types/ethers-contracts";
+import useMetaMask, { getContractWithSigner, getContract } from "../web3/useMetaMask";
 
 export default () => {
     const [tokenRate, setTokenRate] = useState(0);

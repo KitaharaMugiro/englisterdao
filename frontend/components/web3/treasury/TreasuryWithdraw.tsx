@@ -1,7 +1,6 @@
 import { useState } from "react"
-import useDaoToken from "../../../hooks/useDaoToken"
-import useDaoTreasury from "../../../hooks/useDaoTreasury"
-import UserHoldTokenInfo from "../token/UserHoldTokenInfo"
+import useDaoToken from "../../../hooks/dao/useDaoToken"
+import useDaoTreasury from "../../../hooks/dao/useDaoTreasury"
 
 export default () => {
     const [value, setValue] = useState("")

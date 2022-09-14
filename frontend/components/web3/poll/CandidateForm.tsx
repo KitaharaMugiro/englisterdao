@@ -1,6 +1,6 @@
 import { useState } from "react"
-import useContributionPoll from "../../../hooks/useContributionPoll"
-import useMetaMask from "../../../hooks/useMetaMask"
+import useContributionPoll from "../../../hooks/dao/useContributionPoll"
+import useMetaMask from "../../../hooks/web3/useMetaMask"
 
 export default () => {
     const { login } = useMetaMask()

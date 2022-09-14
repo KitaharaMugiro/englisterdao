@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useDaoToken from "../../../hooks/useDaoToken";
+import useDaoToken from "../../../hooks/dao/useDaoToken";
 import { InfoBox } from "../../style/InfoBox";
 
 export default () => {

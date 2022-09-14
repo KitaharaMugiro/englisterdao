@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import { ethers } from "ethers";
-import artifact from "../src/abi/DAOToken.json";
-import { DAOToken } from "../types/ethers-contracts/DAOToken";
-import useMetaMask, { getContract, getProvider } from "./useMetaMask";
+import artifact from "../../src/abi/DAOToken.json";
+import { DAOToken } from "../../types/ethers-contracts/DAOToken";
+import useMetaMask, { getContract } from "../web3/useMetaMask";
 
 export default () => {
     const [tokenName, setTokenName] = useState("");

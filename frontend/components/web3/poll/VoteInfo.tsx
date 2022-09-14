@@ -1,6 +1,6 @@
-import useContributionPollSetting from "../../../hooks/useContributionPollSetting"
-import useDaoNFT from "../../../hooks/useDaoNFT"
-import useDaoToken from "../../../hooks/useDaoToken"
+import useContributionPollSetting from "../../../hooks/dao/useContributionPollSetting"
+import useDaoNFT from "../../../hooks/dao/useDaoNFT"
+import useDaoToken from "../../../hooks/dao/useDaoToken"
 import { InfoBox } from "../../style/InfoBox"
 
 export default () => {
@@ -14,10 +14,6 @@ export default () => {
 
     const { tokenSymbol } = useDaoToken()
     const { owned } = useDaoNFT()
-
-    const isEgibleToVote = owned
-
-
     return <div>
         <h3>貢献度投票 第{pollId}回</h3>
         <div style={InfoBox}>
@@ -28,7 +24,6 @@ export default () => {
                 <div>
                     <p>投票: <b>{votingEnabled ? "受付中" : "停止中"}</b></p>
                     <p>DAOメンバーシップを持っている: <b>{owned ? "OK" : "NG"}</b></p>
-                    {isEgibleToVote ? <div /> : <p style={{ color: "red", fontWeight: "bold" }}>投票に必要なトークンを保有していません</p>}
                     <p>貢献者に配布されるトークン総額: <b>{CONTRIBUTOR_ASSIGNMENT_TOKEN} {tokenSymbol}</b></p>
                     <p>投票者に配布されるトークン総額: <b>{SUPPORTER_ASSIGNMENT_TOKEN} {tokenSymbol}</b></p>
                 </div>

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import artifact from "../src/abi/ContributionPoll.json";
-import { ContributionPoll } from "../types/ethers-contracts";
-import useMetaMask, { getContract, getContractWithSigner } from "./useMetaMask";
-
+import artifact from "../../src/abi/ContributionPoll.json";
+import { ContributionPoll } from "../../types/ethers-contracts";
+import useMetaMask, { getContract, getContractWithSigner } from "../web3/useMetaMask";
 
 export default () => {
     const [voters, setVoters] = useState<string[]>([]);
     const [pollId, setPollId] = useState<number | undefined>(undefined);
     const [candidates, setCandidates] = useState<string[]>([]);
+    const [isEligibleToVote, setIsEligibleToVote] = useState(false);
     const { address } = useMetaMask()
 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRIBUTIONPOLL_CONTRACT_ADDRESS as string
@@ -17,6 +17,10 @@ export default () => {
     useEffect(() => {
         contract.functions.pollId().then(id => setPollId(Number(id[0])));
         contract.functions.getCurrentCandidates().then(c => setCandidates(c[0]));
+        if (address) {
+            contract.functions.isEligibleToVote(address).then(e => setIsEligibleToVote(e[0]));
+
+        }
     }, [address]);
 
     useEffect(() => {
@@ -50,6 +54,7 @@ export default () => {
         settleCurrentPollAndCreateNewPoll: contractWithSigner.functions.settleCurrentPollAndCreateNewPoll,
         voters,
         completedVote,
-        completedCandidate
+        completedCandidate,
+        isEligibleToVote
     };
 }
