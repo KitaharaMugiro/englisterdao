@@ -65,6 +65,10 @@ contract DAONFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
         _safeMint(to, tokenId);
     }
 
+    function getLatestTokenId() public view returns (uint256) {
+        return _tokenIdCounter.current();
+    }
+
     function _beforeTokenTransfer(
         address from,
         address to,

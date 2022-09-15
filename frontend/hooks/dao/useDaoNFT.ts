@@ -16,7 +16,6 @@ export default () => {
     const [totalSupply, setTotalSupply] = useState(0)
     const [metadata, setMetadata] = useState<NftMetaData>()
 
-
     const contractAddress = process.env.NEXT_PUBLIC_DAONFT_CONTRACT_ADDRESS as string
     const contract = getContract(contractAddress, artifact.abi) as DAONFT
     const contractWithSigner = getContractWithSigner(contractAddress, artifact.abi) as DAONFT
@@ -24,24 +23,41 @@ export default () => {
     useEffect(() => {
         if (address) {
             contract.functions.balanceOf(address).then(t => {
-                setOwned(t[0].toNumber() > 0)
-            })
-            contract.functions.totalSupply().then(t => {
-                const totalSupply = t[0].toNumber()
-                setTotalSupply(totalSupply)
-                if (totalSupply > 0) {
-                    contract.functions.tokenURI(0).then(t => {
-                        fetch(t[0]).then(res => res.json()).then(t => setMetadata(t))
+                const _owned = t[0].toNumber() > 0
+                setOwned(_owned)
+                if (_owned) {
+                    contract.functions.tokenOfOwnerByIndex(address, 0).then(t => {
+                        const tokenId = t[0].toNumber()
+                        contract.functions.tokenURI(tokenId).then(t => {
+                            const uri = t[0]
+                            fetch(uri).then(res => res.json()).then(data => {
+                                setMetadata({
+                                    name: data.name,
+                                    description: data.description,
+                                    image: data.image,
+                                    tokenId
+                                })
+                            })
+                        })
                     })
                 }
+
             })
         }
 
     }, [address]);
 
+    useEffect(() => {
+        contract.functions.totalSupply().then(t => {
+            const totalSupply = t[0].toNumber()
+            setTotalSupply(totalSupply)
+        })
+    }, [])
+
     return {
         owned,
         contractAddress,
-        metadata
+        metadata,
+        totalSupply
     };
 }

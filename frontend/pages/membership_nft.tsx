@@ -25,25 +25,28 @@ export default () => {
 
     if (owned) {
         return <div>
+            <h2>Englister DAOメンバーシップ証を手に入れよう</h2>
             <h3>あなたは既にNFTを持っています</h3>
             <p>コントラクトアドレス: <b>{contractAddress}</b></p>
             <p>名前: <b>{metadata?.name}</b></p>
             <p>説明: <b>{metadata?.description}</b></p>
+            <p>シンボル: <b>EDM(Englister DAO Member)</b></p>
+            <p>No: <b>{metadata?.tokenId}</b></p>
             <img src={metadata?.image} width={300} height={300} />
         </div>
     }
     if (!isWhiteListed) {
         return <div>
             <h2>Englister DAOメンバーシップ証を手に入れよう</h2>
-            <img src={metadata?.image} width={200} height={200} />
+            {/* <img src={metadata?.image} width={200} height={200} /> */}
             <p>STEP1 500ENGを集める: {canBuy ? <span style={{ color: "green" }}>OK</span> : <span style={{ color: "red" }}>未達成</span>}</p>
             <p>STEP2 ホワイトリストに追加を依頼する (毎週金曜20:30-21:00の経営会議に参加する) : <span style={{ color: "red" }}>未達成</span></p>
         </div>
     }
     return (
         <div>
-            <h1>You are in white list!</h1>
-            <p>一度だけDAOメンバーシップを購入することができます</p>
+            <h1>You are in the white list!</h1>
+            <p>人生で一度だけDAOメンバーシップを購入することができます</p>
             <p>価格: <b>{price} {tokenSymbol}</b></p>
             <p>あなたの所持金: <b>{yourBalance} {tokenSymbol}</b></p>
             {canBuy ? <div /> : <div>購入するには所持金が足りません</div>}
