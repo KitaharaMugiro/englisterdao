@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import useDaoNFTCrowdSale from "../../hooks/useDaoNFTCrowdSale";
-import useMetaMask from "../../hooks/useMetaMask";
+import useDaoNFTCrowdSale from "../../hooks/dao/useDaoNFTCrowdSale";
+import useMetaMask from "../../hooks/web3/useMetaMask";
 
 export default () => {
     const { addToWhiteList, removeFromWhiteList, setPrice, price } = useDaoNFTCrowdSale()

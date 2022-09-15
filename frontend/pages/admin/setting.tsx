@@ -1,8 +1,7 @@
 import { ethers } from "ethers";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import useContributionPollSetting from "../../hooks/useContributionPollSetting";
-import useTokenSupplySystem from "../../hooks/useTokenSupplySystem";
+import useContributionPollSetting from "../../hooks/dao/useContributionPollSetting";
 
 
 export default () => {

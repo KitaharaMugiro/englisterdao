@@ -1,10 +1,11 @@
 import { useState } from "react"
-import useDaoTreasury from "../../../hooks/useDaoTreasury"
-import UserHoldTokenInfo from "../token/UserHoldTokenInfo"
+import useDaoToken from "../../../hooks/dao/useDaoToken"
+import useDaoTreasury from "../../../hooks/dao/useDaoTreasury"
 
 export default () => {
     const [value, setValue] = useState("")
-    const { withdrawEth, loading } = useDaoTreasury()
+    const { withdrawEth, loading, tokenRate } = useDaoTreasury()
+    const { yourBalance, tokenSymbol } = useDaoToken()
     const [errorMessaage, setErrorMessage] = useState("")
 
     const onClickDeposit = async () => {
@@ -16,10 +17,15 @@ export default () => {
     }
 
     return <div>
-        <h2>出金(出金したいDAOトークンを入力)</h2>
-        <input onChange={(e) => setValue(e.target.value)} value={value}></input>
+        <h2>出金</h2>
+        <input onChange={(e) => setValue(e.target.value)} value={value}></input> <b>{tokenSymbol}</b> (残高:{yourBalance} {tokenSymbol})
+        <br />
+        ↓
+        <br />
+        <input value={tokenRate * Number(value)}></input> <b>MATIC</b>
+        <br />
         <button onClick={onClickDeposit}>
-            {loading ? "Loading..." : "Withdraw"}
+            {loading ? "Loading..." : "交換する"}
         </button>
         <div style={{ color: "red" }}>{errorMessaage}</div>
     </div>

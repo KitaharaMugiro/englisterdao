@@ -29,16 +29,20 @@ const MyApp = ({ Component, pageProps }: any) => {
         );
     };
 
+    const render = () => {
+        return <div>
+            <NetworkCheck />
+            <Component {...pageProps} />
+            <Footer />
+        </div>
+    }
 
     return <SafeHydrate>
-        {typeof window === 'undefined' ? windowErrorRender() :
-            !isMetaMaskInstalled() ? metamaskErrorRender() :
-                <div>
-                    <title>Englister DAO</title>
-                    <NetworkCheck />
-                    <Component {...pageProps} />
-                    <Footer />
-                </div>
+        <title>Englister DAO(PoC)</title>
+        {
+            typeof window === 'undefined' ? windowErrorRender() :
+                !isMetaMaskInstalled() ? metamaskErrorRender() :
+                    render()
         }
     </SafeHydrate>
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useMetaMask from "../../../hooks/useMetaMask";
+import useMetaMask from "../../../hooks/web3/useMetaMask";
 
 export default () => {
     const { address, login } = useMetaMask()

@@ -1,4 +1,4 @@
-import useDaoTreasury from "../../../hooks/useDaoTreasury"
+import useDaoTreasury from "../../../hooks/dao/useDaoTreasury"
 import { InfoBox } from "../../style/InfoBox"
 
 export default () => {

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import useMetaMask from "../../hooks/useMetaMask";
-import useTokenSupplySystem from "../../hooks/useTokenSupplySystem";
+import useTokenSupplySystem from "../../hooks/dao/useTokenSupplySystem";
+import useMetaMask from "../../hooks/web3/useMetaMask";
 
 export default () => {
     const { login } = useMetaMask();

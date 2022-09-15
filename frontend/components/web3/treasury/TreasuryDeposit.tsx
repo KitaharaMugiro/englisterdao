@@ -1,5 +1,5 @@
 import { useState } from "react"
-import useDaoTreasury from "../../../hooks/useDaoTreasury"
+import useDaoTreasury from "../../../hooks/dao/useDaoTreasury"
 
 export default () => {
     const [value, setValue] = useState("")
