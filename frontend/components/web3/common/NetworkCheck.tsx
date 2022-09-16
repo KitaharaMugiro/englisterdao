@@ -41,6 +41,7 @@ export default () => {
                     method: 'wallet_switchEthereumChain',
                     params: [{ chainId: expectedNetworkChainId }],
                 });
+                window.location.reload();
             } catch (e: any) {
                 if (e.code === 4902) {
                     await (window as any).ethereum.request({
@@ -60,10 +61,9 @@ export default () => {
                             },
                         ],
                     });
+                    window.location.reload();
                 }
             }
-
-            window.location.reload();
         }
 
         if (network !== expectedNetwork && network && expectedNetwork) {
