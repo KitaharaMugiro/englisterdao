@@ -20,7 +20,7 @@ contract DAONFTCrowdSale is Ownable {
     }
 
     /**
-     * @notice Set DAOToken Address.
+     * @notice Set DAO NFT Address.
      */
     function setDAONftAddress(address _address) external onlyOwner {
         _daoNftAddress = _address;

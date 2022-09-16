@@ -34,6 +34,7 @@ export interface DAONFTInterface extends utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
+    "getLatestTokenId()": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
@@ -66,6 +67,7 @@ export interface DAONFTInterface extends utils.Interface {
       | "approve"
       | "balanceOf"
       | "getApproved"
+      | "getLatestTokenId"
       | "getRoleAdmin"
       | "grantRole"
       | "hasRole"
@@ -110,6 +112,10 @@ export interface DAONFTInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getLatestTokenId",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
@@ -214,6 +220,10 @@ export interface DAONFTInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getLatestTokenId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -431,6 +441,8 @@ export interface DAONFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getLatestTokenId(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getRoleAdmin(
       role: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -567,6 +579,8 @@ export interface DAONFT extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getLatestTokenId(overrides?: CallOverrides): Promise<BigNumber>;
+
   getRoleAdmin(
     role: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
@@ -702,6 +716,8 @@ export interface DAONFT extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getLatestTokenId(overrides?: CallOverrides): Promise<BigNumber>;
 
     getRoleAdmin(
       role: PromiseOrValue<BytesLike>,
@@ -910,6 +926,8 @@ export interface DAONFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getLatestTokenId(overrides?: CallOverrides): Promise<BigNumber>;
+
     getRoleAdmin(
       role: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -1048,6 +1066,8 @@ export interface DAONFT extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    getLatestTokenId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getRoleAdmin(
       role: PromiseOrValue<BytesLike>,
