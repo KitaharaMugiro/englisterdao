@@ -10,7 +10,7 @@ export default () => {
             <div>
                 <a href="/membership_nft">メンバーシップNFTを手に入れる(まずはここから)</a>
                 <br />
-                <a href="/poll">投票する</a>
+                <a href="/poll">投票する / 立候補する</a>
                 <br />
                 <a href="/withdraw">出金する</a>
             </div>

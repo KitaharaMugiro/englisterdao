@@ -24,6 +24,7 @@ describe("TokenSupplySystem", function () {
         await tokenSupplySystem.setDAOTokenAddress(token.address);
         await tokenSupplySystem.setDAOTreasuryAddress(treasury.address);
         await token.setupMinterRole(tokenSupplySystem.address);
+        await token.setupBurnerRole(tokenSupplySystem.address)
         await token.setupBurnerRole(treasury.address)
         await treasury.setDAOTokenAddress(token.address);
 
@@ -44,6 +45,22 @@ describe("TokenSupplySystem", function () {
             const expectedBalance = ethers.utils.parseEther("10");
             await tokenSupplySystem.mint(expectedBalance);
             expect(await tokenSupplySystem.unclaimedBalance()).to.equal(expectedBalance);
+        });
+    });
+
+    describe("burn", function () {
+        it("コントラクトに保持されているトークンをバーンできる", async function () {
+            const { tokenSupplySystem } = await loadFixture(deployFixture);
+            const expectedBalance = ethers.utils.parseEther("10");
+            await tokenSupplySystem.mint(expectedBalance);
+            await tokenSupplySystem.burn(expectedBalance);
+            expect(await tokenSupplySystem.unclaimedBalance()).to.equal(0);
+        });
+
+        it("コントラクトにないトークンはバーンできない", async function () {
+            const { tokenSupplySystem } = await loadFixture(deployFixture);
+            const expectedBalance = ethers.utils.parseEther("10");
+            await expect(tokenSupplySystem.burn(expectedBalance)).to.revertedWith("ERC20: burn amount exceeds balance")
         });
     });
 

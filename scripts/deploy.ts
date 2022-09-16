@@ -51,6 +51,7 @@ async function main() {
   await token.setupMinterRole(poll.address);
   await token.setupMinterRole(tokenSupplySystem.address);
   await token.setupBurnerRole(nftCrowdSale.address);
+  await token.setupBurnerRole(tokenSupplySystem.address);
 
   await treasury.setDAOTokenAddress(token.address);
 

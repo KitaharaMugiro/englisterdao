@@ -4,12 +4,13 @@ import useMetaMask from "../../hooks/web3/useMetaMask";
 
 export default () => {
     const { login } = useMetaMask();
-    const { payAndPayWithNative, unclaimedBalance, mint } = useTokenSupplySystem()
+    const { payAndPayWithNative, unclaimedBalance, mint, burn } = useTokenSupplySystem()
     const [address, setAddress] = useState("")
     const [amount, setAmount] = useState("")
     const [nativeAmount, setNativeAmount] = useState("")
     const [fee, setFee] = useState("")
     const [mintAmount, setMintAmount] = useState("")
+    const [burnAmount, setBurnAmount] = useState("")
     const total = Number(amount) + Number(nativeAmount) + Number(fee)
     const [errorMessaage, setErrorMessage] = useState("")
 
@@ -32,6 +33,15 @@ export default () => {
 
     }
 
+    const onBurn = async () => {
+        try {
+            await login()
+            await burn(Number(burnAmount))
+        } catch (e: any) {
+            setErrorMessage(e.message)
+        }
+    }
+
     return <div>
         <div>
             Unclaimed Balance: {unclaimedBalance}
@@ -39,6 +49,12 @@ export default () => {
             <input onChange={(e) => setMintAmount(e.target.value)} value={mintAmount}></input>
             <button onClick={onMint}>
                 Mint
+            </button>
+
+            <h2>Burn(BurnしたいDAOトークンを入力)</h2>
+            <input onChange={(e) => setBurnAmount(e.target.value)} value={burnAmount}></input>
+            <button onClick={onBurn}>
+                Burn
             </button>
         </div>
 
@@ -54,5 +70,5 @@ export default () => {
         <button onClick={onSend}>送金</button>
 
         <div style={{ color: "red" }}>{errorMessaage}</div>
-    </div>;
+    </div>
 }

@@ -30,6 +30,7 @@ import type {
 export interface TokenSupplySystemInterface extends utils.Interface {
   functions: {
     "batchPay(address[],uint256[],uint256[])": FunctionFragment;
+    "burn(uint256)": FunctionFragment;
     "daoTokenAddress()": FunctionFragment;
     "daoTreasuryAddress()": FunctionFragment;
     "mint(uint256)": FunctionFragment;
@@ -48,6 +49,7 @@ export interface TokenSupplySystemInterface extends utils.Interface {
   getFunction(
     nameOrSignatureOrTopic:
       | "batchPay"
+      | "burn"
       | "daoTokenAddress"
       | "daoTreasuryAddress"
       | "mint"
@@ -70,6 +72,10 @@ export interface TokenSupplySystemInterface extends utils.Interface {
       PromiseOrValue<BigNumberish>[],
       PromiseOrValue<BigNumberish>[]
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "burn",
+    values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "daoTokenAddress",
@@ -132,6 +138,7 @@ export interface TokenSupplySystemInterface extends utils.Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "batchPay", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "daoTokenAddress",
     data: BytesLike
@@ -244,6 +251,11 @@ export interface TokenSupplySystem extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    burn(
+      value: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     daoTokenAddress(overrides?: CallOverrides): Promise<[string]>;
 
     daoTreasuryAddress(overrides?: CallOverrides): Promise<[string]>;
@@ -308,6 +320,11 @@ export interface TokenSupplySystem extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  burn(
+    value: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   daoTokenAddress(overrides?: CallOverrides): Promise<string>;
 
   daoTreasuryAddress(overrides?: CallOverrides): Promise<string>;
@@ -369,6 +386,11 @@ export interface TokenSupplySystem extends BaseContract {
       _to: PromiseOrValue<string>[],
       _amount: PromiseOrValue<BigNumberish>[],
       _fee: PromiseOrValue<BigNumberish>[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    burn(
+      value: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -452,6 +474,11 @@ export interface TokenSupplySystem extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    burn(
+      value: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     daoTokenAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     daoTreasuryAddress(overrides?: CallOverrides): Promise<BigNumber>;
@@ -514,6 +541,11 @@ export interface TokenSupplySystem extends BaseContract {
       _to: PromiseOrValue<string>[],
       _amount: PromiseOrValue<BigNumberish>[],
       _fee: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    burn(
+      value: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

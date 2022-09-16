@@ -24,6 +24,11 @@ export default () => {
         await contractWithSigner.functions.mint(amount)
     }
 
+    const _burn = async (_amount: number) => {
+        const amount = ethers.utils.parseEther(_amount.toString());
+        await contractWithSigner.functions.burn(amount)
+    }
+
     const _payAndPayWithNative = async (
         address: string,
         _amount: number,
@@ -40,6 +45,7 @@ export default () => {
     return {
         payAndPayWithNative: _payAndPayWithNative,
         mint: _mint,
-        unclaimedBalance
+        unclaimedBalance,
+        burn: _burn,
     };
 }

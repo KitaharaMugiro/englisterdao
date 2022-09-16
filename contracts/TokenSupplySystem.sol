@@ -41,6 +41,13 @@ contract TokenSupplySystem is Ownable, Pausable, ReentrancyGuard {
         DAOToken(daoTokenAddress).mint(address(this), value);
     }
 
+    /**
+     * @notice burn the dao token inside this contract.
+     */
+    function burn(uint256 value) external onlyOwner {
+        DAOToken(daoTokenAddress).burn(address(this), value);
+    }
+
     function _pay(
         address _to,
         uint256 _amount,

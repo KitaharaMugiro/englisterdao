@@ -68,8 +68,9 @@ export default () => {
 
         if (network !== expectedNetwork && network && expectedNetwork) {
             chengeNetworkRequest()
+            return
         }
-    }, [expectedNetwork, network, expectedNetwork])
+    }, [expectedNetwork, network, expectedNetwork, address])
 
     if (network !== expectedNetwork && network && expectedNetwork) {
         return <div className={style["modal"]} id="modal">
