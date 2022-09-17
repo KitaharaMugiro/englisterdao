@@ -53,7 +53,7 @@ export default () => {
             <tbody>
                 <tr>
                     <td>{info.name}</td>
-                    <td>{info.contribution}</td>
+                    <td style={{ whiteSpace: "pre-wrap" }}>{info.contribution}</td>
                     <td>{info.address}</td>
                 </tr>
             </tbody>
