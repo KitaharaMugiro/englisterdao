@@ -15,7 +15,7 @@ describe("DAONFT", function () {
         const NAME = "EnglisterDAOMembership"
         const SYMBOL = "EDM"
         const BASE_URI = "https://raw.githubusercontent.com/KitaharaMugiro/englisterdao/main/contracts/metadata/daonft/"
-        const nft = await DaoNft.deploy(NAME, SYMBOL, BASE_URI) as DAONFT;
+        const nft = await DaoNft.deploy(NAME, SYMBOL) as DAONFT;
 
         const DaoNftCrowdSale = await ethers.getContractFactory("DAONFTCrowdSale");
         const nftCrowdSale = await DaoNftCrowdSale.deploy();
@@ -25,6 +25,8 @@ describe("DAONFT", function () {
 
         await nft.setupMinterRole(nftCrowdSale.address);
         await token.setupBurnerRole(nftCrowdSale.address);
+
+        await nft.setBaseURI(BASE_URI);
 
         return { nft, nftCrowdSale, token, owner, otherAccount, otherAccount2 };
     }

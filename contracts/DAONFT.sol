@@ -15,12 +15,9 @@ contract DAONFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
     Counters.Counter private _tokenIdCounter;
     string private _baseTokenURI;
 
-    constructor(
-        string memory _tokenName,
-        string memory _tokenSymbol,
-        string memory __baseTokenURI
-    ) ERC721(_tokenName, _tokenSymbol) {
-        _baseTokenURI = __baseTokenURI;
+    constructor(string memory _tokenName, string memory _tokenSymbol)
+        ERC721(_tokenName, _tokenSymbol)
+    {
         _grantRole(MINTER_ROLE, msg.sender);
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
@@ -37,6 +34,14 @@ contract DAONFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
         // example:
         // https://raw.githubusercontent.com/KitaharaMugiro/englisterdao/main/contracts/metadata/daonft/
         return _baseTokenURI;
+    }
+
+    function setBaseURI(string memory _newBaseTokenURI) public {
+        require(
+            hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
+            "DAONFT: must have admin role to set base URI"
+        );
+        _baseTokenURI = _newBaseTokenURI;
     }
 
     function pause() public {

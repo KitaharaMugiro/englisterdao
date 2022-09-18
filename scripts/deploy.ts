@@ -36,7 +36,7 @@ async function main() {
   const NFT_NAME = "EnglisterDAOMembership"
   const NFT_SYMBOL = "EDM"
   const BASE_URI = "https://raw.githubusercontent.com/KitaharaMugiro/englisterdao/main/contracts/metadata/daonft/"
-  const nft = await DaoNft.deploy(NFT_NAME, NFT_SYMBOL, BASE_URI);
+  const nft = await DaoNft.deploy(NFT_NAME, NFT_SYMBOL);
   await nft.deployed();
   console.log("DAONFT deployed to", nft.address);
 
@@ -76,6 +76,9 @@ async function main() {
 
   console.log("nft price setting")
   await nftCrowdSale.setPrice(ethers.utils.parseEther("500"));
+
+  console.log("set BaseUri")
+  await nft.setBaseURI(BASE_URI)
 }
 
 // We recommend this pattern to be able to use async/await everywhere

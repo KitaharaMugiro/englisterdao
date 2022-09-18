@@ -24,7 +24,7 @@ describe("ContributionPoll", function () {
 
         // Deploy NFT
         const DaoNft = await ethers.getContractFactory("DAONFT");
-        const nft = await DaoNft.deploy(NAME, SYMBOL, "https://raw.githubusercontent.com/KitaharaMugiro/englisterdao/main/contracts/metadata/daonft/");
+        const nft = await DaoNft.deploy(NAME, SYMBOL);
 
         // 権限設定
         await poll.setPollAdminRole(owner.address);

@@ -50,13 +50,17 @@ Etherscan上でソースコードを確認できるようになる
 
 例(ネットワーク名、コントラクトアドレス、初期値は適切に変更すること)
 ```
-npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network maticmum 0x5427aC1c36c560D602D41dD0F2609DB296dd3CF9 Englister ENG 0
+npx hardhat verify --contract contracts/DAOToken.sol:DAOToken --network polygon 0x5427aC1c36c560D602D41dD0F2609DB296dd3CF9 Englister ENG 0
 
-npx hardhat verify --contract contracts/DAOTreasury.sol:DAOTreasury --network maticmum 0x80CF3dEdf0F03441bd47037Dfa8640eF9f35626a 
+npx hardhat verify --contract contracts/DAOTreasury.sol:DAOTreasury --network polygon 0x80CF3dEdf0F03441bd47037Dfa8640eF9f35626a 
 
-npx hardhat verify --contract contracts/ContributionPoll.sol:ContributionPoll --network maticmum 0x7674214b5daedb9069D55e6F6C47F2c936E47d1B 
+npx hardhat verify --contract contracts/ContributionPoll.sol:ContributionPoll --network polygon 0x7674214b5daedb9069D55e6F6C47F2c936E47d1B 
 
-npx hardhat verify --contract contracts/TokenSupplySystem.sol:TokenSupplySystem --network maticmum 0x77F78729699342EdB653553525570aE2c4F6B98B 
+npx hardhat verify --contract contracts/TokenSupplySystem.sol:TokenSupplySystem --network polygon 0x77F78729699342EdB653553525570aE2c4F6B98B 
+
+npx hardhat verify --contract contracts/DAONFT.sol:DAONFT --network polygon 0x77F78729699342EdB653553525570aE2c4F6B98B EnglisterDAOMembership EDM
+
+npx hardhat verify --contract contracts/DAONFTCrowdSale.sol:DAONFTCrowdSale --network polygon 0x77F78729699342EdB653553525570aE2c4F6B98B 
 ```
 
 
