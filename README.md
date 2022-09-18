@@ -34,11 +34,16 @@ npx hardhat run scripts/demo/candidate.ts --network localhost
 .envファイルを作成して適切な値を入れたのち、以下のコマンドでデプロイを実行
 
 ```
+export PRIVATE_KEY=<ウォレットの秘密鍵を入れる>
+
 # Goerliへのデプロイ
 npx hardhat run scripts/deploy.ts --network goerli 
 
 # Mumbaiへのデプロイ
 npx hardhat run scripts/deploy.ts --network maticmum
+
+# Polygon Mainnetへのデプロイ
+npx hardhat run scripts/deploy.ts --network polygon
 ```
 # EtherscanでVerifyする
 Etherscan上でソースコードを確認できるようになる

@@ -47,27 +47,34 @@ async function main() {
 
 
   // 権限設定
+  console.log("token permission setting");
   await token.setupBurnerRole(treasury.address);
   await token.setupMinterRole(poll.address);
   await token.setupMinterRole(tokenSupplySystem.address);
   await token.setupBurnerRole(nftCrowdSale.address);
   await token.setupBurnerRole(tokenSupplySystem.address);
 
+  console.log("treasury permission setting");
   await treasury.setDAOTokenAddress(token.address);
 
+  console.log("poll permission setting");
   await poll.setDaoTokenAddress(token.address);
   await poll.setPollAdminRole(owner.address);
   await poll.setNftAddress(nft.address);
   await poll.setRequiredTokenForVote(1);
 
+  console.log("tokenSupplySystem permission setting");
   await tokenSupplySystem.setDAOTokenAddress(token.address);
   await tokenSupplySystem.setDAOTreasuryAddress(treasury.address);
 
+  console.log("nftCorwdSale permission setting");
   await nftCrowdSale.setDAOTokenAddress(token.address);
   await nftCrowdSale.setDAONftAddress(nft.address);
 
+  console.log("nft permission setting");
   await nft.setupMinterRole(nftCrowdSale.address);
 
+  console.log("nft price setting")
   await nftCrowdSale.setPrice(ethers.utils.parseEther("500"));
 }
 

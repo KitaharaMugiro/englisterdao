@@ -31,6 +31,10 @@ describe("ContributionPoll", function () {
         await token.setupMinterRole(poll.address);
         await poll.setDaoTokenAddress(token.address);
         await poll.setNftAddress(nft.address);
+
+        //設定値
+        await poll.setContributorAssignmentToken(ethers.utils.parseEther("5000"));
+        await poll.setSupporterAssignmentToken(ethers.utils.parseEther("3000"));
         return { token, poll, nft, owner, otherAccount, otherAccount2 };
     }
 

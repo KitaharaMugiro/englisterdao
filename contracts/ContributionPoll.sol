@@ -44,7 +44,7 @@ contract ContributionPoll is
 
     // 立候補者(貢献者)に割り当てられるDAOトークンの総数
     // total amount of DAO tokens to be distributed to candidates(contributors)
-    uint256 public CONTRIBUTOR_ASSIGNMENT_TOKEN = 5000 * (10**18);
+    uint256 public CONTRIBUTOR_ASSIGNMENT_TOKEN = 7000 * (10**18);
 
     // 投票者に割り当てられるDAOトークンの総数
     // total amount of DAO tokens to be distributed to voters

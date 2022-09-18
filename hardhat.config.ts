@@ -6,6 +6,10 @@ require('dotenv').config();
 
 // hardhat-gas-reporter
 const COINMARKETCAP = process.env.COINMARKETCAP || ''
+let PRIVATE_KEY = process.env.PRIVATE_KEY
+if (PRIVATE_KEY?.length !== 66) {
+  PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000000'
+}
 const config: HardhatUserConfig = {
   solidity: "0.8.9",
   defaultNetwork: "hardhat",
@@ -21,11 +25,15 @@ const config: HardhatUserConfig = {
     },
     goerli: {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-      accounts: [`${process.env.PRIVATE_KEY}`]
+      accounts: [PRIVATE_KEY],
     },
     maticmum: {
       url: "https://rpc-mumbai.maticvigil.com",
-      accounts: [`${process.env.PRIVATE_KEY}`]
+      accounts: [PRIVATE_KEY]
+    },
+    polygon: {
+      url: "https://polygon-rpc.com",
+      accounts: [PRIVATE_KEY]
     }
   },
 
