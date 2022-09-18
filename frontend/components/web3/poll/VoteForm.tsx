@@ -18,6 +18,8 @@ export default () => {
     const [errorMessaage, setErrorMessage] = useState("")
 
     const [votes, setVotes] = useState<Vote[]>([])
+    //0以上のポイントをつけていることが投票に必要
+    const voteIsGreaterThanZero = votes.filter((v) => v.point > 0).length > 0
 
     const { data, loading, error } = useGoogleSheets({
         apiKey: GOOGLE_API_KEY,
@@ -128,7 +130,7 @@ export default () => {
         if (completedVote) {
             return <button disabled>投票済み</button>
         }
-        return <button onClick={onClickVote}>投票</button>
+        return <button disabled={!voteIsGreaterThanZero} onClick={onClickVote}>投票</button>
     }
 
     return <div>
