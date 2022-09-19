@@ -29,9 +29,8 @@ export default () => {
     });
     const onSubmitRequiredTokenForVote = handleSubmit(data => {
         setRequiredTokenForVote(
-            ethers.utils.parseEther(
-                data.requiredTokenForVote
-            ))
+            data.requiredTokenForVote
+        )
     });
     const onSubmitContributorAssignmentToken = handleSubmit(data => {
         setContributorAssignmentToken(

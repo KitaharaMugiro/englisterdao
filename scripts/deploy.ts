@@ -49,36 +49,53 @@ async function main() {
   // 権限設定
   console.log("token permission setting");
   await token.setupBurnerRole(treasury.address);
+  console.log("token permission setting done");
   await token.setupMinterRole(poll.address);
+  console.log("token permission setting done");
   await token.setupMinterRole(tokenSupplySystem.address);
+  console.log("token permission setting done");
   await token.setupBurnerRole(nftCrowdSale.address);
+  console.log("token permission setting done");
   await token.setupBurnerRole(tokenSupplySystem.address);
+  console.log("token permission setting done");
 
   console.log("treasury permission setting");
   await treasury.setDAOTokenAddress(token.address);
+  console.log("treasury permission setting done");
 
   console.log("poll permission setting");
   await poll.setDaoTokenAddress(token.address);
+  console.log("poll permission setting done");
   await poll.setPollAdminRole(owner.address);
+  console.log("poll permission setting done");
   await poll.setNftAddress(nft.address);
+  console.log("poll permission setting done");
   await poll.setRequiredTokenForVote(1);
+  console.log("poll permission setting done");
 
   console.log("tokenSupplySystem permission setting");
   await tokenSupplySystem.setDAOTokenAddress(token.address);
+  console.log("tokenSupplySystem permission setting done");
   await tokenSupplySystem.setDAOTreasuryAddress(treasury.address);
+  console.log("tokenSupplySystem permission setting done");
 
   console.log("nftCorwdSale permission setting");
   await nftCrowdSale.setDAOTokenAddress(token.address);
+  console.log("nftCorwdSale permission setting done");
   await nftCrowdSale.setDAONftAddress(nft.address);
+  console.log("nftCorwdSale permission setting done");
 
   console.log("nft permission setting");
   await nft.setupMinterRole(nftCrowdSale.address);
+  console.log("nft permission setting done");
 
   console.log("nft price setting")
   await nftCrowdSale.setPrice(ethers.utils.parseEther("500"));
+  console.log("nft price setting done")
 
   console.log("set BaseUri")
   await nft.setBaseURI(BASE_URI)
+  console.log("set BaseUri done")
 }
 
 // We recommend this pattern to be able to use async/await everywhere

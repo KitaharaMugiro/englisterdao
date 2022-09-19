@@ -28,7 +28,7 @@ export default () => {
             if (n.name === "unknown") setNetwork("Unknown")
             else if (n.name === "maticmum") setNetwork("Mumbai")
             else if (n.name === "homestead") setNetwork("Mainnet")
-            else if (n.name === "matic") setNetwork("Matic")
+            else if (n.name === "matic") setNetwork("Polygon Mainnet")
             else setNetwork(n.name)
         }
         )

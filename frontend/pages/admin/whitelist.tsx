@@ -1,3 +1,4 @@
+import { ethers } from "ethers";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import useDaoNFTCrowdSale from "../../hooks/dao/useDaoNFTCrowdSale";
@@ -31,7 +32,7 @@ export default () => {
     const onSubmitSetPrice = handleSubmit(async data => {
         try {
             await login()
-            setPrice(data.price)
+            setPrice(ethers.utils.parseEther(data.price))
         } catch (e: any) {
             setErrorMessage(e.message)
         }

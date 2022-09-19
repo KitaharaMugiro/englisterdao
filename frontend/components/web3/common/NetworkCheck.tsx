@@ -13,7 +13,7 @@ export default () => {
             return <div>
                 接続方法は<a target="_blank" href="https://button-hearing-b81.notion.site/Polygon-Mumbai-a2c0d728603044359f5a820db5f07636">こちら</a>を参照してください。
             </div>
-        } else if (expectedNetwork === "Matic") {
+        } else if (expectedNetwork === "Polygon Mainnet") {
             return <div>
                 接続方法は<a target="_blank" href="https://button-hearing-b81.notion.site/Polygon-fd2333b6919343fcaf32a54a83562727">こちら</a>を参照してください。
             </div>
@@ -52,7 +52,7 @@ export default () => {
                                 rpcUrl: (() => {
                                     if (expectedNetwork === "Mumbai") {
                                         return "https://rpc-mumbai.maticvigil.com/";
-                                    } else if (expectedNetwork === "Matic") {
+                                    } else if (expectedNetwork === "Polygon Mainnet") {
                                         return "https://polygon-rpc.com/";
                                     } else if (expectedNetwork === "Unknown") {
                                         return "http://localhost:8545";
